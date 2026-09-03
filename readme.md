@@ -26,3 +26,10 @@ Kemudian buka `http://localhost:8889` di browser.
 - `assets/audio/benar.mp3` — efek suara jawaban benar
 - `assets/audio/salah.mp3` — efek suara jawaban salah
 - `netlify.toml` — konfigurasi publikasi dan cache audio
+
+## Support By
+
+ -XCODEX-
+ -TESTER_HIDES
+ -KANG_ALIF
+ 
