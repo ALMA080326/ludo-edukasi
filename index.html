@@ -45,23 +45,6 @@
         }
         .finish-text { font-size: 1.05em; color: #333; line-height: 1.55; }
         .finish-text strong { color: #16324f; }
-
-        /* Papan diperkecil jadi 10 kotak: override grid bawaan game.css
-           (yang dibuat untuk papan 64 kotak) supaya kotak tersusun rapi
-           dalam satu jalur lurus, dan tetap membungkus rapi di layar sempit. */
-        #boardGrid {
-            display: grid !important;
-            grid-template-columns: repeat(5, 1fr) !important;
-            grid-template-rows: repeat(2, 1fr) !important;
-            gap: 10px !important;
-            width: 100% !important;
-            aspect-ratio: auto !important;
-        }
-        #boardGrid .cell {
-            width: auto !important;
-            height: auto !important;
-            aspect-ratio: 1 / 1 !important;
-        }
     </style>
 </head>
 <body>
@@ -378,10 +361,6 @@
         };
 
         const groups = ['red', 'blue', 'yellow', 'green', 'purple'];
-        // Ukuran papan: jumlah kotak dari START (0) sampai FINISH.
-        // Kotak terakhir (index BOARD_SIZE - 1) adalah kotak FINISH.
-        const BOARD_SIZE = 10;
-        const FINISH_INDEX = BOARD_SIZE - 1;
         // Permainan otomatis selesai begitu 3 kelompok (Juara 1, 2, 3) mencapai FINISH,
         // kelompok yang belum sampai tidak perlu menyelesaikan papan.
         const WINNERS_NEEDED = Math.min(3, groups.length);
@@ -430,12 +409,12 @@
             const boardGrid = document.getElementById('boardGrid');
             boardGrid.innerHTML = '';
             
-            for (let i = 0; i < BOARD_SIZE; i++) {
+            for (let i = 0; i < 64; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
                 cell.id = `cell-${i}`;
                 
-                if (i === FINISH_INDEX) {
+                if (i === 63) {
                     cell.classList.add('finish');
                     cell.innerHTML = '<div class="finish-mark">FIN</div>';
                 } else {
@@ -832,12 +811,12 @@ function showReadingCountdown(seconds = 2) {
             const currentGroup = getCurrentGroup();
             let newPosition = gameState.positions[currentGroup] + gameState.diceValue;
             
-            if (newPosition >= BOARD_SIZE) {
-                // Bug fix: posisi HARUS dibatasi ke FINISH_INDEX (kotak FIN) untuk kelompok
-                // manapun yang sampai finish, bukan hanya kelompok ke-3. Sebelumnya posisi
-                // bisa melebihi batas papan sehingga cell tujuan tidak ditemukan dan pion
+            if (newPosition >= 64) {
+                // Bug fix: posisi HARUS dibatasi ke 63 (kotak FIN) untuk kelompok manapun
+                // yang sampai finish, bukan hanya kelompok ke-3. Sebelumnya posisi bisa
+                // melebihi 63 (mis. 65), sehingga cell-65 tidak ditemukan dan pion
                 // menghilang dari papan.
-                newPosition = FINISH_INDEX;
+                newPosition = 63;
 
                 const alreadyFinished = gameState.finishOrder.includes(currentGroup);
                 if (!alreadyFinished) {
