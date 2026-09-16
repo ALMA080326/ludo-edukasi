@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alur Pembelajaran Ludo Edukasi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+        .section { display: none; animation: fadeIn 0.4s; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        h1 { color: #2c3e50; }
+        h2 { color: #34495e; border-bottom: 2px solid #3498db; display: inline-block; padding-bottom: 5px; }
+        p, li { font-size: 16px; line-height: 1.6; text-align: left; }
+        .nav-buttons { margin-top: 30px; display: flex; justify-content: space-between; }
+        button, .btn {
+            background-color: #3498db; color: white; border: none; padding: 10px 20px;
+            border-radius: 8px; font-size: 16px; cursor: pointer; text-decoration: none; font-weight: bold;
+        }
+        button:hover, .btn:hover { background-color: #2980b9; }
+        .btn-secondary { background-color: #95a5a6; }
+        .btn-secondary:hover { background-color: #7f8c8d; }
+        .btn-action { background-color: #27ae60; margin-top: 15px; display: inline-block; }
+        .btn-action:hover { background-color: #2ecc71; }
+        iframe { width: 100%; height: 400px; border: none; border-radius: 8px; margin-top: 15px; background: #eee; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 1. Halaman Utama -->
+        <div id="sec-utama" class="section active">
+            <h1>🎲 Website Ludo Edukasi</h1>
+            <p style="text-align: center;">Selamat datang di platform pembelajaran interaktif berbasis Ludo. Mari belajar sambil bermain!</p>
+            <br>
+            <button onclick="navigasi('sec-tujuan')">Mulai Belajar 🚀</button>
+        </div>
+
+        <!-- 2. Tujuan Pembelajaran -->
+        <div id="sec-tujuan" class="section">
+            <h2>🎯 Tujuan Pembelajaran</h2>
+            <ul>
+                <li>Memahami konsep dasar materi dengan baik.</li>
+                <li>Mampu memecahkan masalah melalui studi kasus di dalam permainan.</li>
+                <li>Meningkatkan kerja sama tim dan ketangkasan berpikir.</li>
+            </ul>
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="navigasi('sec-utama')">⬅ Sebelumnya</button>
+                <button onclick="navigasi('sec-materi')">Selanjutnya ➡</button>
+            </div>
+        </div>
+
+        <!-- 3. Materi & PPT -->
+        <div id="sec-materi" class="section">
+            <h2>📚 Materi & PPT</h2>
+            <p>Silakan pelajari materi berikut sebelum memulai permainan:</p>
+            <!-- Ganti URL src di bawah dengan link semat (embed) dari Google Slides Anda -->
+            <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQ.../embed?start=false&loop=false&delayms=3000" allowfullscreen></iframe>
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="navigasi('sec-tujuan')">⬅ Sebelumnya</button>
+                <button onclick="navigasi('sec-ludo')">Selanjutnya ➡</button>
+            </div>
+        </div>
+
+        <!-- 4. Permainan Ludo -->
+        <div id="sec-ludo" class="section">
+            <h2>🎲 Permainan Ludo</h2>
+            <p style="text-align: center;">Waktunya bermain! Terapkan materi yang sudah dipelajari di papan Ludo Edukasi.</p>
+            <a href="game.html" target="_blank" class="btn btn-action">Buka Game Ludo Terpisah 🎮</a>
+            <p style="font-size: 12px; color: #7f8c8d; text-align: center; margin-top: 10px;">(Game akan terbuka di tab baru)</p>
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="navigasi('sec-materi')">⬅ Sebelumnya</button>
+                <button onclick="navigasi('sec-rebutan')">Selanjutnya ➡</button>
+            </div>
+        </div>
+
+        <!-- 5. Babak Rebutan -->
+        <div id="sec-rebutan" class="section">
+            <h2>⚡ Babak Rebutan</h2>
+            <p style="text-align: center;">Bersiaplah! Guru akan membacakan soal tantangan. Kelompok tercepat yang mengangkat tangan boleh menjawab.</p>
+            <h1 style="font-size: 50px; margin: 20px 0;">🙋‍♂️🙋‍♀️</h1>
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="navigasi('sec-ludo')">⬅ Sebelumnya</button>
+                <button onclick="navigasi('sec-kuis')">Selanjutnya ➡</button>
+            </div>
+        </div>
+
+        <!-- 6. Kuis Individu -->
+        <div id="sec-kuis" class="section">
+            <h2>📝 Kuis Individu</h2>
+            <p style="text-align: center;">Uji pemahaman mandiri Anda melalui platform Wayground.</p>
+            <!-- Ganti href dengan link kuis Wayground Anda -->
+            <a href="https://link-wayground-anda.com" target="_blank" class="btn btn-action">Kerjakan Kuis di Wayground ✍️</a>
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="navigasi('sec-rebutan')">⬅ Sebelumnya</button>
+                <button onclick="navigasi('sec-refleksi')">Selanjutnya ➡</button>
+            </div>
+        </div>
+
+        <!-- 7. Refleksi -->
+        <div id="sec-refleksi" class="section">
+            <h2>💭 Refleksi Pembelajaran</h2>
+            <p style="text-align: center;">Bagaimana perasaanmu belajar hari ini? Yuk isi form refleksi di bawah ini.</p>
+            <!-- Ganti href dengan link Google Form Anda -->
+            <a href="https://forms.gle/link-google-form-anda" target="_blank" class="btn btn-action">Isi Google Form Refleksi 📋</a>
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="navigasi('sec-kuis')">⬅ Sebelumnya</button>
+                <button onclick="navigasi('sec-profil')">Selesai ➡</button>
+            </div>
+        </div>
+
+        <!-- 8. Profil Pengembang -->
+        <div id="sec-profil" class="section">
+            <h2>👩‍💻 Profil Pengembang</h2>
+            <p style="text-align: center;"><strong>Nama Anda / Tim Anda</strong><br>Instansi / Sekolah Anda<br>Tahun 2024</p>
+            <p style="text-align: center;">Terima kasih telah mengikuti pembelajaran hari ini!</p>
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="navigasi('sec-refleksi')">⬅ Sebelumnya</button>
+                <button onclick="navigasi('sec-utama')">🏠 Kembali ke Beranda</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Fungsi untuk berpindah antar halaman/section
+        function navigasi(idTujuan) {
+            // Sembunyikan semua section
+            let sections = document.querySelectorAll('.section');
+            sections.forEach(function(sec) {
+                sec.classList.remove('active');
+            });
+            // Tampilkan section yang dituju
+            document.getElementById(idTujuan).classList.add('active');
+            // Scroll ke atas
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
