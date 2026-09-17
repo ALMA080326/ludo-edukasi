@@ -27,7 +27,7 @@ Kemudian buka `http://localhost:8889` di browser.
 - `assets/audio/salah.mp3` — efek suara jawaban salah
 - `netlify.toml` — konfigurasi publikasi dan cache audio
 
-## Support By
+## Pengembang Website
 
  -XCODEX-
  -TESTER_HIDES
