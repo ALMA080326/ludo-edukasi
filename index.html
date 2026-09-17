@@ -50,6 +50,9 @@
 <body>
     <audio id="soundCorrect" src="assets/audio/benar.mp3" preload="auto"></audio>
     <audio id="soundWrong" src="assets/audio/salah.mp3" preload="auto"></audio>
+    <audio id="soundBukaSoal" src="assets/audio/buka_soal.mp3" preload="auto"></audio>
+    <audio id="soundDadu" src="assets/audio/dadu.mp3" preload="auto"></audio>
+    <audio id="soundKlik" src="assets/audio/klik.mp3" preload="auto"></audio>
     <!-- Modal Cara Main -->
     <div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
         <div class="help-box">
@@ -376,6 +379,7 @@
             answerTimeLeft: 60,
             answerTimerInterval: null,
             closeTimeoutId: null,
+            bukaSoalStopTimeout: null,
             soundEnabled: true,
             pendingMove: false,
             pendingSlots: [],
@@ -479,6 +483,7 @@
             diceBtn.disabled = true;
             diceBtn.classList.add('rolling');
             document.getElementById('diceResult').textContent = 'Bersiap... ⚡';
+            playDaduBacksound();
 
             setTimeout(() => {
                 diceBtn.classList.remove('rolling');
@@ -563,6 +568,7 @@
             optionsContainer.querySelector('.option')?.focus();
             
             startAnswerTimer();
+            playBukaSoalBacksound();
         }
 
         function startAnswerTimer() {
@@ -740,6 +746,73 @@ function showReadingCountdown(seconds = 2) {
             }
         }
 
+        // Backsound saat soal dibuka: diputar selama maksimal 60 detik (durasi
+        // menjawab), otomatis berhenti kalau soal ditutup lebih cepat.
+        function playBukaSoalBacksound() {
+            try {
+                if (gameState.bukaSoalStopTimeout) {
+                    clearTimeout(gameState.bukaSoalStopTimeout);
+                    gameState.bukaSoalStopTimeout = null;
+                }
+                if (!gameState.soundEnabled) return;
+                const audioEl = document.getElementById('soundBukaSoal');
+                if (!audioEl) return;
+                audioEl.currentTime = 0;
+                audioEl.play().catch(e => console.error('Gagal memutar backsound buka soal:', e));
+
+                gameState.bukaSoalStopTimeout = setTimeout(() => {
+                    stopBukaSoalBacksound();
+                }, 60000);
+            } catch (e) {
+                console.error('Gagal memutar backsound buka soal:', e);
+            }
+        }
+
+        function stopBukaSoalBacksound() {
+            if (gameState.bukaSoalStopTimeout) {
+                clearTimeout(gameState.bukaSoalStopTimeout);
+                gameState.bukaSoalStopTimeout = null;
+            }
+            const audioEl = document.getElementById('soundBukaSoal');
+            if (audioEl) {
+                audioEl.pause();
+                audioEl.currentTime = 0;
+            }
+        }
+
+        // Backsound saat tombol dadu / mulai soal diklik.
+        function playDaduBacksound() {
+            try {
+                if (!gameState.soundEnabled) return;
+                const audioEl = document.getElementById('soundDadu');
+                if (!audioEl) return;
+                audioEl.currentTime = 0;
+                audioEl.play().catch(e => console.error('Gagal memutar backsound dadu:', e));
+            } catch (e) {
+                console.error('Gagal memutar backsound dadu:', e);
+            }
+        }
+
+        // Suara klik untuk SETIAP tombol <button> di game (dadu, jawab, tutup,
+        // cara main, toggle suara, main lagi, lanjutkan, dsb).
+        function playKlikSound() {
+            try {
+                if (!gameState.soundEnabled) return;
+                const audioEl = document.getElementById('soundKlik');
+                if (!audioEl) return;
+                audioEl.currentTime = 0;
+                audioEl.play().catch(e => console.error('Gagal memutar suara klik:', e));
+            } catch (e) {
+                console.error('Gagal memutar suara klik:', e);
+            }
+        }
+
+        document.addEventListener('click', (event) => {
+            if (event.target.closest('button')) {
+                playKlikSound();
+            }
+        }, true);
+
         function toggleSound() {
             gameState.soundEnabled = !gameState.soundEnabled;
             const toggle = document.getElementById('soundToggle');
@@ -849,6 +922,7 @@ function showReadingCountdown(seconds = 2) {
         function closeQuestion() {
             stopAnswerTimer();
             cancelScheduledClose();
+            stopBukaSoalBacksound();
             let justFinished = null;
             if (gameState.pendingMove) {
                 gameState.pendingMove = false;
