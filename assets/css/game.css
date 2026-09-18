@@ -1753,6 +1753,13 @@ body::after{
 .dice-btn-text{color:#fff;font-family:'Paytone One',sans-serif;font-size:1rem;white-space:nowrap;}
 .dice-btn:hover:not(:disabled){transform:translateY(-3px)}
 .dice-btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 #0a4f87!important;}
+/* Sebelumnya .dice-btn.rolling memutar 360° seluruh tombol (peninggalan versi
+   tombol dadu lama), sehingga teks "▶ Mulai Soal" ikut berputar aneh. Sekarang
+   tombolnya cukup "menekan" sebentar, dan dadu hiasan di pojok yang berputar. */
+.dice-btn.rolling{animation:diceBtnPress .6s ease;}
+@keyframes diceBtnPress{0%,100%{transform:scale(1);}40%{transform:scale(.94);}70%{transform:scale(1.03);}}
+.dice-btn.rolling ~ .dice-decor{animation:diceDecorSpin .6s cubic-bezier(.2,.8,.2,1);}
+@keyframes diceDecorSpin{0%{transform:rotate(18deg) scale(1);}50%{transform:rotate(198deg) scale(1.15);}100%{transform:rotate(378deg) scale(1);}}
 .dice-decor{position:absolute;right:10px;bottom:6px;font-size:2.4rem;opacity:.8;transform:rotate(18deg);pointer-events:none;}
 
 /* --- Papan skor: ikon rank + label kelompok berdampingan --- */
