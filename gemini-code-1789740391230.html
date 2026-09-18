@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Ludo Edukasi — Belajar Sambil Bermain</title>
+  <meta name="description" content="Game papan edukasi interaktif untuk belajar, menjawab soal, dan berlomba mencapai garis finish bersama kelompok.">
+  <style>
+    :root{--blue:#0865d8;--navy:#073b88;--sky:#21b8eb;--cream:#fff8dc;--ink:#173868;--yellow:#ffc928;--red:#ef476f;--green:#30bb6a;--purple:#8a48db;--orange:#ff8e2a;--line:#b7def4;--shadow:0 10px 0 rgba(18,83,131,.12),0 18px 34px rgba(20,69,105,.16)}
+    *{box-sizing:border-box}html{min-height:100%;background:#62c9e8}body{margin:0;min-height:100vh;color:var(--ink);font-family:"Trebuchet MS","Avenir Next",Verdana,sans-serif;background:linear-gradient(180deg,#1cb5e8 0 20%,#dff8f4 62%,#f4bd75 100%);overflow-x:hidden}button{font:inherit}button:focus-visible{outline:4px solid #ffdd38;outline-offset:3px}.hidden{display:none!important}
+    
+    /* BACKGROUND */
+    .scene{position:fixed;inset:0;pointer-events:none;overflow:hidden}.cloud{position:absolute;background:#fff;border-radius:999px;filter:drop-shadow(0 8px 0 rgba(96,174,205,.18));opacity:.9}.cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%}.c1{width:190px;height:52px;left:-30px;top:70px}.c1:before{width:90px;height:90px;left:38px;bottom:0}.c1:after{width:70px;height:70px;right:18px;bottom:0}.c2{width:230px;height:58px;right:6%;top:125px}.c2:before{width:105px;height:105px;left:30px;bottom:0}.c2:after{width:80px;height:80px;right:25px;bottom:0}.sun{position:absolute;width:150px;height:150px;border-radius:50%;background:#ffe55b;right:-40px;top:-45px;box-shadow:0 0 60px #fff19b}.hills{position:absolute;inset:auto 0 0;height:34%;background:radial-gradient(ellipse at 10% 100%,#48b75d 0 22%,transparent 23%),radial-gradient(ellipse at 40% 110%,#7dce68 0 31%,transparent 32%),radial-gradient(ellipse at 75% 100%,#38a858 0 31%,transparent 32%),radial-gradient(ellipse at 105% 110%,#79cb68 0 35%,transparent 36%)}.leaf{position:absolute;width:70px;height:32px;border-radius:100% 0 100% 0;background:linear-gradient(135deg,#9bd844,#43a83e);transform:rotate(var(--r));filter:drop-shadow(0 4px 2px #2e844855)}.leaf:nth-child(5){left:2%;top:16%;--r:28deg}.leaf:nth-child(6){right:2%;top:28%;--r:-30deg}.leaf:nth-child(7){left:5%;bottom:10%;--r:60deg}.leaf:nth-child(8){right:6%;bottom:5%;--r:-60deg}
+    .app{position:relative;z-index:1;width:min(1390px,96vw);margin:0 auto;padding:16px 0 34px}
+    
+    /* HEADER */
+    header{height:160px;display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:20px}.icon-btn,.pill-btn{border:4px solid #fff;color:#fff;background:linear-gradient(#1988ef,#0758bd);box-shadow:0 7px 0 #084389,0 10px 22px #07509255;cursor:pointer;transition:.18s transform,.18s filter}.icon-btn{width:84px;height:72px;border-radius:22px;display:grid;place-items:center}.icon-btn svg{width:39px;height:39px;fill:currentColor}.logo{display:flex;align-items:center;justify-content:center;gap:12px;transform:rotate(-1deg)}.mascot-die,.die-face{background:linear-gradient(145deg,#fff,#e2e9ef);border:4px solid #123d7c;box-shadow:inset -8px -9px 0 #c4d5e1,0 8px 0 #0c3a76,0 14px 20px #093f7666}.mascot-die{width:82px;height:82px;border-radius:20px;transform:rotate(-10deg);position:relative;flex:none}.mascot-die:before,.mascot-die:after{content:"";position:absolute;border-radius:50%;background:#123d7c;width:9px;height:13px;top:34px}.mascot-die:before{left:23px}.mascot-die:after{right:23px}.smile{position:absolute;left:31px;top:49px;width:20px;height:10px;border-radius:0 0 20px 20px;background:#ef6683}.brand{text-align:center;text-shadow:0 7px 0 #073e88,0 10px 0 #fff}.brand h1{margin:0;color:#fff;font-size:clamp(42px,5vw,76px);font-weight:1000;letter-spacing:-5px;line-height:.86}.brand h1 span{color:#ffc62c}.brand p{display:inline-block;margin:10px 0 0;padding:5px 32px;color:#fff7c9;background:linear-gradient(#b66525,#7b3916);border-radius:5px 5px 20px 20px;font-size:19px;letter-spacing:2px;box-shadow:0 6px 0 #54290e}.head-actions{display:flex;gap:16px;align-items:center}.pill-btn{height:58px;padding:0 22px;border-radius:18px;font-weight:900;font-size:17px;display:flex;align-items:center;gap:9px}.pill-btn svg{width:25px;height:25px;fill:currentColor}.sound-round{width:62px;padding:0;justify-content:center;border-radius:50%;background:linear-gradient(#55df69,#24a74b)}button:hover{filter:brightness(1.08);transform:translateY(-2px)}button:active{transform:translateY(4px);box-shadow:none!important}button:disabled{filter:grayscale(.6);opacity:.55;cursor:not-allowed;transform:none!important}
+    
+    /* LAYOUT */
+    .statusbar{margin:4px 0 14px;background:#fff;border:7px solid rgba(255,255,255,.8);border-radius:26px;box-shadow:var(--shadow);padding:8px 16px;display:grid;grid-template-columns:1fr 1.2fr;gap:16px}.sound-status,.turn-status{min-height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:12px;font-weight:1000}.sound-status{background:#dff3ff}.turn-status{background:linear-gradient(100deg,#fff,#fff3bd);text-transform:uppercase;letter-spacing:1px}.status-dot{width:14px;height:14px;background:#31bf56;border-radius:50%;box-shadow:inset -3px -3px 2px #148838}.turn-status b{font-size:20px;color:#0e408e}.main-grid{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(330px,.95fr);gap:18px;align-items:start}.card{background:rgba(255,253,238,.95);border:8px solid #fff;border-radius:30px;box-shadow:var(--shadow),inset 0 0 0 3px #e2be6f}
+    
+    /* GAME BOARD */
+    .board-card{padding:18px 18px 14px}.board-wrap{display:grid;grid-template-columns:1fr;gap:10px;position:relative}
+    .board{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;position:relative}.cell{position:relative;min-width:0;aspect-ratio:.83;border:2px solid #dad8cb;border-radius:10px;background:linear-gradient(145deg,#fffef8,#efede4);box-shadow:inset 0 -5px 0 rgba(61,69,74,.08),0 3px 4px rgba(75,76,61,.16);display:flex;align-items:flex-start;justify-content:center;padding-top:6px;font-weight:900;font-size:14px}
+    .cell.finish{padding-top:4px;background:linear-gradient(145deg,#ffe477,#ffbb25);border-color:#ef9d00}
+    
+    /* PLAYERS */
+    .pawn{--pc:#ec3157;--pd:#a90f31;width:35px;height:41px;position:relative;filter:drop-shadow(0 5px 2px rgba(15,44,64,.32));z-index:5;transition:transform .2s}.pawn:before{content:"";position:absolute;width:22px;height:22px;border-radius:50%;left:6px;top:0;background:radial-gradient(circle at 32% 25%,#fff 0 7%,var(--pc) 22%,var(--pd) 85%);border:2px solid #fff}.pawn:after{content:"";position:absolute;width:32px;height:18px;left:1px;bottom:0;border-radius:50% 50% 34% 34%;background:linear-gradient(90deg,var(--pd),var(--pc) 45%,var(--pd));border:2px solid #fff;box-shadow:inset 0 -5px 0 rgba(70,0,20,.2)}.pawn .neck{position:absolute;left:10px;top:15px;width:15px;height:17px;background:linear-gradient(90deg,var(--pd),var(--pc),var(--pd));clip-path:polygon(15% 0,85% 0,100% 100%,0 100%)}.pawn.blue{--pc:#158ff1;--pd:#064da9}.pawn.green{--pc:#21bd63;--pd:#087d3b}.pawn.yellow{--pc:#ffc928;--pd:#cc9a12}.pawn.purple{--pc:#9149e5;--pd:#54209c}.pawn.orange{--pc:#ff942d;--pd:#cf4d0c}.lane .pawn{transform:scale(.9)}.piece{position:absolute;z-index:15;transform:translate(-50%,-50%);transition:left .23s ease,top .23s ease}.piece .pawn{transform:scale(.78)}.piece.active .pawn{animation:bob .8s infinite alternate}.piece.moving .pawn{animation:hop .23s ease-in-out}
+    
+    /* ACTION PANEL */
+    .side{display:grid;gap:18px}.action-card{position:relative;overflow:hidden;padding:26px 24px 20px;text-align:center;background:radial-gradient(circle at 15% 10%,#fff386 0 5%,transparent 6%),linear-gradient(145deg,#ffdf34,#ffb823);border-color:#fff}.action-card:before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at center,transparent 0 35px,#fff2 36px 38px);pointer-events:none}.action-card>*{position:relative}.eyebrow{font-size:15px;font-weight:1000;letter-spacing:2px}.action-card h2{font-size:clamp(42px,4.1vw,65px);line-height:.8;margin:12px 0 18px;color:#fff;letter-spacing:-3px;text-shadow:0 6px 0 #063f91,0 9px 0 #fff;-webkit-text-stroke:2px #093c80}.action-card p{margin:0 0 15px;font-size:16px;font-weight:bold}.primary-btn{width:92%;min-height:68px;border:5px solid #fff;border-radius:32px;background:linear-gradient(#1688ef,#0758c8);box-shadow:0 8px 0 #06428c,0 11px 18px #6a630955;color:#fff;font-size:27px;font-weight:1000;cursor:pointer}.play-triangle{display:inline-block;width:0;height:0;border-top:12px solid transparent;border-bottom:12px solid transparent;border-left:19px solid #fff;margin-right:12px;filter:drop-shadow(0 2px 1px #06418a)}.dice-result{text-align:center;font-weight:bold; margin-top: 10px;} .dice-result strong{display:block;font-size:27px;color:#07499e}
+    
+    /* SCORE SYSTEM */
+    .score-card{padding:14px}.score-head{display:flex;align-items:center;gap:10px;padding:2px 8px 12px;font-size:28px;font-weight:1000;color:#073f8d}.score-head svg{width:34px;height:34px;fill:#f1b719}.live{margin-left:auto;font-size:13px;color:#fff;background:#ed3760;border-radius:20px;padding:7px 13px;letter-spacing:1px}.rank-list{display:grid;gap:8px}.rank-row{--rc:#ffcb25;display:grid;grid-template-columns:40px 1fr auto;align-items:center;min-height:53px;padding:5px 12px;border-radius:16px;background:color-mix(in srgb,var(--rc) 15%,white);border:2px solid color-mix(in srgb,var(--rc) 35%,white);box-shadow:inset 9px 0 0 var(--rc);font-weight:bold}.rank{font-size:19px;color:#a96500}.stats{text-align:right;font-size:12px}.stats b{display:block;font-size:15px;color:#073e88}.rank-row.current{animation:pulse-border 1.2s infinite;transform:scale(1.015)}
+    
+    /* MODALS */
+    .overlay{position:fixed;z-index:100;inset:0;background:rgba(5,42,76,.65);backdrop-filter:blur(6px);display:grid;place-items:center;padding:16px;animation:fade .2s}.modal{width:min(680px,96vw);max-height:92vh;overflow:auto;background:#fffdf0;border:7px solid #fff;border-radius:30px;box-shadow:0 20px 0 rgba(5,48,86,.22),0 30px 60px rgba(3,25,50,.4);animation:pop .35s cubic-bezier(.2,1.5,.5,1);position:relative}.modal-head{padding:18px 24px;background:linear-gradient(110deg,#1ba9e4,#0860c9);color:#fff;display:flex;justify-content:space-between;align-items:center}.modal-head h3{margin:0;font-size:24px}.timer{font-weight:1000;background:#fff;color:#0758b7;border-radius:20px;padding:8px 14px;min-width:90px;text-align:center}.modal-body{padding:24px}.question-no{text-transform:uppercase;letter-spacing:2px;color:#1381c9;font-weight:1000;font-size:13px}.question-text{font-size:clamp(21px,3vw,28px);font-weight:1000;margin:8px 0 20px;line-height:1.25}.options{display:grid;gap:10px}.option{border:3px solid #c3e2f4;border-radius:15px;background:#f2fbff;color:var(--ink);padding:14px 16px;text-align:left;font-weight:bold;cursor:pointer;box-shadow:0 4px 0 #acd4e9;transition:.15s; display: flex; align-items: center;}.option:hover{background:#e5f7ff;transform:translateX(4px)}.option.correct{background:#d8f6df;border-color:#42bd68;color:#126b35}.option.wrong{background:#ffe0e6;border-color:#e85170;color:#a51432}.option::before{content: attr(data-letter); font-weight: bold; background: var(--ink); color: #fff; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; justify-content: center; align-items: center; margin-right: 12px; flex-shrink: 0;}.option.selected{border-color: #0865d8; background: #e5f7ff;}.feedback{min-height:30px;margin:16px 0 0;text-align:center;font-weight:1000;font-size:20px}.feedback.good{color:#1b9b4e;animation:pop .3s}.feedback.bad{color:#d92f53;animation:shake .35s}.close-x{border:0;background:#fff;color:#0757b4;border-radius:50%;width:38px;height:38px;font-size:25px;font-weight:bold;cursor:pointer}.rules ol{line-height:1.8;padding-left:24px}.rules .primary-btn{display:block;margin:16px auto 4px;font-size:20px;min-height:54px}.result-modal{text-align:center;padding:32px}.trophy-big{width:100px;height:100px;margin:auto;color:#efb716;animation:trophy 1s infinite alternate}.trophy-big svg{width:100%;height:100%;fill:currentColor}.result-modal h2{font-size:48px;margin:6px 0;color:#0750ae}.result-modal p{font-size:22px;font-weight:bold}.confetti{position:fixed;z-index:99;inset:0;pointer-events:none;overflow:hidden}.confetti i{position:absolute;width:12px;height:22px;background:var(--c);left:var(--x);top:-30px;animation:fall var(--d) linear forwards;transform:rotate(var(--r))}
+    .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-secondary { background: #e2e9ef; color: #173868; border: 5px solid #fff; border-radius: 32px; font-size: 20px; font-weight: 1000; padding: 15px; flex: 1; cursor: pointer;}
+    .buzz-btn { padding: 15px; font-size: 18px; font-weight: bold; border-radius: 15px; border: none; cursor: pointer; background: #0865d8; color: white; margin: 5px;}
+    .buzz-btn:disabled { background: #ccc; cursor: not-allowed; }
+    
+    /* ANIMATION */
+    .toast{position:fixed;z-index:120;left:50%;top:22px;transform:translateX(-50%);padding:12px 23px;border-radius:20px;background:#173868;color:#fff;font-weight:bold;box-shadow:0 8px 20px #06264c55;animation:toast 2.3s forwards}.turn-flash{animation:turnFlash .55s}.shake-screen{animation:shake .35s}@keyframes bob{to{transform:translateY(-5px) scale(1.05)}}@keyframes hop{50%{transform:translateY(-15px) scale(1.08)}}@keyframes roll{to{transform:rotate(90deg) scale(.9)}}@keyframes pop{from{opacity:0;transform:scale(.75)}to{opacity:1;transform:scale(1)}}@keyframes fade{from{opacity:0}}@keyframes shake{25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}@keyframes pulse-border{50%{box-shadow:inset 9px 0 0 var(--rc),0 0 0 4px #ffdc4d}}@keyframes trophy{to{transform:rotate(5deg) scale(1.08)}}@keyframes fall{to{top:110vh;transform:rotate(760deg)}}@keyframes toast{0%{opacity:0;transform:translate(-50%,-25px)}12%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}@keyframes turnFlash{50%{transform:scale(1.05);filter:brightness(1.14)}}
+    
+    /* RESPONSIVE (Fixed media query closing braces) */
+    @media(max-width:980px){
+        header{height:auto;grid-template-columns:70px 1fr auto;padding:10px 0 18px}
+        .icon-btn{width:60px;height:55px}
+        .main-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+    <audio id="soundCorrect" src="assets/audio/benar.mp3" preload="auto"></audio>
+    <audio id="soundWrong" src="assets/audio/salah.mp3" preload="auto"></audio>
+    <audio id="soundBukaSoal" src="assets/audio/buka_soal.mp3" preload="auto"></audio>
+    <audio id="soundDadu" src="assets/audio/dadu.mp3" preload="auto"></audio>
+    <audio id="soundKlik" src="assets/audio/klik.mp3" preload="auto"></audio>
+
+    <div class="scene">
+        <div class="cloud c1"></div>
+        <div class="cloud c2"></div>
+        <div class="sun"></div>
+        <div class="hills"></div>
+        <div class="leaf"></div><div class="leaf"></div><div class="leaf"></div><div class="leaf"></div>
+    </div>
+
+    <div class="app">
+        <header>
+            <div class="logo">
+                <div class="mascot-die"><div class="smile"></div></div>
+            </div>
+            <div class="brand">
+                <h1>LUDO <span>EDUKASI</span></h1>
+                <p>Berpikir Komputasional</p>
+            </div>
+            <div class="head-actions">
+                <button class="pill-btn sound-round" id="soundToggle" onclick="toggleSound()" aria-label="Toggle Sound">
+                    <svg viewBox="0 0 24 24"><path d="M11 5 L6.8 8.5 H3 v7 h3.8 L11 19 V5 Z m4.2 3.1 a5.5 5.5 0 0 1 0 7.8 M18 5.5 a9 9 0 0 1 0 13"/></svg>
+                </button>
+                <button class="pill-btn" onclick="toggleHelp()">📖 Cara Main</button>
+            </div>
+        </header>
+
+        <div class="statusbar">
+            <div class="sound-status">
+                <div class="status-dot"></div>
+                Arena Interaktif
+            </div>
+            <div class="turn-status">
+                Giliran: <b id="currentGroupDisplay">KELOMPOK 1</b>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card board-card">
+                <div class="board-wrap">
+                    <div class="board" id="boardGrid"></div>
+                </div>
+            </div>
+
+            <div class="side">
+                <div class="card action-card">
+                    <span class="eyebrow">LANGKAH BERIKUTNYA</span>
+                    <p>Klik saat kelompokmu siap. Jawab cepat = langkah jauh!</p>
+                    <button class="primary-btn" id="diceBtn" onclick="rollDice()">
+                        <span class="play-triangle"></span> MULAI SOAL
+                    </button>
+                    <div class="dice-result" id="diceResult">-</div>
+                </div>
+
+                <div class="card score-card">
+                    <div class="score-head">
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        PAPAN SKOR
+                        <span class="live">LIVE</span>
+                    </div>
+                    <div class="rank-list" id="scoreList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="overlay hidden rules" id="helpModal">
+        <div class="modal">
+            <div class="modal-head">
+                <h3>📖 PANDUAN BERMAIN</h3>
+                <button class="close-x" onclick="toggleHelp()">×</button>
+            </div>
+            <div class="modal-body">
+                <ol>
+                    <li><strong>Klik tombol dadu:</strong> Mulai giliranmu dengan klik "MULAI SOAL".</li>
+                    <li><strong>Jawab Cepat:</strong> Timer 60 detik berjalan. Jawab secepat mungkin.</li>
+                    <li><strong>Langkah:</strong> ≤ 5 dtk = 6 langkah, ≤ 10 dtk = 5, ≤ 20 dtk = 4, ≤ 30 dtk = 3, ≤ 45 dtk = 2, > 45 dtk = 1.</li>
+                    <li><strong>Salah Jawab:</strong> Pion tetap di tempat.</li>
+                    <li><strong>Soal Rebutan:</strong> Jika ada skor seri di akhir, pemenang ditentukan lewat soal rebutan!</li>
+                    <li><strong>Finish:</strong> Game selesai jika Juara 1, 2, dan 3 telah mencapai garis Finish.</li>
+                </ol>
+                <button class="primary-btn" onclick="toggleHelp()">Mengerti, Mulai Main! 🎲</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="questionModal">
+        <div class="modal">
+            <div class="modal-head">
+                <h3 id="questionHeader">SOAL KELOMPOK</h3>
+                <div class="timer" id="timerText">60s</div>
+            </div>
+            <div class="modal-body">
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+                <div id="feedbackContainer"></div>
+                <div class="btn-group">
+                    <button class="primary-btn" id="submitBtn" onclick="submitAnswer()" disabled>✅ JAWAB SEKARANG</button>
+                    <button class="btn-secondary" onclick="closeQuestion()">TUTUP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="tiebreakModal">
+        <div class="modal">
+            <div class="modal-head">
+                <h3>🔥 SOAL REBUTAN</h3>
+            </div>
+            <div class="modal-body">
+                <p id="tiebreakInfo" style="font-weight: bold; color: #d92f53; margin-bottom: 10px;"></p>
+                <div class="question-text" id="tiebreakQuestionText"></div>
+                <div id="buzzRow" style="display: flex; flex-wrap: wrap; justify-content: center;"></div>
+                <div id="tiebreakBuzzedLabel"></div>
+                <div class="options" id="tiebreakOptions" style="display: none;"></div>
+                <div id="tiebreakFeedback"></div>
+                <div class="btn-group" id="tiebreakButtonGroup" style="display:none;">
+                    <button class="primary-btn" id="tiebreakSubmitBtn" onclick="submitTieAnswer()" disabled>✅ JAWAB</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="finishModal">
+        <div class="modal" style="text-align: center;">
+            <div class="modal-body result-modal">
+                <h2>SELAMAT!</h2>
+                <p id="finishText"></p>
+                <button class="primary-btn" onclick="dismissFinishCongrats()">Lanjutkan 👉</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="winnerModal">
+        <div class="modal">
+            <div class="modal-body result-modal">
+                <div class="trophy-big">
+                    <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 0 0 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM7 10.82C5.84 10.4 5 9.3 5 8V7h2v3.82zM19 8c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+                </div>
+                <h2>PERMAINAN SELESAI</h2>
+                <div class="rank-list" id="rankingContainer" style="margin-top: 20px; text-align: left;"></div>
+                <button class="primary-btn" style="margin-top: 25px;" onclick="location.reload()">MAIN LAGI</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Soal 
+        const groupsData = {
+            red: {
+                name: 'KELOMPOK 1',
+                color: 'red',
+                questions: [
+                    { q: 'Saat menghadapi masalah yang rumit, seorang siswa membagi masalah tersebut menjadi beberapa bagian agar lebih mudah diselesaikan. Konsep yang digunakan adalah ....', opts: ['Abstraksi', 'Pengenalan pola', 'Dekomposisi', 'Debugging'], ans: 2 },
+                    { q: 'Perhatikan situasi berikut. Setiap pagi, Andi membutuhkan waktu lebih lama ketika melewati jalan tertentu karena selalu terjadi kemacetan. Setelah mengamati selama beberapa hari, Andi menyadari adanya kecenderungan yang sama. Ia sedang menerapkan ....', opts: ['Pengenalan pola', 'Dekomposisi', 'Abstraksi', 'Algoritma'], ans: 0 },
+                    { q: 'Dalam membuat denah sekolah, seorang siswa hanya mencantumkan ruang kelas, laboratorium, perpustakaan, dan gerbang. Informasi seperti warna kendaraan yang terparkir tidak dicantumkan. Tindakan tersebut merupakan ....', opts: ['Dekomposisi', 'Debugging', 'Algoritma', 'Abstraksi'], ans: 3 },
+                    { q: 'Urutan langkah yang disusun secara sistematis untuk mencapai tujuan tertentu disebut ....', opts: ['Pola', 'Algoritma', 'Abstraksi', 'Dekomposisi'], ans: 1 },
+                    { q: 'Seorang siswa membuat langkah penyelesaian soal, tetapi hasil akhirnya salah. Ia memeriksa kembali setiap langkah untuk menemukan bagian yang keliru. Kegiatan tersebut disebut ....', opts: ['Dekomposisi', 'Abstraksi', 'Debugging', 'Pengenalan pola'], ans: 2 },
+                    { q: 'Ketika membuat rencana kegiatan kelas, pekerjaan dibagi menjadi bagian konsumsi, perlengkapan, dokumentasi, dan acara. Pembagian tersebut bertujuan untuk ....', opts: ['membuat pekerjaan lebih terarah', 'menghilangkan informasi penting', 'mencari pola kesalahan', 'mengurangi jumlah anggota'], ans: 0 },
+                    { q: 'Seorang siswa menemukan bahwa beberapa soal yang berbeda ternyata dapat diselesaikan dengan cara yang hampir sama. Kemampuan yang digunakan adalah ....', opts: ['Abstraksi', 'Dekomposisi', 'Debugging', 'Pengenalan pola'], ans: 3 },
+                    { q: 'Saat membuat algoritma untuk mencuci tangan, langkah pertama yang paling tepat adalah ....', opts: ['mengeringkan tangan', 'membilas tangan', 'membasahi tangan', 'menggunakan sabun'], ans: 2 },
+                    { q: 'Dalam menyelesaikan masalah, abstraksi diperlukan agar seseorang ....', opts: ['memasukkan seluruh informasi', 'fokus pada informasi yang relevan', 'menghilangkan tujuan', 'memperbanyak langkah'], ans: 1 },
+                    { q: 'Seorang siswa ingin mengetahui rute tercepat menuju sekolah. Data yang paling relevan untuk dianalisis adalah ....', opts: ['warna rumah di sepanjang jalan', 'jenis kendaraan yang lewat', 'warna pakaian pengendara', 'jarak dan kondisi jalan'], ans: 3 },
+                    { q: 'Perhatikan urutan berikut: memilih pakaian, mandi, sarapan, kemudian berangkat sekolah. Jika urutan tersebut digunakan sebagai algoritma rutinitas pagi, bagian yang perlu diperbaiki adalah ....', opts: ['urutan langkah', 'jumlah kegiatan', 'jenis pakaian', 'waktu sarapan'], ans: 0 },
+                    { q: 'Seorang ketua kelompok membagi proyek menjadi riset, penulisan, desain, dan presentasi. Proses tersebut merupakan ....', opts: ['Debugging', 'Abstraksi', 'Dekomposisi', 'Pengenalan pola'], ans: 2 },
+                    { q: 'Dalam data nilai siswa terlihat bahwa nilai sebagian besar siswa meningkat setelah dilakukan latihan tambahan. Kesimpulan tersebut diperoleh melalui ....', opts: ['algoritma', 'dekomposisi', 'debugging', 'pengenalan pola'], ans: 3 },
+                    { q: 'Informasi berikut yang paling tepat diabaikan ketika menentukan jadwal piket kelas adalah ....', opts: ['nama anggota kelompok', 'warna tas siswa', 'hari piket', 'pembagian kelompok'], ans: 1 },
+                    { q: 'Sebuah algoritma dikatakan baik apabila ....', opts: ['memiliki langkah yang jelas dan logis', 'menggunakan sebanyak mungkin langkah', 'sulit dipahami orang lain', 'tidak memiliki tujuan'], ans: 0 },
+                    { q: 'Ketika sebuah program menghasilkan nilai yang salah karena salah menuliskan rumus, tindakan yang tepat adalah ....', opts: ['mengganti komputer', 'menghapus semua data', 'mencari dan memperbaiki kesalahan rumus', 'membiarkan program berjalan'], ans: 2 }
+                ]
+            },
+            blue: {
+                name: 'KELOMPOK 2',
+                color: 'blue',
+                questions: [
+                    { q: 'Seseorang ingin mengatur kegiatan belajar selama satu minggu. Ia memisahkan tugas sekolah, belajar mandiri, istirahat, dan kegiatan lainnya. Cara tersebut menunjukkan ....', opts: ['debugging', 'pengenalan pola', 'abstraksi', 'dekomposisi'], ans: 3 },
+                    { q: 'Perhatikan pola bilangan: 5, 10, 15, 20, 25. Angka berikutnya adalah ....', opts: ['28', '30', '35', '40'], ans: 1 },
+                    { q: 'Dalam membuat aplikasi perpustakaan, data warna rambut peminjam tidak diperlukan untuk proses peminjaman buku. Mengabaikan data tersebut merupakan penerapan ....', opts: ['dekomposisi', 'algoritma', 'abstraksi', 'debugging'], ans: 2 },
+                    { q: 'Ketika sebuah solusi tidak memberikan hasil sesuai tujuan, proses untuk menemukan penyebab masalah disebut ....', opts: ['pengenalan pola', 'debugging', 'abstraksi', 'dekomposisi'], ans: 1 },
+                    { q: 'Seorang siswa menyusun langkah: membuka aplikasi, memilih kelas, memilih tugas, mengunggah file, dan menekan tombol kirim. Susunan tersebut merupakan ....', opts: ['algoritma', 'abstraksi', 'pola', 'dekomposisi'], ans: 0 },
+                    { q: 'Seorang siswa menyadari bahwa ia sering lupa membawa buku setiap hari Senin karena jadwal pelajaran berubah. Setelah beberapa kejadian, ia menemukan kebiasaan tersebut. Ini merupakan ....', opts: ['abstraksi', 'algoritma', 'debugging', 'pengenalan pola'], ans: 3 },
+                    { q: 'Dalam proyek membuat majalah kelas, pekerjaan "menentukan tema, mengumpulkan artikel, membuat desain, dan mencetak" merupakan ....', opts: ['pola', 'langkah-langkah dekomposisi', 'proses debugging', 'bentuk abstraksi'], ans: 1 },
+                    { q: 'Jika sebuah masalah memiliki terlalu banyak detail, langkah yang dapat dilakukan agar lebih mudah dipahami adalah ....', opts: ['menambahkan detail lain', 'mengabaikan tujuan masalah', 'melakukan abstraksi', 'menghapus semua data'], ans: 2 },
+                    { q: 'Seorang siswa menguji algoritma yang dibuatnya menggunakan beberapa contoh masukan. Tujuannya adalah ....', opts: ['memastikan algoritma menghasilkan keluaran yang benar', 'memperbanyak jumlah instruksi', 'menghilangkan algoritma', 'mengganti masalah'], ans: 0 },
+                    { q: 'Dalam kegiatan memasak, seorang siswa mengamati bahwa nasi menjadi terlalu lembek setiap kali jumlah air yang digunakan terlalu banyak. Pengamatan tersebut dapat digunakan untuk ....', opts: ['melakukan dekomposisi', 'menemukan pola hubungan air dan hasil nasi', 'menghapus resep', 'membuat perangkat keras'], ans: 1 },
+                    { q: 'Saat menyusun rencana perjalanan, seseorang membagi proses menjadi menentukan tujuan, memilih transportasi, memesan penginapan, dan menyusun jadwal. Konsep utamanya adalah ....', opts: ['debugging', 'abstraksi', 'dekomposisi', 'pengenalan pola'], ans: 2 },
+                    { q: '"Jika hujan maka membawa payung, jika tidak hujan maka tidak membawa payung." Bentuk algoritma tersebut menggunakan ....', opts: ['pengenalan pola', 'percabangan', 'dekomposisi', 'abstraksi'], ans: 1 },
+                    { q: 'Seorang siswa menemukan bahwa setiap kali ia mengerjakan tugas tanpa membaca petunjuk, hasilnya sering salah. Berdasarkan pengalaman tersebut, ia mulai selalu membaca petunjuk terlebih dahulu. Ia menggunakan ....', opts: ['pengenalan pola', 'abstraksi', 'dekomposisi', 'penghapusan data'], ans: 0 },
+                    { q: 'Dalam membuat peta sederhana sekolah, tujuan utama abstraksi adalah ....', opts: ['menampilkan semua benda secara detail', 'menampilkan informasi yang penting untuk navigasi', 'menghilangkan semua lokasi', 'menambahkan sebanyak mungkin simbol'], ans: 1 },
+                    { q: 'Langkah yang paling tepat setelah menemukan kesalahan dalam algoritma adalah ....', opts: ['mengabaikannya', 'menghapus tujuan', 'memperbaiki bagian yang salah kemudian menguji kembali', 'membuat masalah baru'], ans: 2 },
+                    { q: 'Seorang siswa mendapatkan 10 tugas dari beberapa mata pelajaran. Ia mengelompokkan tugas berdasarkan mata pelajaran sebelum menentukan urutan pengerjaan. Pengelompokan tersebut membantu proses ....', opts: ['dekomposisi masalah', 'penghapusan informasi', 'pengenalan perangkat', 'penggantian algoritma'], ans: 0 }
+                ]
+            },
+            yellow: {
+                name: 'KELOMPOK 3',
+                color: 'yellow',
+                questions: [
+                    { q: 'Perhatikan deret: 3, 6, 12, 24, .... Pola yang digunakan adalah ....', opts: ['ditambah 3', 'dikurangi 3', 'dikalikan 2', 'dibagi 2'], ans: 2 },
+                    { q: 'Ketika mencari buku tertentu di perpustakaan, seseorang hanya memperhatikan nomor rak dan kode buku. Ia tidak memperhatikan warna sampul. Hal tersebut merupakan ....', opts: ['debugging', 'abstraksi', 'dekomposisi', 'perulangan'], ans: 1 },
+                    { q: 'Algoritma diperlukan dalam penyelesaian masalah agar ....', opts: ['proses memiliki langkah yang terarah', 'semua masalah menjadi otomatis', 'manusia tidak perlu berpikir', 'hasil selalu muncul tanpa proses'], ans: 0 },
+                    { q: 'Seorang siswa membuat program untuk menghitung luas segitiga, tetapi hasilnya selalu dua kali lebih besar. Setelah diperiksa, ternyata ia lupa membagi dua. Proses menemukan kesalahan tersebut disebut ....', opts: ['abstraksi', 'pengenalan pola', 'dekomposisi', 'debugging'], ans: 3 },
+                    { q: 'Dalam sebuah kelas, guru menemukan bahwa siswa yang membuat catatan cenderung lebih mudah mengingat materi. Temuan tersebut merupakan contoh ....', opts: ['algoritma', 'pengenalan pola', 'abstraksi', 'dekomposisi'], ans: 1 },
+                    { q: 'Ketika menyelesaikan masalah "membuat acara perpisahan kelas", kegiatan yang termasuk submasalah adalah ....', opts: ['menentukan tempat dan konsumsi', 'memilih warna sepatu', 'menghitung jumlah kendaraan di jalan', 'mencatat semua nama warga sekitar'], ans: 0 },
+                    { q: 'Sebuah algoritma memiliki langkah yang ambigu sehingga orang yang berbeda dapat menafsirkannya secara berbeda. Kelemahan algoritma tersebut adalah ....', opts: ['tidak cukup jelas', 'terlalu sederhana', 'terlalu cepat', 'terlalu pendek'], ans: 0 },
+                    { q: 'Dalam menyelesaikan masalah, pengenalan pola dapat dilakukan dengan ....', opts: ['membandingkan beberapa contoh untuk menemukan kesamaan', 'menghapus semua contoh', 'mengabaikan data', 'mengubah semua informasi'], ans: 0 },
+                    { q: 'Seorang siswa membuat prosedur untuk mengurutkan buku berdasarkan abjad. Ia menentukan aturan yang sama untuk setiap buku. Hal tersebut menunjukkan penggunaan ....', opts: ['abstraksi', 'algoritma', 'debugging', 'dekomposisi'], ans: 1 },
+                    { q: 'Saat membuat sistem absensi, informasi yang paling penting adalah ....', opts: ['nama dan status kehadiran siswa', 'warna sepatu siswa', 'makanan kesukaan siswa', 'merek ponsel siswa'], ans: 0 },
+                    { q: 'Jika suatu masalah dapat dibagi menjadi masalah yang lebih kecil dan masing-masing dapat diselesaikan, maka masalah tersebut ....', opts: ['tidak dapat diselesaikan', 'lebih mudah ditangani', 'semakin tidak teratur', 'membutuhkan lebih banyak masalah'], ans: 1 },
+                    { q: 'Seorang siswa menguji langkah "masukkan password" tetapi password selalu ditolak meskipun sudah benar. Ia kemudian memeriksa apakah tombol Caps Lock aktif. Kegiatan tersebut merupakan ....', opts: ['dekomposisi', 'abstraksi', 'debugging', 'pengenalan pola'], ans: 2 },
+                    { q: 'Ketika menemukan pola bahwa harga barang tertentu selalu lebih murah pada waktu tertentu, informasi tersebut dapat digunakan untuk ....', opts: ['memperkirakan waktu pembelian yang lebih menguntungkan', 'menghapus harga barang', 'mengganti nama toko', 'mengabaikan data harga'], ans: 0 },
+                    { q: 'Dalam algoritma membuat telur goreng, langkah yang paling masuk akal setelah menyalakan kompor adalah ....', opts: ['mematikan kompor', 'memanaskan wajan', 'menyimpan telur', 'mencuci piring'], ans: 1 },
+                    { q: 'Seorang siswa ingin menyelesaikan masalah koneksi internet. Ia memisahkannya menjadi pemeriksaan Wi-Fi, router, perangkat, dan koneksi jaringan. Ini merupakan ....', opts: ['abstraksi', 'pengenalan pola', 'algoritma', 'dekomposisi'], ans: 3 },
+                    { q: 'Ketika membuat solusi untuk masalah tertentu, informasi yang dipilih harus disesuaikan dengan ....', opts: ['tujuan penyelesaian masalah', 'jumlah informasi yang tersedia', 'keinginan untuk menambah data', 'banyaknya perangkat'], ans: 0 }
+                ]
+            },
+            green: {
+                name: 'KELOMPOK 4',
+                color: 'green',
+                questions: [
+                    { q: 'Sebuah algoritma untuk mengakses akun terdiri dari membuka halaman login, memasukkan username, memasukkan password, dan menekan tombol masuk. Jika username tidak dimasukkan, maka ....', opts: ['proses tetap pasti berhasil', 'salah satu langkah penting tidak terpenuhi', 'password otomatis berubah', 'akun langsung terhapus'], ans: 1 },
+                    { q: 'Dalam permainan teka-teki, pemain melihat bahwa setiap level memiliki bentuk tantangan yang serupa. Ia menggunakan pengalaman dari level sebelumnya untuk menyelesaikan level berikutnya. Ini merupakan ....', opts: ['dekomposisi', 'debugging', 'pengenalan pola', 'abstraksi'], ans: 2 },
+                    { q: 'Seorang siswa membuat daftar langkah untuk menghitung nilai rata-rata: menjumlahkan seluruh nilai, menghitung banyak data, kemudian membagi jumlah nilai dengan banyak data. Contoh tersebut merupakan ....', opts: ['algoritma', 'pola', 'abstraksi', 'debugging'], ans: 0 },
+                    { q: 'Saat menganalisis masalah, dekomposisi sebaiknya dilakukan dengan membagi masalah berdasarkan ....', opts: ['bagian atau tugas yang dapat ditangani', 'warna yang disukai', 'informasi yang paling panjang', 'jumlah perangkat komputer'], ans: 0 },
+                    { q: 'Pengenalan pola tidak berarti hanya mencari pola bilangan, tetapi juga dapat digunakan untuk menemukan ....', opts: ['kesamaan dalam kejadian atau masalah', 'jenis komputer', 'ukuran monitor', 'warna aplikasi'], ans: 0 },
+                    { q: 'Seorang siswa membuat sistem untuk menentukan kelulusan berdasarkan nilai. Ia menggunakan aturan "jika nilai ≥ 75 maka lulus, jika kurang dari 75 maka belum lulus". Struktur tersebut merupakan ....', opts: ['perulangan', 'percabangan', 'dekomposisi', 'abstraksi'], ans: 1 },
+                    { q: 'Saat memperbaiki sebuah program, mengubah beberapa bagian sekaligus tanpa mengetahui penyebab kesalahan dapat menyulitkan proses ....', opts: ['debugging', 'dekomposisi', 'abstraksi', 'pengenalan pola'], ans: 0 },
+                    { q: 'Dalam membuat jadwal pelajaran digital, informasi seperti mata pelajaran, guru, kelas, hari, dan jam perlu dipertahankan karena ....', opts: ['merupakan informasi yang relevan', 'membuat tampilan lebih ramai', 'memperbanyak data', 'merupakan informasi hiburan'], ans: 0 },
+                    { q: 'Seseorang ingin mengetahui penyebab penggunaan listrik di rumah meningkat. Ia memisahkan penggunaan listrik berdasarkan AC, kulkas, lampu, televisi, dan perangkat lainnya. Proses awal yang dilakukan adalah ....', opts: ['abstraksi', 'dekomposisi', 'debugging', 'pengenalan pola'], ans: 1 },
+                    { q: 'Setelah data penggunaan listrik dikumpulkan selama beberapa hari, seseorang melihat bahwa penggunaan meningkat pada malam hari. Ia sedang melakukan ....', opts: ['algoritma', 'abstraksi', 'pengenalan pola', 'dekomposisi'], ans: 2 },
+                    { q: 'Jika seseorang hanya memilih data penggunaan listrik pada malam hari karena itulah waktu yang sedang dianalisis, ia menerapkan ....', opts: ['debugging', 'abstraksi', 'dekomposisi', 'algoritma'], ans: 1 },
+                    { q: 'Setelah menentukan penyebab penggunaan listrik tinggi, seseorang menyusun langkah untuk mengurangi pemakaian. Langkah terstruktur tersebut merupakan ....', opts: ['algoritma', 'pola', 'abstraksi', 'dekomposisi'], ans: 0 },
+                    { q: 'Dalam menyelesaikan masalah secara komputasional, solusi sebaiknya tidak langsung dibuat sebelum ....', opts: ['masalah dipahami dengan jelas', 'komputer dinyalakan', 'semua informasi dihafalkan', 'program ditulis'], ans: 0 },
+                    { q: 'Seorang siswa mengelompokkan jenis sampah menjadi organik, anorganik, dan B3 sebelum menentukan cara pengelolaannya. Pengelompokan tersebut dapat membantu ....', opts: ['mengidentifikasi bagian-bagian masalah', 'menghilangkan semua sampah', 'membuat sampah baru', 'mengubah warna tempat sampah'], ans: 0 },
+                    { q: 'Jika dari beberapa kejadian ditemukan hubungan yang sama, langkah berikutnya yang dapat dilakukan adalah ....', opts: ['memanfaatkan pola tersebut untuk menentukan solusi', 'membuang semua data', 'mengabaikan kejadian sebelumnya', 'membuat pola yang berbeda tanpa alasan'], ans: 0 },
+                    { q: 'Dalam membuat aplikasi pemesanan makanan, proses dapat dipecah menjadi memilih makanan, memasukkan pesanan, menentukan alamat, memilih pembayaran, dan mengonfirmasi pesanan. Ini merupakan contoh ....', opts: ['abstraksi', 'dekomposisi', 'debugging', 'pengenalan pola'], ans: 1 }
+                ]
+            },
+            purple: {
+                name: 'KELOMPOK 5',
+                color: 'purple',
+                questions: [
+                    { q: 'Seorang siswa menyederhanakan informasi tentang sebuah kota dengan hanya mempertahankan nama kota, lokasi, dan jumlah penduduk karena hanya data tersebut yang dibutuhkan. Proses tersebut adalah ....', opts: ['algoritma', 'pengenalan pola', 'abstraksi', 'debugging'], ans: 2 },
+                    { q: 'Ketika algoritma digunakan untuk menyelesaikan masalah yang sama secara berulang, keuntungan utamanya adalah ....', opts: ['proses dapat dilakukan secara konsisten', 'masalah menjadi lebih rumit', 'hasil selalu berbeda', 'langkah tidak perlu dipahami'], ans: 0 },
+                    { q: 'Seorang siswa menemukan bahwa kesalahan program selalu muncul ketika pengguna memasukkan angka nol. Ia kemudian memeriksa bagian program yang menangani angka nol. Tindakan ini menggabungkan ....', opts: ['pengenalan pola dan debugging', 'abstraksi dan dekomposisi', 'algoritma dan abstraksi', 'dekomposisi dan algoritma'], ans: 0 },
+                    { q: 'Ketika membuat solusi untuk masalah yang kompleks, setelah melakukan dekomposisi seseorang dapat mencari kesamaan di antara bagian-bagian masalah. Proses tersebut merupakan ....', opts: ['debugging', 'pengenalan pola', 'abstraksi', 'perulangan'], ans: 1 },
+                    { q: 'Perhatikan situasi berikut. Sebuah kelompok sering terlambat mengumpulkan tugas karena anggota tidak mengetahui pembagian pekerjaan. Solusi yang paling sesuai dengan konsep dekomposisi adalah ....', opts: ['membagi tugas berdasarkan bagian pekerjaan', 'meminta semua anggota mengerjakan semuanya', 'menghapus tugas', 'menunggu sampai tugas selesai sendiri'], ans: 0 },
+                    { q: 'Seorang siswa membuat algoritma tetapi terdapat dua langkah yang sebenarnya melakukan hal yang sama. Agar lebih efisien, ia dapat ....', opts: ['menggabungkan atau menghilangkan langkah yang tidak diperlukan', 'menambahkan langkah baru', 'mengulang semua langkah', 'menghapus tujuan algoritma'], ans: 0 },
+                    { q: 'Saat mengembangkan solusi, melakukan pengujian dengan berbagai kondisi penting karena ....', opts: ['dapat menunjukkan apakah solusi mampu menangani berbagai keadaan', 'membuat program lebih berwarna', 'menghilangkan kebutuhan debugging', 'memperbanyak masalah'], ans: 0 },
+                    { q: 'Sebuah algoritma menentukan apakah seseorang boleh mengikuti suatu kegiatan berdasarkan usia. Jika usia memenuhi syarat, proses dilanjutkan. Jika tidak, proses dihentikan. Konsep yang digunakan adalah ....', opts: ['perulangan', 'percabangan', 'abstraksi', 'pengenalan pola'], ans: 1 },
+                    { q: 'Seorang siswa ingin mencari barang yang hilang di kamar. Ia membagi area pencarian menjadi meja, lemari, tempat tidur, dan rak. Cara tersebut merupakan ....', opts: ['abstraksi', 'dekomposisi', 'debugging', 'pengenalan pola'], ans: 1 },
+                    { q: 'Setelah beberapa kali mencari barang, siswa tersebut menyadari bahwa barang yang hilang biasanya berada di sekitar meja belajar. Temuan tersebut menunjukkan ....', opts: ['algoritma', 'abstraksi', 'pengenalan pola', 'dekomposisi'], ans: 2 },
+                    { q: 'Untuk mempercepat pencarian barang, siswa hanya memeriksa lokasi yang paling mungkin berdasarkan pengalaman sebelumnya. Ia sedang menggunakan ....', opts: ['abstraksi berdasarkan informasi relevan', 'debugging program', 'dekomposisi perangkat', 'algoritma tanpa tujuan'], ans: 0 },
+                    { q: 'Seorang siswa menyusun langkah pencarian barang: tentukan lokasi, periksa satu per satu, tandai lokasi yang sudah diperiksa, lalu berhenti ketika barang ditemukan. Susunan tersebut merupakan ....', opts: ['pengenalan pola', 'abstraksi', 'algoritma', 'dekomposisi'], ans: 2 },
+                    { q: 'Jika barang tidak ditemukan setelah seluruh lokasi diperiksa, siswa sebaiknya ....', opts: ['mengevaluasi kembali strategi pencariannya', 'langsung menyalahkan orang lain', 'menganggap barang tidak pernah ada', 'menghapus daftar pencarian'], ans: 0 },
+                    { q: 'Contoh penerapan berpikir komputasional yang paling lengkap adalah ....', opts: ['membagi masalah, mencari pola, memilih informasi penting, menyusun langkah, lalu menguji solusi', 'langsung mencoba solusi tanpa memahami masalah', 'menghafalkan semua informasi', 'menggunakan komputer untuk semua kegiatan'], ans: 0 },
+                    { q: 'Dalam berpikir komputasional, proses menemukan solusi bukan berarti ....', opts: ['selalu membutuhkan komputer', 'membutuhkan analisis masalah', 'membutuhkan langkah yang terstruktur', 'dapat diterapkan dalam kehidupan sehari-hari'], ans: 0 },
+                    { q: 'Pernyataan yang paling tepat tentang berpikir komputasional adalah ....', opts: ['hanya digunakan oleh programmer', 'hanya dapat dilakukan menggunakan komputer', 'merupakan cara sistematis untuk memahami dan menyelesaikan masalah', 'hanya digunakan ketika membuat aplikasi'], ans: 2 }
+                ]
+            }
+        };
+
+        const groups = ['red', 'blue', 'yellow', 'green', 'purple'];
+        const WINNERS_NEEDED = Math.min(3, groups.length);
+        let currentGroupIndex = Math.floor(Math.random() * 5);
+        let gameState = {
+            positions: { red: 0, blue: 0, yellow: 0, green: 0, purple: 0 },
+            scores: { red: 0, blue: 0, yellow: 0, green: 0, purple: 0 },
+            diceValue: 0,
+            selectedAnswer: null,
+            askedQuestions: { red: new Set(), blue: new Set(), yellow: new Set(), green: new Set(), purple: new Set() },
+            currentQuestion: null,
+            finishOrder: [], 
+            answerTimeLeft: 60,
+            answerTimerInterval: null,
+            closeTimeoutId: null,
+            bukaSoalStopTimeout: null,
+            soundEnabled: true,
+            pendingMove: false,
+            pendingSlots: [],
+            finalOrderGroups: [],
+            tieUsedQuestions: new Set(),
+            activeTie: null
+        };
+
+        const groupColors = {
+            red: '#ef476f', blue: '#0865d8', yellow: '#ffc928', green: '#30bb6a', purple: '#8a48db'
+        };
+
+        function getCurrentGroup() {
+            return groups[currentGroupIndex];
+        }
+
+        function shuffleOptions(question) {
+            const indices = question.opts.map((_, i) => i);
+            for (let i = indices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
+            }
+            return {
+                q: question.q,
+                opts: indices.map(i => question.opts[i]),
+                ans: indices.indexOf(question.ans)
+            };
+        }
+
+        function initializeBoard() {
+            const boardGrid = document.getElementById('boardGrid');
+            boardGrid.innerHTML = '';
+            for (let i = 0; i < 64; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.id = `cell-${i}`;
+                if (i === 63) {
+                    cell.classList.add('finish');
+                    cell.innerHTML = 'FIN';
+                } else {
+                    cell.textContent = i + 1;
+                }
+                boardGrid.appendChild(cell);
+            }
+            drawPieces();
+            updateScoreBoard();
+        }
+
+        function drawPieces() {
+            document.querySelectorAll('.piece').forEach(p => p.remove());
+            groups.forEach((group, idx) => {
+                const piece = document.createElement('div');
+                piece.className = `piece`;
+                piece.id = `piece-${group}`;
+                piece.innerHTML = `<div class="pawn ${group}"></div>`;
+                const cell = document.getElementById(`cell-${gameState.positions[group]}`);
+                if (cell) {
+                    cell.appendChild(piece);
+                }
+            });
+        }
+
+        function updateScoreBoard() {
+            const scoreList = document.getElementById('scoreList');
+            scoreList.innerHTML = '';
+            const sortedGroups = [...groups].sort((a, b) => gameState.scores[b] - gameState.scores[a]);
+
+            sortedGroups.forEach((group, index) => {
+                const scoreItem = document.createElement('div');
+                scoreItem.className = 'rank-row';
+                scoreItem.style.setProperty('--rc', groupColors[group]);
+                const groupNum = groups.indexOf(group) + 1;
+                scoreItem.innerHTML = `
+                    <div class="rank">#${index + 1}</div>
+                    <div>Kelompok ${groupNum}</div>
+                    <div class="stats"><b>${gameState.scores[group]}</b> benar</div>
+                `;
+                scoreList.appendChild(scoreItem);
+            });
+        }
+
+        function rollDice() {
+            if (gameState.finishOrder.includes(getCurrentGroup())) {
+                advanceTurn();
+                return;
+            }
+            const diceBtn = document.getElementById('diceBtn');
+            diceBtn.disabled = true;
+            document.getElementById('diceResult').innerHTML = '<strong>Bersiap... ⚡</strong>';
+            playVoice('dadu');
+            setTimeout(() => { showQuestion(); }, 600);
+        }
+
+        function calcStepsFromSpeed(elapsedSeconds) {
+            if (elapsedSeconds <= 5) return 6;
+            if (elapsedSeconds <= 10) return 5;
+            if (elapsedSeconds <= 20) return 4;
+            if (elapsedSeconds <= 30) return 3;
+            if (elapsedSeconds <= 45) return 2;
+            return 1;
+        }
+
+        function showQuestion() {
+            const currentGroup = getCurrentGroup();
+            const groupData = groupsData[currentGroup];
+            const groupNum = groups.indexOf(currentGroup) + 1;
+            const groupAsked = gameState.askedQuestions[currentGroup];
+
+            if (groupAsked.size >= groupData.questions.length) groupAsked.clear();
+
+            let rawQuestion;
+            do {
+                rawQuestion = groupData.questions[Math.floor(Math.random() * groupData.questions.length)];
+            } while (groupAsked.has(JSON.stringify(rawQuestion)) && groupAsked.size < groupData.questions.length);
+
+            const question = shuffleOptions(rawQuestion);
+            gameState.currentQuestion = question;
+            groupAsked.add(JSON.stringify(rawQuestion));
+            gameState.selectedAnswer = null;
+
+            document.getElementById('questionHeader').textContent = `SOAL KELOMPOK ${groupNum}`;
+            document.getElementById('questionText').textContent = question.q;
+            document.getElementById('feedbackContainer').innerHTML = '';
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.opts.forEach((opt, idx) => {
+                const option = document.createElement('div');
+                option.className = 'option';
+                option.dataset.letter = String.fromCharCode(65 + idx);
+                option.textContent = opt;
+                option.onclick = () => selectOption(idx, option);
+                optionsContainer.appendChild(option);
+            });
+            
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('questionModal').classList.remove('hidden');
+            
+            startAnswerTimer();
+            playVoice('bukasoal');
+        }
+
+        function startAnswerTimer() {
+            stopAnswerTimer();
+            gameState.answerTimeLeft = 60;
+            document.getElementById('timerText').textContent = '60s';
+            gameState.answerTimerInterval = setInterval(() => {
+                gameState.answerTimeLeft--;
+                document.getElementById('timerText').textContent = gameState.answerTimeLeft + 's';
+                if (gameState.answerTimeLeft <= 0) {
+                    stopAnswerTimer();
+                    handleTimeUp();
+                }
+            }, 1000);
+        }
+
+        function stopAnswerTimer() {
+            if (gameState.answerTimerInterval) {
+                clearInterval(gameState.answerTimerInterval);
+                gameState.answerTimerInterval = null;
+            }
+        }
+
+        function selectOption(index, optionElement) {
+            document.querySelectorAll('#optionsContainer .option').forEach(o => o.classList.remove('selected'));
+            optionElement.classList.add('selected');
+            gameState.selectedAnswer = index;
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function handleTimeUp() {
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('feedbackContainer').innerHTML = `<div class="feedback bad">Waktu Habis! Pion tetap di tempat.</div>`;
+            playVoice('wrong');
+            setTimeout(() => closeQuestion(), 2500);
+        }
+
+        function submitAnswer() {
+            if (gameState.selectedAnswer === null) return;
+            stopAnswerTimer();
+            document.getElementById('submitBtn').disabled = true;
+            
+            const isCorrect = gameState.selectedAnswer === gameState.currentQuestion.ans;
+            const options = document.querySelectorAll('#optionsContainer .option');
+            const feedback = document.getElementById('feedbackContainer');
+            
+            if (isCorrect) {
+                options[gameState.currentQuestion.ans].classList.add('correct');
+                const elapsedSeconds = 60 - gameState.answerTimeLeft;
+                const steps = calcStepsFromSpeed(elapsedSeconds);
+                gameState.diceValue = steps;
+                
+                feedback.innerHTML = `<div class="feedback good">Benar! Dijawab ${elapsedSeconds} detik → <b>Maju ${steps} langkah</b>.</div>`;
+                document.getElementById('diceResult').innerHTML = `<strong>${steps} Langkah</strong>`;
+                
+                gameState.scores[getCurrentGroup()]++;
+                gameState.pendingMove = true;
+                playVoice('correct');
+                setTimeout(() => closeQuestion(), 2500);
+            } else {
+                options[gameState.selectedAnswer].classList.add('wrong');
+                feedback.innerHTML = `<div class="feedback bad">Belum Tepat! Pion tetap di tempat.</div>`;
+                document.getElementById('diceResult').innerHTML = `<strong>Tetap</strong>`;
+                playVoice('wrong');
+                setTimeout(() => closeQuestion(), 2500);
+            }
+            updateScoreBoard();
+        }
+
+        function closeQuestion() {
+            stopAnswerTimer();
+            document.getElementById('questionModal').classList.add('hidden');
+            let justFinished = null;
+            if (gameState.pendingMove) {
+                gameState.pendingMove = false;
+                justFinished = movePiece();
+            }
+            document.getElementById('diceResult').innerHTML = '-';
+
+            if (gameState.finishOrder.length >= WINNERS_NEEDED) return;
+
+            if (justFinished) {
+                showFinishCongrats(justFinished.group, justFinished.rank);
+                return;
+            }
+            advanceTurn();
+        }
+
+        function movePiece() {
+            const currentGroup = getCurrentGroup();
+            let newPosition = gameState.positions[currentGroup] + gameState.diceValue;
+            
+            if (newPosition >= 63) {
+                newPosition = 63;
+                const alreadyFinished = gameState.finishOrder.includes(currentGroup);
+                if (!alreadyFinished) gameState.finishOrder.push(currentGroup);
+                
+                gameState.positions[currentGroup] = newPosition;
+                drawPieces();
+                
+                if (gameState.finishOrder.length >= WINNERS_NEEDED) {
+                    showWinner();
+                    return null;
+                }
+                if (!alreadyFinished) return { group: currentGroup, rank: gameState.finishOrder.length };
+                return null;
+            }
+            gameState.positions[currentGroup] = newPosition;
+            drawPieces();
+            return null;
+        }
+
+        function advanceTurn() {
+            let attempts = 0;
+            do {
+                currentGroupIndex = (currentGroupIndex + 1) % groups.length;
+                attempts++;
+            } while (gameState.finishOrder.includes(getCurrentGroup()) && attempts < groups.length);
+
+            const nextGroup = getCurrentGroup();
+            document.getElementById('currentGroupDisplay').textContent = `KELOMPOK ${groups.indexOf(nextGroup) + 1}`;
+            document.getElementById('diceBtn').disabled = false;
+        }
+
+        function showFinishCongrats(group, rank) {
+            document.getElementById('finishText').innerHTML = `Kelompok ${groups.indexOf(group) + 1} Finish sebagai JUARA ${rank}!`;
+            document.getElementById('finishModal').classList.remove('hidden');
+            playVoice('correct');
+        }
+
+        function dismissFinishCongrats() {
+            document.getElementById('finishModal').classList.add('hidden');
+            advanceTurn();
+        }
+
+        function showWinner() {
+            const sorted = [...groups].sort((a, b) => gameState.scores[b] - gameState.scores[a]);
+            const slots = [];
+            let i = 0;
+            while (i < sorted.length) {
+                let j = i + 1;
+                while (j < sorted.length && gameState.scores[sorted[j]] === gameState.scores[sorted[i]]) j++;
+                const clusterGroups = sorted.slice(i, j);
+                slots.push(clusterGroups.length > 1 ? { type: 'tie', groups: clusterGroups } : { type: 'single', group: clusterGroups[0] });
+                i = j;
+            }
+            gameState.pendingSlots = slots;
+            gameState.finalOrderGroups = [];
+            processNextSlot();
+        }
+
+        function processNextSlot() {
+            if (gameState.pendingSlots.length === 0) {
+                renderFinalStandings(gameState.finalOrderGroups);
+                return;
+            }
+            const slot = gameState.pendingSlots.shift();
+            if (slot.type === 'single') {
+                gameState.finalOrderGroups.push(slot.group);
+                processNextSlot();
+            } else {
+                startTieBreak(slot.groups);
+            }
+        }
+
+        function startTieBreak(tiedGroups) {
+            gameState.activeTie = {
+                contenders: [...tiedGroups], eliminatedThisQuestion: new Set(), order: [], question: null, buzzedGroup: null
+            };
+            document.getElementById('tiebreakModal').classList.remove('hidden');
+            loadTieQuestion();
+        }
+
+        function loadTieQuestion() {
+            const tie = gameState.activeTie;
+            if (tie.contenders.length === 1) {
+                tie.order.push(tie.contenders[0]);
+                finishTieBreak();
+                return;
+            }
+            const pool = [];
+            groups.forEach(g => groupsData[g].questions.forEach(q => pool.push(q)));
+            tie.question = shuffleOptions(pool[Math.floor(Math.random() * pool.length)]);
+            tie.buzzedGroup = null;
+            tie.eliminatedThisQuestion = new Set();
+            renderTieBuzzStage();
+        }
+
+        function renderTieBuzzStage() {
+            const tie = gameState.activeTie;
+            document.getElementById('tiebreakInfo').textContent = `Rebutan Skor Seri (${gameState.scores[tie.contenders[0]]} Benar)`;
+            document.getElementById('tiebreakQuestionText').textContent = tie.question.q;
+            document.getElementById('tiebreakFeedback').innerHTML = '';
+            document.getElementById('tiebreakOptions').style.display = 'none';
+            document.getElementById('tiebreakButtonGroup').style.display = 'none';
+            document.getElementById('tiebreakBuzzedLabel').innerHTML = '';
+
+            const buzzRow = document.getElementById('buzzRow');
+            buzzRow.innerHTML = '';
+            buzzRow.style.display = 'flex';
+
+            tie.contenders.forEach(g => {
+                const btn = document.createElement('button');
+                btn.className = 'buzz-btn';
+                btn.textContent = `BELL KEL ${groups.indexOf(g) + 1}`;
+                if (tie.eliminatedThisQuestion.has(g)) { btn.disabled = true; btn.textContent = `❌ (SALAH)`; }
+                else btn.onclick = () => buzzIn(g);
+                buzzRow.appendChild(btn);
+            });
+        }
+
+        function buzzIn(group) {
+            const tie = gameState.activeTie;
+            if (!tie || tie.buzzedGroup) return;
+            tie.buzzedGroup = group;
+            document.getElementById('buzzRow').style.display = 'none';
+            document.getElementById('tiebreakBuzzedLabel').innerHTML = `<p style="font-weight:bold; color:var(--blue);">🎙️ KELOMPOK ${groups.indexOf(group) + 1} Merebut, Silakan Jawab!</p>`;
+
+            const optionsContainer = document.getElementById('tiebreakOptions');
+            optionsContainer.style.display = 'grid';
+            optionsContainer.innerHTML = '';
+            gameState.tieSelectedAnswer = null;
+
+            tie.question.opts.forEach((opt, idx) => {
+                const option = document.createElement('div');
+                option.className = 'option';
+                option.dataset.letter = String.fromCharCode(65 + idx);
+                option.textContent = opt;
+                option.onclick = () => {
+                    document.querySelectorAll('#tiebreakOptions .option').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                    gameState.tieSelectedAnswer = idx;
+                    document.getElementById('tiebreakSubmitBtn').disabled = false;
+                };
+                optionsContainer.appendChild(option);
+            });
+            document.getElementById('tiebreakButtonGroup').style.display = 'flex';
+        }
+
+        function submitTieAnswer() {
+            const tie = gameState.activeTie;
+            document.getElementById('tiebreakSubmitBtn').disabled = true;
+            const isCorrect = gameState.tieSelectedAnswer === tie.question.ans;
+            const options = document.querySelectorAll('#tiebreakOptions .option');
+            const feedback = document.getElementById('tiebreakFeedback');
+
+            if (isCorrect) {
+                options[tie.question.ans].classList.add('correct');
+                feedback.innerHTML = `<div class="feedback good">🎉 BENAR! Kelompok ${groups.indexOf(tie.buzzedGroup) + 1} Lolos!</div>`;
+                playVoice('correct');
+                tie.order.push(tie.buzzedGroup);
+                tie.contenders = tie.contenders.filter(g => g !== tie.buzzedGroup);
+                setTimeout(() => {
+                    if (tie.contenders.length <= 1) {
+                        if (tie.contenders.length === 1) tie.order.push(tie.contenders[0]);
+                        finishTieBreak();
+                    } else loadTieQuestion();
+                }, 2000);
+            } else {
+                options[gameState.tieSelectedAnswer].classList.add('wrong');
+                feedback.innerHTML = `<div class="feedback bad">SALAH! Giliran kelompok lain.</div>`;
+                playVoice('wrong');
+                tie.eliminatedThisQuestion.add(tie.buzzedGroup);
+                setTimeout(() => {
+                    if (tie.eliminatedThisQuestion.size >= tie.contenders.length) loadTieQuestion();
+                    else renderTieBuzzStage();
+                }, 2000);
+            }
+        }
+
+        function finishTieBreak() {
+            gameState.finalOrderGroups.push(...gameState.activeTie.order);
+            document.getElementById('tiebreakModal').classList.add('hidden');
+            processNextSlot();
+        }
+
+        function renderFinalStandings(orderedGroups) {
+            const rankingContainer = document.getElementById('rankingContainer');
+            rankingContainer.innerHTML = '';
+            orderedGroups.forEach((group, index) => {
+                const div = document.createElement('div');
+                div.className = 'rank-row';
+                div.style.setProperty('--rc', groupColors[group]);
+                div.innerHTML = `
+                    <div class="rank">#${index + 1}</div>
+                    <div>Kelompok ${groups.indexOf(group) + 1}</div>
+                    <div class="stats"><b>${gameState.scores[group]}</b> benar</div>
+                `;
+                rankingContainer.appendChild(div);
+            });
+            document.getElementById('winnerModal').classList.remove('hidden');
+        }
+
+        function toggleHelp() {
+            document.getElementById('helpModal').classList.toggle('hidden');
+            playVoice('klik');
+        }
+
+        function toggleSound() {
+            gameState.soundEnabled = !gameState.soundEnabled;
+            document.getElementById('soundToggle').style.opacity = gameState.soundEnabled ? '1' : '0.5';
+        }
+
+        function playVoice(type) {
+            if (!gameState.soundEnabled) return;
+            const map = { 'correct': 'soundCorrect', 'wrong': 'soundWrong', 'dadu': 'soundDadu', 'bukasoal': 'soundBukaSoal', 'klik': 'soundKlik' };
+            const el = document.getElementById(map[type]);
+            if (el) { el.currentTime = 0; el.play().catch(e=>{}); }
+        }
+
+        window.onload = () => {
+            initializeBoard();
+            document.getElementById('currentGroupDisplay').textContent = `KELOMPOK ${groups.indexOf(getCurrentGroup()) + 1}`;
+            document.getElementById('helpModal').classList.remove('hidden');
+        };
+    </script>
+</body>
+</html>
