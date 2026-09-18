@@ -124,24 +124,32 @@
         <div class="header">
             <button class="hero-home" type="button" onclick="goHome()" aria-label="Kembali ke awal permainan">🏠</button>
 
-            <div class="mascot-dice" aria-hidden="true">
-                <span class="mascot-cap">🎓</span>
-                <span class="mascot-body">
-                    <i class="pip p1"></i><i class="pip p2"></i><i class="pip p3"></i><i class="pip p4"></i><i class="pip p5"></i>
-                </span>
-                <span class="mascot-sparkle s1">✨</span>
-                <span class="mascot-sparkle s2">⭐</span>
+            <div class="mini-dice" aria-hidden="true">
+                <svg viewBox="0 0 40 40"><rect x="3" y="3" width="34" height="34" rx="9" fill="#fff" stroke="#164e82" stroke-width="3"/>
+                    <circle cx="13" cy="13" r="3" fill="#164e82"/><circle cx="27" cy="13" r="3" fill="#164e82"/>
+                    <circle cx="20" cy="20" r="3" fill="#164e82"/>
+                    <circle cx="13" cy="27" r="3" fill="#164e82"/><circle cx="27" cy="27" r="3" fill="#164e82"/>
+                </svg>
             </div>
 
             <div class="brand-block">
-                <span class="eyebrow">Arena belajar interaktif</span>
+                <span class="eyebrow">Arena Belajar Interaktif</span>
                 <div class="wood-sign">
-                    <h1>LUDO <span>EDUKASI</span></h1>
+                    <h1><span class="line-ludo">LUDO</span><span class="line-edukasi">EDUKASI</span></h1>
                 </div>
                 <p>Belajar Sambil Bermain</p>
             </div>
 
-            <div class="hero-slogan">Langkah kecil hari ini,<br>prestasi besar esok hari! ✨</div>
+            <div class="hero-photo-wrap" aria-hidden="true">
+                <img class="hero-photo" src="assets/img/students_header.png" alt="">
+                <span class="hero-star st1">⭐</span>
+                <span class="hero-star st2">⭐</span>
+                <span class="hero-caption">
+                    <span>Belajar Bersama</span>
+                    <span>Bermain Bersama</span>
+                    <svg class="hero-plane" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="1.6"><path d="M2 12 21 3l-6.5 19-3-7-7-3Z"/></svg>
+                </span>
+            </div>
 
             <div class="header-actions">
                 <button class="help-toggle" id="helpToggle" type="button" onclick="toggleHelp()" aria-haspopup="dialog" aria-controls="helpModal">
@@ -160,12 +168,12 @@
                 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M11 5 6.8 8.5H3v7h3.8L11 19V5Zm4.2 3.1a5.5 5.5 0 0 1 0 7.8M18 5.5a9 9 0 0 1 0 13"/></svg>
                 <span>Suara aktif</span>
             </button>
-            <span class="toolbar-divider" aria-hidden="true">〈〉</span>
+            <svg class="toolbar-divider" aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0d578d" stroke-width="2"><path d="M4 12a8 8 0 0 1 14-5M20 12a8 8 0 0 1-14 5"/><path d="M18 4v3.5H14.5M6 20v-3.5H9.5"/></svg>
             <div class="current-turn">
                 <span class="turn-label">GILIRAN BERMAIN</span>
             </div>
             <div class="group-pill" id="currentGroupPill">
-                <span class="group-pill-icon" aria-hidden="true">👥</span>
+                <span class="group-pill-icon" aria-hidden="true">🚩</span>
                 <span class="group-name" id="currentGroupDisplay">KELOMPOK 1</span>
             </div>
         </div>
@@ -175,6 +183,7 @@
                 <div class="ludo-board" id="ludoBoard">
                     <div class="board-grid" id="boardGrid"></div>
                 </div>
+
                 <div class="play-tip">
                     <span class="tip-number"> NOTES : </span>
                     <p><strong>Klik Dadu,</strong> Jawab soal dengan cepat dan tepat. makin cepat menjawab, maka pion akan semakin jauh melangkah</p>
@@ -183,13 +192,18 @@
             
             <div class="sidebar">
                 <div class="dice-panel">
-                    <span class="panel-kicker">Langkah berikutnya</span>
-                    <div class="dice-label">MULAI SOAL</div>
-                    <div class="dice-helper">Klik saat kelompokmu siap. Jawab cepat = langkah jauh!</div>
+                    <img class="dice-panel-photo" src="assets/img/students_side.png" alt="" aria-hidden="true">
+                    <span class="panel-kicker">Siap Belajar?</span>
+                    <div class="dice-helper">Tantang temanmu dan jawab soal!</div>
                     <button class="dice-btn" id="diceBtn" onclick="rollDice()" aria-label="Mulai soal">
                         <span class="dice-face" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
-                        <span class="dice-btn-text">▶ Mulai Soal</span>
+                        <span class="dice-btn-text">▶ MULAI SOAL</span>
                     </button>
+                    <div class="dice-roll-overlay" id="diceRollOverlay" aria-hidden="true">
+                        <div class="dice-roll-cube">
+                            <i class="rpip rp1"></i><i class="rpip rp2"></i><i class="rpip rp3"></i><i class="rpip rp4"></i><i class="rpip rp5"></i>
+                        </div>
+                    </div>
                     <div class="dice-result" id="diceResult">-</div>
                     <div class="dice-decor" aria-hidden="true">🎲</div>
                 </div>
@@ -202,6 +216,23 @@
                     <div id="scoreList"></div>
                 </div>
             </div>
+        </div>
+
+        <div class="footer-band" aria-hidden="true">
+            <span class="footer-star f1">⭐</span>
+            <span class="footer-star f2">⭐</span>
+            <span class="footer-star f3">⭐</span>
+            <div class="footer-books">
+                <div class="fbook" style="--bc:#2a7fd1">MATEMATIKA</div>
+                <div class="fbook" style="--bc:#8a2f3a">BAHASA INDONESIA</div>
+                <div class="fbook" style="--bc:#2f8f5b">IPA</div>
+                <div class="fbook" style="--bc:#1c3f66">BAHASA INGGRIS</div>
+            </div>
+            <div class="footer-quote">
+                <span>Jadi versi terbaik</span>
+                <span>dari diri sendiri <i>♡</i></span>
+            </div>
+            <svg class="footer-plane" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="1.6"><path d="M2 12 21 3l-6.5 19-3-7-7-3Z"/></svg>
         </div>
     </div>
     
@@ -500,7 +531,7 @@
             });
         }
 
-        const rankMedal = ['🏆', '🥈', '🥉', '👥', '👥'];
+        const rankMedal = ['🏆', '🏆', '🏆', '👥', '👥'];
 
         function updateScoreBoard() {
             const scoreList = document.getElementById('scoreList');
@@ -532,16 +563,19 @@
             }
 
             const diceBtn = document.getElementById('diceBtn');
+            const diceRollOverlay = document.getElementById('diceRollOverlay');
 
             diceBtn.disabled = true;
             diceBtn.classList.add('rolling');
+            diceRollOverlay.classList.add('active');
             document.getElementById('diceResult').textContent = 'Bersiap... ⚡';
             playDaduBacksound();
 
             setTimeout(() => {
                 diceBtn.classList.remove('rolling');
+                diceRollOverlay.classList.remove('active');
                 showQuestion();
-            }, 600);
+            }, 700);
         }
 
         // Semakin cepat kelompok menjawab (dihitung dari sisa waktu di timer 60 detik),
