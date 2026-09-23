@@ -1,0 +1,2741 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Family 100 — Kuis Belajar Informatika</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#0a0f1e; --bg-1:#111a30; --panel:#16213e; --panel-2:#1c2b4d;
+  --line: rgba(255,255,255,0.08);
+  --ink:#eef2ff; --ink-dim:#93a0c4;
+  --gold:#f5c542; --gold-deep:#c9962c;
+  --red:#ef4444;
+  --teamA:#3b82f6; --teamB:#ef4444; --teamC:#22c55e; --teamD:#f59e0b; --teamE:#a855f7;
+  --radius-lg:22px; --radius-md:14px; --radius-sm:9px;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top:var(--safe-t);}
+body{
+  margin:0; min-height:100%;
+  font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(ellipse 900px 500px at 50% -10%, rgba(245,197,66,0.10), transparent 60%),
+    linear-gradient(160deg, var(--bg-0), var(--bg-1) 55%, #0a0f1e 100%);
+  padding-top:var(--safe-t); padding-bottom:var(--safe-b);
+  -webkit-font-smoothing:antialiased;
+}
+html,body{height:100%;}
+.wrap{max-width:1080px;margin:0 auto;padding:22px 16px 40px;}
+
+/* ---------- header ---------- */
+.hero{text-align:center;margin-bottom:18px;}
+.hero h1{
+  font-size:clamp(1.6rem,4.5vw,2.6rem); font-weight:900; margin:0;
+  letter-spacing:-0.01em; color:var(--gold);
+  text-shadow:0 2px 24px rgba(245,197,66,0.35);
+}
+.hero p{color:var(--ink-dim); margin:.5rem 0 0; font-size:.92rem;}
+
+/* ---------- top toolbar ---------- */
+.toolbar{display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+.chip-btn{
+  background:var(--panel); border:1px solid var(--line); color:var(--ink-dim);
+  padding:7px 14px; border-radius:999px; font-size:.78rem; font-weight:600;
+  cursor:pointer; transition:.15s; display:inline-flex; align-items:center; gap:6px;
+}
+.chip-btn:hover{color:var(--ink); border-color:rgba(245,197,66,0.4);}
+.chip-btn:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+
+/* ---------- setup panel ---------- */
+.panel{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--line); border-radius:var(--radius-lg);
+  padding:18px; margin-bottom:16px;
+}
+.panel h3{margin:0 0 12px; text-align:center; font-size:.95rem; color:var(--gold); font-weight:700;}
+.team-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:14px;}
+@media (max-width:520px){.team-grid{grid-template-columns:repeat(3,1fr);}}
+.team-btn{
+  padding:12px 4px; border-radius:var(--radius-md); font-weight:800; font-size:1rem;
+  background:rgba(255,255,255,0.03); border:2px solid transparent; color:var(--ink);
+  cursor:pointer; transition:.15s; position:relative;
+}
+.team-btn:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+.team-btn.tA{border-color:var(--teamA);} .team-btn.tB{border-color:var(--teamB);}
+.team-btn.tC{border-color:var(--teamC);} .team-btn.tD{border-color:var(--teamD);}
+.team-btn.tE{border-color:var(--teamE);}
+.team-btn.selected{background:rgba(245,197,66,0.16); box-shadow:0 0 0 2px var(--gold) inset;}
+.vs-row{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;}
+.vs-row .nm{font-weight:800; font-size:1.05rem;}
+.vs-row .vs{color:var(--ink-dim); font-weight:600; font-size:.85rem;}
+.btn-primary{
+  background:linear-gradient(135deg,var(--gold),var(--gold-deep)); color:#1a1300; border:none;
+  font-weight:800; padding:10px 22px; border-radius:999px; cursor:pointer; font-size:.9rem;
+  box-shadow:0 4px 16px rgba(245,197,66,0.25); transition:.15s;
+}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-primary:disabled{opacity:.4; cursor:not-allowed; transform:none;}
+.btn-primary:focus-visible{outline:2px solid #fff; outline-offset:2px;}
+
+/* ---------- turn banner ---------- */
+.turn-banner{
+  display:none; text-align:center; margin-bottom:14px; padding:10px 16px;
+  background:var(--panel); border:1px solid var(--line); border-radius:999px;
+}
+.turn-banner.show{display:block;}
+.turn-banner .label{color:var(--ink-dim); font-size:.78rem;}
+.turn-banner .who{font-weight:900; font-size:1.15rem; color:var(--gold); margin-left:6px;}
+.strikes{display:inline-flex; gap:4px; margin-left:10px; vertical-align:middle;}
+.strike-x{
+  width:20px; height:20px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+  font-size:.7rem; font-weight:900; background:rgba(255,255,255,0.06); color:var(--ink-dim);
+}
+.strike-x.hit{background:var(--red); color:#fff;}
+
+/* ---------- board ---------- */
+.board{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--line); border-radius:var(--radius-lg);
+  padding:20px; margin-bottom:18px; box-shadow:0 20px 60px rgba(0,0,0,0.35);
+}
+.board-top{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+.progress-pill{background:rgba(255,255,255,0.05); padding:6px 14px; border-radius:999px; font-size:.8rem; font-weight:700; color:var(--ink-dim);}
+.progress-pill b{color:var(--gold);}
+.nav-btns{display:flex; gap:6px; flex-wrap:wrap;}
+.icon-btn{
+  background:rgba(255,255,255,0.05); border:1px solid var(--line); color:var(--ink);
+  padding:7px 12px; border-radius:var(--radius-sm); font-size:.78rem; font-weight:700; cursor:pointer;
+}
+.icon-btn:hover{background:rgba(255,255,255,0.1);}
+.icon-btn:disabled{opacity:.35; cursor:not-allowed;}
+.icon-btn:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+
+.progress-bar{height:5px; background:rgba(255,255,255,0.06); border-radius:99px; overflow:hidden; margin-bottom:16px;}
+.progress-bar > i{display:block; height:100%; background:linear-gradient(90deg,var(--gold-deep),var(--gold)); transition:width .35s ease;}
+
+.soal-box{
+  background:rgba(0,0,0,0.22); border:1px solid rgba(96,165,250,0.25); border-radius:var(--radius-md);
+  padding:20px; margin-bottom:16px; text-align:center;
+}
+.soal-box h2{margin:0; font-size:clamp(1.05rem,2.6vw,1.4rem); font-weight:700; line-height:1.4;}
+
+.cards{display:grid; gap:10px; margin-bottom:16px;}
+.kartu{
+  border-radius:var(--radius-md); padding:14px 16px; display:flex; justify-content:space-between; align-items:center;
+  cursor:pointer; transition:transform .15s, box-shadow .15s; border:2px solid transparent;
+  font-weight:700; user-select:none;
+}
+.kartu:focus-visible{outline:2px solid #fff; outline-offset:2px;}
+.kartu.tutup{background:linear-gradient(135deg,#1e3a8a,#1e40af); border-color:#3b82f6;}
+.kartu.tutup:hover{border-color:var(--gold); transform:translateY(-1px);}
+.kartu.terlihat{background:linear-gradient(135deg,#243352,#1c2b4d); border-color:rgba(255,255,255,0.15); cursor:pointer;}
+.kartu.terlihat:hover{border-color:var(--gold);}
+.kartu.benar{background:linear-gradient(135deg,var(--gold),var(--gold-deep)); color:#1a1300; border-color:#fff8dc; cursor:default; animation:pop .3s ease;}
+.kartu.terbuang{background:rgba(255,255,255,0.03); border-color:rgba(255,255,255,0.06); color:var(--ink-dim); cursor:default;}
+@keyframes pop{0%{transform:scale(.94);}60%{transform:scale(1.02);}100%{transform:scale(1);}}
+.kartu .teks{font-size:.95rem;}
+.kartu .poin{font-size:1.05rem; font-weight:900;}
+
+.action-row{display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+.btn-reveal{
+  background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; border:none; font-weight:800;
+  padding:11px 20px; border-radius:999px; cursor:pointer; font-size:.88rem;
+}
+.btn-reveal:disabled{opacity:.4; cursor:not-allowed;}
+.btn-strike{
+  background:rgba(239,68,68,0.14); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); font-weight:800;
+  padding:11px 20px; border-radius:999px; cursor:pointer; font-size:.88rem;
+}
+.btn-strike:disabled{opacity:.35; cursor:not-allowed;}
+
+.round-over{
+  text-align:center; padding:12px; margin-top:8px; border-radius:var(--radius-md);
+  background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; font-weight:700; font-size:.9rem;
+  display:none;
+}
+.round-over.show{display:block;}
+
+.sementara{display:flex; justify-content:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); flex-wrap:wrap;}
+.sementara .box{text-align:center; min-width:110px;}
+.sementara .nm{font-weight:800; font-size:.85rem;}
+.sementara .val{font-size:1.8rem; font-weight:900; color:var(--gold);}
+
+/* ---------- scoreboard ---------- */
+.score-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+@media (max-width:640px){.score-grid{grid-template-columns:repeat(2,1fr);}}
+.score-card{
+  background:var(--panel); border:2px solid var(--line); border-radius:var(--radius-md);
+  padding:14px 8px; text-align:center; transition:.2s;
+}
+.score-card.tA{border-color:var(--teamA);} .score-card.tB{border-color:var(--teamB);}
+.score-card.tC{border-color:var(--teamC);} .score-card.tD{border-color:var(--teamD);}
+.score-card.tE{border-color:var(--teamE);}
+.score-card .nm{font-weight:800; font-size:.85rem;}
+.score-card .val{font-size:1.8rem; font-weight:900; color:var(--gold); margin:4px 0;}
+.score-card .bump{animation:bump .4s ease;}
+@keyframes bump{0%{transform:scale(1);}40%{transform:scale(1.12);}100%{transform:scale(1);}}
+
+.hint{text-align:center; color:var(--ink-dim); font-size:.8rem; margin-top:18px;}
+
+/* ---------- toasts ---------- */
+#toast-stack{
+  position:fixed; top:calc(var(--safe-t) + 14px); left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; gap:8px; z-index:80; width:min(92vw,420px); align-items:center;
+}
+.toast{
+  background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:10px 18px;
+  font-weight:700; font-size:.85rem; box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  animation:toast-in .25s ease, toast-out .25s ease 2.2s forwards; opacity:0;
+}
+.toast.ok{border-color:var(--gold); color:var(--gold);}
+.toast.bad{border-color:var(--red); color:#fca5a5;}
+@keyframes toast-in{from{opacity:0; transform:translateY(-8px);} to{opacity:1; transform:translateY(0);}}
+@keyframes toast-out{to{opacity:0;}}
+
+/* ---------- modal ---------- */
+.modal-back{
+  position:fixed; inset:0; background:rgba(5,8,16,0.72); display:none; align-items:center; justify-content:center;
+  padding:20px; z-index:90;
+}
+.modal-back.show{display:flex;}
+.modal-card{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2)); border:1px solid var(--line);
+  border-radius:var(--radius-lg); padding:24px; max-width:420px; width:100%; text-align:center;
+}
+.modal-card h4{margin:0 0 8px; font-size:1.1rem; color:var(--gold);}
+.modal-card p{color:var(--ink-dim); font-size:.88rem; margin:0 0 18px; line-height:1.5;}
+.modal-actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+.btn-ghost{
+  background:transparent; border:1px solid var(--line); color:var(--ink); font-weight:700;
+  padding:9px 18px; border-radius:999px; cursor:pointer; font-size:.85rem;
+}
+
+/* ---------- rebutan / buzzer screen ---------- */
+#buzzer-screen{
+  position:fixed; inset:0; z-index:94; display:none;
+  flex-direction:column; padding:var(--safe-t) 0 var(--safe-b);
+  background:#05070d;
+}
+#buzzer-screen.show{display:flex;}
+.buzzer-title{
+  text-align:center; padding:16px 16px 10px; color:var(--gold); font-weight:800;
+  font-size:clamp(1rem,3vw,1.3rem);
+}
+.buzzer-sub{text-align:center; color:var(--ink-dim); font-size:.82rem; margin-top:-4px; padding-bottom:10px;}
+.buzzer-halves{flex:1; display:flex; flex-direction:row; gap:2px;}
+@media (max-width:640px){.buzzer-halves{flex-direction:column;}}
+.buzzer-half{
+  flex:1; border:none; cursor:pointer; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:10px; color:#fff; font-weight:900;
+  transition:filter .12s, transform .08s; position:relative; overflow:hidden;
+}
+.buzzer-half:active{transform:scale(0.98);}
+.buzzer-half:hover{filter:brightness(1.12);}
+.buzzer-half:focus-visible{outline:4px solid #fff; outline-offset:-6px;}
+.buzzer-half .nm{font-size:clamp(1.6rem,6vw,2.6rem); letter-spacing:-0.01em;}
+.buzzer-half .kbd{
+  font-size:.8rem; font-weight:700; opacity:.85; padding:6px 14px; border-radius:999px;
+  background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.3);
+}
+.buzzer-vs{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:#05070d; color:var(--gold); font-weight:900; font-size:1.1rem;
+  padding:10px 16px; border-radius:50%; border:2px solid var(--gold); z-index:2;
+}
+@media (max-width:640px){.buzzer-vs{position:static; transform:none; margin:0 auto;}}
+
+/* ---------- winner screen ---------- */
+#winner-screen{
+  position:fixed; inset:0; background:rgba(5,8,16,0.92); display:none; align-items:center; justify-content:center;
+  z-index:95; padding:20px; overflow:auto;
+}
+#winner-screen.show{display:flex;}
+.winner-card{max-width:520px; width:100%; text-align:center;}
+.winner-card h2{color:var(--gold); font-size:clamp(1.5rem,5vw,2.2rem); margin:0 0 4px;}
+.podium{display:flex; flex-direction:column; gap:10px; margin-top:18px;}
+.podium-row{
+  display:flex; align-items:center; justify-content:space-between; padding:12px 18px;
+  background:var(--panel); border-radius:var(--radius-md); border:2px solid var(--line);
+}
+.podium-row .rank{font-weight:900; color:var(--ink-dim); width:28px;}
+.podium-row.top1{border-color:var(--gold); background:rgba(245,197,66,0.1);}
+.podium-row .pts{font-weight:900; color:var(--gold);}
+#confetti-canvas{position:fixed; inset:0; pointer-events:none; z-index:96;}
+
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>Family 100 &mdash; Kuis Belajar Informatika</h1>
+    <p>100 soal acak &bull; jawaban tampil, tim menebak, poin masuk otomatis</p>
+  </div>
+
+  <div class="toolbar">
+    <button class="chip-btn" id="btn-sound" onclick="toggleSuara()">🔊 Suara: Aktif</button>
+    <button class="chip-btn" onclick="toggleFullscreen()">⛶ Mode Layar Penuh</button>
+    <button class="chip-btn" onclick="mintaResetSkor()">↺ Reset Skor</button>
+    <button class="chip-btn" onclick="mintaResetTotal()">⟲ Ulang dari Awal</button>
+  </div>
+
+  <div class="panel">
+    <h3>Pilih 2 Tim yang Bertanding</h3>
+    <div class="team-grid">
+      <button class="team-btn tA" id="pilih-A" onclick="pilihTimDuel('A')">Tim A</button>
+      <button class="team-btn tB" id="pilih-B" onclick="pilihTimDuel('B')">Tim B</button>
+      <button class="team-btn tC" id="pilih-C" onclick="pilihTimDuel('C')">Tim C</button>
+      <button class="team-btn tD" id="pilih-D" onclick="pilihTimDuel('D')">Tim D</button>
+      <button class="team-btn tE" id="pilih-E" onclick="pilihTimDuel('E')">Tim E</button>
+    </div>
+    <div class="vs-row">
+      <span class="nm" id="tim1-nama" style="color:var(--teamA)">Pilih Tim 1</span>
+      <span class="vs">VS</span>
+      <span class="nm" id="tim2-nama" style="color:var(--teamB)">Pilih Tim 2</span>
+      <button class="btn-primary" id="btn-mulai" onclick="mulaiDuel()" disabled>Mulai Duel!</button>
+    </div>
+  </div>
+
+  <div class="turn-banner" id="kotak-giliran">
+    <span class="label">Giliran menjawab:</span><span class="who" id="giliran-sekarang">&mdash;</span>
+    <span class="strikes" id="strike-wrap">
+      <span class="strike-x" id="strike-1">X</span>
+      <span class="strike-x" id="strike-2">X</span>
+      <span class="strike-x" id="strike-3">X</span>
+    </span>
+  </div>
+
+  <div class="board">
+    <div class="board-top">
+      <span class="progress-pill">Soal <b id="nomor">1</b> dari <b id="total-soal">100</b></span>
+      <div class="nav-btns">
+        <button class="icon-btn" id="btn-prev" onclick="soalSebelumnya()" disabled>&larr; Sebelumnya</button>
+        <select class="icon-btn" id="pilih-nomor" onchange="lompatKeSoal(this.value)"></select>
+        <button class="icon-btn" id="btn-next" onclick="mintaSoalBerikutnya()">Berikutnya &rarr;</button>
+      </div>
+    </div>
+    <div class="progress-bar"><i id="progress-fill" style="width:1%"></i></div>
+
+    <div class="soal-box">
+      <h2 id="soal">Pilih 2 tim, lalu klik &ldquo;Mulai Duel!&rdquo; untuk memulai.</h2>
+    </div>
+
+    <div id="daftar-jawaban" class="cards"></div>
+
+    <div class="action-row">
+      <button class="btn-reveal" onclick="bukaSemuaJawaban()" id="btn-buka-semua" disabled>Tampilkan Semua Jawaban <span style="opacity:.75;font-weight:600;">(tekan L)</span></button>
+      <button class="btn-strike" onclick="tandaiSalah()" id="btn-salah" disabled>Jawaban Tidak Ada di Papan <span style="opacity:.7;font-weight:600;">(tekan X)</span></button>
+    </div>
+    <div class="round-over" id="round-over">Ronde selesai &mdash; papan sudah penuh dengan 3 kesalahan. Lanjut ke soal berikutnya.</div>
+
+    <div class="sementara">
+      <div class="box"><div class="nm" id="sementara-tim1-nama" style="color:var(--teamA)">Tim 1</div><div class="val" id="sementara-tim1">0</div></div>
+      <div class="box"><div class="nm" id="sementara-tim2-nama" style="color:var(--teamB)">Tim 2</div><div class="val" id="sementara-tim2">0</div></div>
+    </div>
+  </div>
+
+  <div class="score-grid">
+    <div class="score-card tA"><div class="nm" style="color:var(--teamA)">TIM A</div><div class="val" id="skor-A">0</div></div>
+    <div class="score-card tB"><div class="nm" style="color:var(--teamB)">TIM B</div><div class="val" id="skor-B">0</div></div>
+    <div class="score-card tC"><div class="nm" style="color:var(--teamC)">TIM C</div><div class="val" id="skor-C">0</div></div>
+    <div class="score-card tD"><div class="nm" style="color:var(--teamD)">TIM D</div><div class="val" id="skor-D">0</div></div>
+    <div class="score-card tE"><div class="nm" style="color:var(--teamE)">TIM E</div><div class="val" id="skor-E">0</div></div>
+  </div>
+
+  <p class="hint">Baca soal &rarr; siswa menjawab lisan &rarr; klik &ldquo;Tampilkan Semua Jawaban&rdquo; &rarr; klik jawaban yang disebut. Jawaban benar tetap lanjut menjawab; salah menambah satu &times; dan giliran pindah. Progres tersimpan otomatis di perangkat ini.<br>Pintasan keyboard: <b>F</b>/<b>J</b> = tim menang rebutan &bull; <b>L</b> = tampilkan semua jawaban &bull; <b>1&ndash;9</b> = pilih jawaban sesuai nomor kartu &bull; <b>X</b> = tandai salah.</p>
+</div>
+
+<div id="toast-stack" aria-live="polite"></div>
+<span class="sr-only" id="sr-announcer" aria-live="assertive"></span>
+
+<div class="modal-back" id="modal-back">
+  <div class="modal-card">
+    <h4 id="modal-title">Konfirmasi</h4>
+    <p id="modal-text"></p>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<div id="buzzer-screen">
+  <div class="buzzer-title">Rebutan &mdash; siapa yang berhasil menjawab lebih dulu?</div>
+  <div class="buzzer-sub">Klik / tekan tombol keyboard sisi tim yang duluan menjawab</div>
+  <div class="buzzer-halves">
+    <button class="buzzer-half" id="buzzer-t1" onclick="pilihPemenangRebutan(1)">
+      <span class="nm" id="buzzer-t1-nama">TIM A</span>
+      <span class="kbd">Tekan F</span>
+    </button>
+    <span class="buzzer-vs">VS</span>
+    <button class="buzzer-half" id="buzzer-t2" onclick="pilihPemenangRebutan(2)">
+      <span class="nm" id="buzzer-t2-nama">TIM B</span>
+      <span class="kbd">Tekan J</span>
+    </button>
+  </div>
+</div>
+
+<div id="winner-screen">
+  <div class="winner-card">
+    <h2>🏆 Permainan Selesai!</h2>
+    <p style="color:var(--ink-dim);margin:6px 0 0;">Berikut peringkat akhir semua tim</p>
+    <div class="podium" id="podium"></div>
+    <button class="btn-primary" style="margin-top:22px;" onclick="tutupLayarPemenang()">Tutup</button>
+  </div>
+</div>
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+// ================= DATA 100 SOAL (tidak diubah) =================
+const soalDataAsli = [
+  {
+    "tanya": "Sebutkan langkah sebelum berangkat sekolah!",
+    "jawab": [
+      {
+        "teks": "Bangun",
+        "poin": 40
+      },
+      {
+        "teks": "mandi",
+        "poin": 30
+      },
+      {
+        "teks": "sarapan",
+        "poin": 20
+      },
+      {
+        "teks": "pakai seragam",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah membuat teh!",
+    "jawab": [
+      {
+        "teks": "Siapkan gelas",
+        "poin": 33
+      },
+      {
+        "teks": "teh",
+        "poin": 27
+      },
+      {
+        "teks": "gula",
+        "poin": 20
+      },
+      {
+        "teks": "air",
+        "poin": 13
+      },
+      {
+        "teks": "aduk",
+        "poin": 7
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah mencuci tangan!",
+    "jawab": [
+      {
+        "teks": "Basahi",
+        "poin": 33
+      },
+      {
+        "teks": "sabun",
+        "poin": 27
+      },
+      {
+        "teks": "gosok",
+        "poin": 20
+      },
+      {
+        "teks": "bilas",
+        "poin": 13
+      },
+      {
+        "teks": "keringkan",
+        "poin": 7
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah menyikat gigi!",
+    "jawab": [
+      {
+        "teks": "Ambil sikat",
+        "poin": 40
+      },
+      {
+        "teks": "beri pasta",
+        "poin": 30
+      },
+      {
+        "teks": "sikat",
+        "poin": 20
+      },
+      {
+        "teks": "kumur",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah mandi!",
+    "jawab": [
+      {
+        "teks": "Siapkan alat mandi",
+        "poin": 40
+      },
+      {
+        "teks": "basahi",
+        "poin": 30
+      },
+      {
+        "teks": "sabun",
+        "poin": 20
+      },
+      {
+        "teks": "bilas",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah memakai sepatu!",
+    "jawab": [
+      {
+        "teks": "Pakai kaus kaki",
+        "poin": 50
+      },
+      {
+        "teks": "masukkan kaki",
+        "poin": 33
+      },
+      {
+        "teks": "ikat tali",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah membuat mi instan!",
+    "jawab": [
+      {
+        "teks": "Rebus air",
+        "poin": 40
+      },
+      {
+        "teks": "masukkan mi",
+        "poin": 30
+      },
+      {
+        "teks": "bumbu",
+        "poin": 20
+      },
+      {
+        "teks": "aduk",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah makan!",
+    "jawab": [
+      {
+        "teks": "Siapkan makanan",
+        "poin": 40
+      },
+      {
+        "teks": "berdoa",
+        "poin": 30
+      },
+      {
+        "teks": "makan",
+        "poin": 20
+      },
+      {
+        "teks": "bereskan",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah tidur!",
+    "jawab": [
+      {
+        "teks": "Bersihkan diri",
+        "poin": 40
+      },
+      {
+        "teks": "sikat gigi",
+        "poin": 30
+      },
+      {
+        "teks": "berdoa",
+        "poin": 20
+      },
+      {
+        "teks": "tidur",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan barang yang disiapkan sebelum sekolah!",
+    "jawab": [
+      {
+        "teks": "Buku",
+        "poin": 40
+      },
+      {
+        "teks": "pulpen",
+        "poin": 30
+      },
+      {
+        "teks": "seragam",
+        "poin": 20
+      },
+      {
+        "teks": "tas",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah menyalakan HP!",
+    "jawab": [
+      {
+        "teks": "Tekan tombol power",
+        "poin": 50
+      },
+      {
+        "teks": "tunggu",
+        "poin": 33
+      },
+      {
+        "teks": "buka kunci",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah membuka WhatsApp!",
+    "jawab": [
+      {
+        "teks": "Buka HP",
+        "poin": 50
+      },
+      {
+        "teks": "cari WhatsApp",
+        "poin": 33
+      },
+      {
+        "teks": "tekan",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah mengirim pesan WhatsApp!",
+    "jawab": [
+      {
+        "teks": "Pilih kontak",
+        "poin": 50
+      },
+      {
+        "teks": "ketik pesan",
+        "poin": 33
+      },
+      {
+        "teks": "kirim",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah mengambil foto!",
+    "jawab": [
+      {
+        "teks": "Buka kamera",
+        "poin": 50
+      },
+      {
+        "teks": "arahkan",
+        "poin": 33
+      },
+      {
+        "teks": "tekan tombol",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah mematikan komputer!",
+    "jawab": [
+      {
+        "teks": "Simpan pekerjaan",
+        "poin": 67
+      },
+      {
+        "teks": "pilih shutdown",
+        "poin": 33
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah menyalakan komputer!",
+    "jawab": [
+      {
+        "teks": "Tekan power",
+        "poin": 50
+      },
+      {
+        "teks": "tunggu",
+        "poin": 33
+      },
+      {
+        "teks": "login",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah membuka Google!",
+    "jawab": [
+      {
+        "teks": "Buka browser",
+        "poin": 67
+      },
+      {
+        "teks": "ketik Google",
+        "poin": 33
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah mencari sesuatu di Google!",
+    "jawab": [
+      {
+        "teks": "Ketik kata kunci",
+        "poin": 67
+      },
+      {
+        "teks": "tekan cari",
+        "poin": 33
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah menyimpan file!",
+    "jawab": [
+      {
+        "teks": "Klik save",
+        "poin": 50
+      },
+      {
+        "teks": "beri nama",
+        "poin": 33
+      },
+      {
+        "teks": "pilih lokasi",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah mencetak tugas!",
+    "jawab": [
+      {
+        "teks": "Buka file",
+        "poin": 40
+      },
+      {
+        "teks": "print",
+        "poin": 30
+      },
+      {
+        "teks": "pilih printer",
+        "poin": 20
+      },
+      {
+        "teks": "cetak",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah membuat folder!",
+    "jawab": [
+      {
+        "teks": "Klik kanan",
+        "poin": 50
+      },
+      {
+        "teks": "New Folder",
+        "poin": 33
+      },
+      {
+        "teks": "beri nama",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah mengganti nama file!",
+    "jawab": [
+      {
+        "teks": "Klik file",
+        "poin": 50
+      },
+      {
+        "teks": "rename",
+        "poin": 33
+      },
+      {
+        "teks": "ketik nama",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah menghapus foto!",
+    "jawab": [
+      {
+        "teks": "Pilih foto",
+        "poin": 50
+      },
+      {
+        "teks": "klik hapus",
+        "poin": 33
+      },
+      {
+        "teks": "konfirmasi",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah membuat PPT!",
+    "jawab": [
+      {
+        "teks": "Buka PowerPoint",
+        "poin": 50
+      },
+      {
+        "teks": "tambah slide",
+        "poin": 33
+      },
+      {
+        "teks": "isi materi",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah presentasi!",
+    "jawab": [
+      {
+        "teks": "Maju",
+        "poin": 40
+      },
+      {
+        "teks": "salam",
+        "poin": 30
+      },
+      {
+        "teks": "menjelaskan",
+        "poin": 20
+      },
+      {
+        "teks": "tanya jawab",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah mengerjakan tugas!",
+    "jawab": [
+      {
+        "teks": "Baca",
+        "poin": 40
+      },
+      {
+        "teks": "pahami",
+        "poin": 30
+      },
+      {
+        "teks": "kerjakan",
+        "poin": 20
+      },
+      {
+        "teks": "periksa",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah mengumpulkan tugas!",
+    "jawab": [
+      {
+        "teks": "Selesaikan",
+        "poin": 50
+      },
+      {
+        "teks": "periksa",
+        "poin": 33
+      },
+      {
+        "teks": "kirim",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah meminjam buku!",
+    "jawab": [
+      {
+        "teks": "Cari buku",
+        "poin": 50
+      },
+      {
+        "teks": "ambil",
+        "poin": 33
+      },
+      {
+        "teks": "pinjam",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah membeli makanan di kantin!",
+    "jawab": [
+      {
+        "teks": "Pilih",
+        "poin": 40
+      },
+      {
+        "teks": "pesan",
+        "poin": 30
+      },
+      {
+        "teks": "bayar",
+        "poin": 20
+      },
+      {
+        "teks": "ambil",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah mencuci piring!",
+    "jawab": [
+      {
+        "teks": "Buang sisa",
+        "poin": 40
+      },
+      {
+        "teks": "sabun",
+        "poin": 30
+      },
+      {
+        "teks": "gosok",
+        "poin": 20
+      },
+      {
+        "teks": "bilas",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah menyapu lantai!",
+    "jawab": [
+      {
+        "teks": "Ambil sapu",
+        "poin": 50
+      },
+      {
+        "teks": "sapu",
+        "poin": 33
+      },
+      {
+        "teks": "kumpulkan sampah",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah membuang sampah!",
+    "jawab": [
+      {
+        "teks": "Ambil",
+        "poin": 67
+      },
+      {
+        "teks": "masukkan tempat sampah",
+        "poin": 33
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah menyiram tanaman!",
+    "jawab": [
+      {
+        "teks": "Ambil air",
+        "poin": 67
+      },
+      {
+        "teks": "siram tanaman",
+        "poin": 33
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah membuat jus!",
+    "jawab": [
+      {
+        "teks": "Potong buah",
+        "poin": 50
+      },
+      {
+        "teks": "masukkan blender",
+        "poin": 33
+      },
+      {
+        "teks": "blender",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah memasak nasi!",
+    "jawab": [
+      {
+        "teks": "Cuci beras",
+        "poin": 50
+      },
+      {
+        "teks": "beri air",
+        "poin": 33
+      },
+      {
+        "teks": "masak",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah membuat telur goreng!",
+    "jawab": [
+      {
+        "teks": "Pecahkan telur",
+        "poin": 50
+      },
+      {
+        "teks": "beri bumbu",
+        "poin": 33
+      },
+      {
+        "teks": "goreng",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah memakai seragam!",
+    "jawab": [
+      {
+        "teks": "Pakai baju",
+        "poin": 50
+      },
+      {
+        "teks": "celana/rok",
+        "poin": 33
+      },
+      {
+        "teks": "atribut",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah masuk kelas!",
+    "jawab": [
+      {
+        "teks": "Salam",
+        "poin": 40
+      },
+      {
+        "teks": "masuk",
+        "poin": 30
+      },
+      {
+        "teks": "duduk",
+        "poin": 20
+      },
+      {
+        "teks": "siapkan buku",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah belajar!",
+    "jawab": [
+      {
+        "teks": "Baca",
+        "poin": 40
+      },
+      {
+        "teks": "pahami",
+        "poin": 30
+      },
+      {
+        "teks": "catat",
+        "poin": 20
+      },
+      {
+        "teks": "latihan",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Sebutkan langkah membuat jadwal belajar!",
+    "jawab": [
+      {
+        "teks": "Tentukan waktu",
+        "poin": 50
+      },
+      {
+        "teks": "pelajaran",
+        "poin": 33
+      },
+      {
+        "teks": "tulis jadwal",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Apa yang dilakukan jika lupa password?",
+    "jawab": [
+      {
+        "teks": "Coba ingat",
+        "poin": 50
+      },
+      {
+        "teks": "pilih lupa password",
+        "poin": 33
+      },
+      {
+        "teks": "reset",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Apa yang dilakukan jika internet tidak tersambung?",
+    "jawab": [
+      {
+        "teks": "Cek Wi-Fi/data",
+        "poin": 50
+      },
+      {
+        "teks": "restart",
+        "poin": 33
+      },
+      {
+        "teks": "cek jaringan",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Apa yang dilakukan jika laptop tidak menyala?",
+    "jawab": [
+      {
+        "teks": "Cek charger",
+        "poin": 40
+      },
+      {
+        "teks": "power",
+        "poin": 30
+      },
+      {
+        "teks": "tunggu",
+        "poin": 20
+      },
+      {
+        "teks": "restart",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Apa yang dilakukan jika file tugas hilang?",
+    "jawab": [
+      {
+        "teks": "Cari folder",
+        "poin": 50
+      },
+      {
+        "teks": "gunakan search",
+        "poin": 33
+      },
+      {
+        "teks": "cek Recycle Bin",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Apa yang dilakukan jika printer kehabisan kertas?",
+    "jawab": [
+      {
+        "teks": "Isi kertas",
+        "poin": 50
+      },
+      {
+        "teks": "cek printer",
+        "poin": 33
+      },
+      {
+        "teks": "cetak ulang",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Apa yang dilakukan jika HP memorinya penuh?",
+    "jawab": [
+      {
+        "teks": "Hapus file",
+        "poin": 50
+      },
+      {
+        "teks": "pindahkan foto",
+        "poin": 33
+      },
+      {
+        "teks": "uninstall aplikasi",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah mengirim tugas lewat Google Classroom?",
+    "jawab": [
+      {
+        "teks": "Buka tugas",
+        "poin": 50
+      },
+      {
+        "teks": "lampirkan file",
+        "poin": 33
+      },
+      {
+        "teks": "serahkan",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah mengirim file melalui WhatsApp?",
+    "jawab": [
+      {
+        "teks": "Pilih kontak",
+        "poin": 40
+      },
+      {
+        "teks": "lampiran",
+        "poin": 30
+      },
+      {
+        "teks": "dokumen",
+        "poin": 20
+      },
+      {
+        "teks": "kirim",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah membuat akun media sosial?",
+    "jawab": [
+      {
+        "teks": "Daftar",
+        "poin": 40
+      },
+      {
+        "teks": "isi data",
+        "poin": 30
+      },
+      {
+        "teks": "buat password",
+        "poin": 20
+      },
+      {
+        "teks": "verifikasi",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah membuat password yang aman?",
+    "jawab": [
+      {
+        "teks": "Kombinasi huruf",
+        "poin": 50
+      },
+      {
+        "teks": "angka",
+        "poin": 33
+      },
+      {
+        "teks": "simbol",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah mencari informasi untuk tugas!",
+    "jawab": [
+      {
+        "teks": "Tentukan kata kunci",
+        "poin": 40
+      },
+      {
+        "teks": "cari",
+        "poin": 30
+      },
+      {
+        "teks": "baca",
+        "poin": 20
+      },
+      {
+        "teks": "bandingkan",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah membuat rangkuman pelajaran!",
+    "jawab": [
+      {
+        "teks": "Baca",
+        "poin": 50
+      },
+      {
+        "teks": "tentukan poin penting",
+        "poin": 33
+      },
+      {
+        "teks": "tulis",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah menyelesaikan tugas kelompok!",
+    "jawab": [
+      {
+        "teks": "Pahami tugas",
+        "poin": 40
+      },
+      {
+        "teks": "bagi tugas",
+        "poin": 30
+      },
+      {
+        "teks": "kerjakan",
+        "poin": 20
+      },
+      {
+        "teks": "gabungkan",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah membagi tugas dalam kelompok!",
+    "jawab": [
+      {
+        "teks": "Tentukan pekerjaan",
+        "poin": 50
+      },
+      {
+        "teks": "pilih anggota",
+        "poin": 33
+      },
+      {
+        "teks": "kerjakan",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah melakukan presentasi kelompok!",
+    "jawab": [
+      {
+        "teks": "Siapkan materi",
+        "poin": 50
+      },
+      {
+        "teks": "bagi peran",
+        "poin": 33
+      },
+      {
+        "teks": "presentasi",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Apa yang dilakukan jika jawaban tugas salah?",
+    "jawab": [
+      {
+        "teks": "Cari kesalahan",
+        "poin": 50
+      },
+      {
+        "teks": "perbaiki",
+        "poin": 33
+      },
+      {
+        "teks": "periksa kembali",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Apa yang dilakukan jika tidak memahami soal?",
+    "jawab": [
+      {
+        "teks": "Baca ulang",
+        "poin": 50
+      },
+      {
+        "teks": "cari contoh",
+        "poin": 33
+      },
+      {
+        "teks": "bertanya",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah membuat video tugas sekolah!",
+    "jawab": [
+      {
+        "teks": "Tentukan ide",
+        "poin": 40
+      },
+      {
+        "teks": "rekam",
+        "poin": 30
+      },
+      {
+        "teks": "edit",
+        "poin": 20
+      },
+      {
+        "teks": "simpan",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah mengedit foto sederhana!",
+    "jawab": [
+      {
+        "teks": "Pilih foto",
+        "poin": 40
+      },
+      {
+        "teks": "crop",
+        "poin": 30
+      },
+      {
+        "teks": "atur",
+        "poin": 20
+      },
+      {
+        "teks": "simpan",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah mengunduh aplikasi!",
+    "jawab": [
+      {
+        "teks": "Buka Play Store",
+        "poin": 50
+      },
+      {
+        "teks": "cari aplikasi",
+        "poin": 33
+      },
+      {
+        "teks": "install",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah memperbarui aplikasi!",
+    "jawab": [
+      {
+        "teks": "Buka Play Store",
+        "poin": 50
+      },
+      {
+        "teks": "pilih aplikasi",
+        "poin": 33
+      },
+      {
+        "teks": "update",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah menghubungkan HP ke Wi-Fi!",
+    "jawab": [
+      {
+        "teks": "Buka pengaturan",
+        "poin": 50
+      },
+      {
+        "teks": "pilih Wi-Fi",
+        "poin": 33
+      },
+      {
+        "teks": "pilih jaringan",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah mengirim file melalui Bluetooth!",
+    "jawab": [
+      {
+        "teks": "Aktifkan Bluetooth",
+        "poin": 50
+      },
+      {
+        "teks": "pilih file",
+        "poin": 33
+      },
+      {
+        "teks": "bagikan",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah membuat tabel di Word!",
+    "jawab": [
+      {
+        "teks": "Insert",
+        "poin": 50
+      },
+      {
+        "teks": "Table",
+        "poin": 33
+      },
+      {
+        "teks": "tentukan baris/kolom",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah membuat daftar menggunakan bullet!",
+    "jawab": [
+      {
+        "teks": "Blok teks",
+        "poin": 67
+      },
+      {
+        "teks": "pilih bullet",
+        "poin": 33
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah mencari file di laptop!",
+    "jawab": [
+      {
+        "teks": "Buka File Explorer",
+        "poin": 67
+      },
+      {
+        "teks": "gunakan pencarian",
+        "poin": 33
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah mengubah nama file tugas!",
+    "jawab": [
+      {
+        "teks": "Klik file",
+        "poin": 50
+      },
+      {
+        "teks": "rename",
+        "poin": 33
+      },
+      {
+        "teks": "tulis nama baru",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah memindahkan file ke flashdisk!",
+    "jawab": [
+      {
+        "teks": "Sambungkan flashdisk",
+        "poin": 50
+      },
+      {
+        "teks": "copy",
+        "poin": 33
+      },
+      {
+        "teks": "paste",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah mencetak dokumen dua halaman!",
+    "jawab": [
+      {
+        "teks": "Buka dokumen",
+        "poin": 40
+      },
+      {
+        "teks": "print",
+        "poin": 30
+      },
+      {
+        "teks": "pilih halaman",
+        "poin": 20
+      },
+      {
+        "teks": "cetak",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah membeli barang secara online!",
+    "jawab": [
+      {
+        "teks": "Cari",
+        "poin": 40
+      },
+      {
+        "teks": "pilih",
+        "poin": 30
+      },
+      {
+        "teks": "masukkan keranjang",
+        "poin": 20
+      },
+      {
+        "teks": "bayar",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah memesan makanan online!",
+    "jawab": [
+      {
+        "teks": "Pilih restoran",
+        "poin": 40
+      },
+      {
+        "teks": "makanan",
+        "poin": 30
+      },
+      {
+        "teks": "pesan",
+        "poin": 20
+      },
+      {
+        "teks": "bayar",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah memesan ojek online!",
+    "jawab": [
+      {
+        "teks": "Masukkan lokasi",
+        "poin": 50
+      },
+      {
+        "teks": "tujuan",
+        "poin": 33
+      },
+      {
+        "teks": "pilih kendaraan",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Apa yang dilakukan jika barang online salah?",
+    "jawab": [
+      {
+        "teks": "Cek pesanan",
+        "poin": 50
+      },
+      {
+        "teks": "hubungi penjual",
+        "poin": 33
+      },
+      {
+        "teks": "komplain",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Apa yang dilakukan jika salah mengirim pesan?",
+    "jawab": [
+      {
+        "teks": "Hapus pesan",
+        "poin": 50
+      },
+      {
+        "teks": "klarifikasi",
+        "poin": 33
+      },
+      {
+        "teks": "kirim ulang",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Langkah menyelesaikan masalah dengan teman!",
+    "jawab": [
+      {
+        "teks": "Dengarkan",
+        "poin": 50
+      },
+      {
+        "teks": "diskusi",
+        "poin": 33
+      },
+      {
+        "teks": "cari solusi",
+        "poin": 17
+      }
+    ]
+  },
+  {
+    "tanya": "Apa yang kamu lakukan ketika lupa membawa tugas yang harus dikumpulkan hari ini?",
+    "jawab": [
+      {
+        "teks": "Jujur memberi tahu guru",
+        "poin": 40
+      },
+      {
+        "teks": "Menghubungi teman untuk memastikan tugas",
+        "poin": 30
+      },
+      {
+        "teks": "Mencari salinan digital",
+        "poin": 20
+      },
+      {
+        "teks": "Meminta kesempatan mengumpulkan susulan",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Tugas kelompok hampir dikumpulkan, tetapi satu anggota belum mengerjakan bagiannya. Apa langkah kalian?",
+    "jawab": [
+      {
+        "teks": "Tanyakan kendalanya",
+        "poin": 40
+      },
+      {
+        "teks": "Ingatkan dengan baik",
+        "poin": 30
+      },
+      {
+        "teks": "Bagi ulang pekerjaan",
+        "poin": 20
+      },
+      {
+        "teks": "Bantu menyelesaikan bagian penting",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Saat kuis online berlangsung, internet sekolah tiba-tiba terputus. Apa yang perlu dilakukan?",
+    "jawab": [
+      {
+        "teks": "Beri tahu guru",
+        "poin": 40
+      },
+      {
+        "teks": "Periksa Wi-Fi/data",
+        "poin": 30
+      },
+      {
+        "teks": "Coba sambungkan ulang",
+        "poin": 20
+      },
+      {
+        "teks": "Catat atau simpan jawaban jika bisa",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "File presentasi tidak bisa dibuka beberapa menit sebelum tampil. Apa yang bisa dicoba?",
+    "jawab": [
+      {
+        "teks": "Coba buka ulang",
+        "poin": 40
+      },
+      {
+        "teks": "Gunakan file cadangan",
+        "poin": 30
+      },
+      {
+        "teks": "Pindahkan ke perangkat lain",
+        "poin": 20
+      },
+      {
+        "teks": "Minta bantuan guru/teman",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Kamu baru sadar mengirim file tugas yang salah. Apa tindakan berikutnya?",
+    "jawab": [
+      {
+        "teks": "Kirim file yang benar",
+        "poin": 40
+      },
+      {
+        "teks": "Jelaskan kesalahan kepada guru",
+        "poin": 30
+      },
+      {
+        "teks": "Periksa nama dan isi file",
+        "poin": 20
+      },
+      {
+        "teks": "Pastikan file pengganti terkirim",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Komputer laboratorium tidak menyala ketika akan digunakan. Apa yang diperiksa lebih dahulu?",
+    "jawab": [
+      {
+        "teks": "Kabel listrik",
+        "poin": 40
+      },
+      {
+        "teks": "Tombol power",
+        "poin": 30
+      },
+      {
+        "teks": "Sambungan monitor",
+        "poin": 20
+      },
+      {
+        "teks": "Laporkan kepada guru/laboran",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Proyektor menyala tetapi layar laptop tidak tampil. Apa yang bisa dilakukan?",
+    "jawab": [
+      {
+        "teks": "Periksa kabel/adapter",
+        "poin": 40
+      },
+      {
+        "teks": "Pilih sumber input",
+        "poin": 30
+      },
+      {
+        "teks": "Atur mode tampilan laptop",
+        "poin": 20
+      },
+      {
+        "teks": "Minta bantuan guru",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Printer sekolah tidak mencetak tugas. Apa yang sebaiknya diperiksa?",
+    "jawab": [
+      {
+        "teks": "Kertas",
+        "poin": 40
+      },
+      {
+        "teks": "Tinta/toner",
+        "poin": 30
+      },
+      {
+        "teks": "Koneksi printer",
+        "poin": 20
+      },
+      {
+        "teks": "Printer yang dipilih",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Kamu tidak bisa masuk ke akun belajar sekolah. Apa langkah pemecahan masalahnya?",
+    "jawab": [
+      {
+        "teks": "Periksa nama pengguna",
+        "poin": 40
+      },
+      {
+        "teks": "Periksa kata sandi",
+        "poin": 30
+      },
+      {
+        "teks": "Gunakan fitur reset",
+        "poin": 20
+      },
+      {
+        "teks": "Periksa koneksi internet",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Saat diskusi, dua anggota kelompok berselisih pendapat tentang jawaban. Apa yang dilakukan?",
+    "jawab": [
+      {
+        "teks": "Dengarkan pendapat",
+        "poin": 40
+      },
+      {
+        "teks": "Periksa instruksi soal",
+        "poin": 30
+      },
+      {
+        "teks": "Cari bukti atau sumber",
+        "poin": 20
+      },
+      {
+        "teks": "Sepakati jawaban bersama",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Waktu diskusi tinggal sedikit dan banyak soal belum selesai. Bagaimana kelompok mengatur pekerjaan?",
+    "jawab": [
+      {
+        "teks": "Lihat soal yang tersisa",
+        "poin": 40
+      },
+      {
+        "teks": "Bagi soal antaranggota",
+        "poin": 30
+      },
+      {
+        "teks": "Dahulukan soal penting",
+        "poin": 20
+      },
+      {
+        "teks": "Sisakan waktu untuk memeriksa",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Kamu punya dua tugas dengan tenggat besok. Bagaimana menentukan urutan pengerjaan?",
+    "jawab": [
+      {
+        "teks": "Catat tenggat",
+        "poin": 40
+      },
+      {
+        "teks": "Perkirakan waktu pengerjaan",
+        "poin": 30
+      },
+      {
+        "teks": "Dahulukan yang paling mendesak",
+        "poin": 20
+      },
+      {
+        "teks": "Buat jadwal singkat",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Kamu menemukan informasi internet yang berbeda dengan buku pelajaran. Apa yang perlu dilakukan?",
+    "jawab": [
+      {
+        "teks": "Periksa sumbernya",
+        "poin": 40
+      },
+      {
+        "teks": "Bandingkan sumber tepercaya",
+        "poin": 30
+      },
+      {
+        "teks": "Tanyakan kepada guru",
+        "poin": 20
+      },
+      {
+        "teks": "Jangan langsung menyebarkan",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Jawaban tugasmu dinilai salah, padahal kamu merasa sudah benar. Apa langkah selanjutnya?",
+    "jawab": [
+      {
+        "teks": "Baca komentar guru",
+        "poin": 40
+      },
+      {
+        "teks": "Periksa kembali langkah",
+        "poin": 30
+      },
+      {
+        "teks": "Cari letak kesalahan",
+        "poin": 20
+      },
+      {
+        "teks": "Tanyakan bagian yang belum jelas",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Kamu kehilangan file tugas di laptop sekolah. Bagaimana mencarinya?",
+    "jawab": [
+      {
+        "teks": "Cari berdasarkan nama",
+        "poin": 40
+      },
+      {
+        "teks": "Periksa folder dokumen",
+        "poin": 30
+      },
+      {
+        "teks": "Periksa folder unduhan",
+        "poin": 20
+      },
+      {
+        "teks": "Cek tempat sampah/backup",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "HP yang dipakai untuk memindai tugas kehabisan baterai. Apa solusi yang mungkin?",
+    "jawab": [
+      {
+        "teks": "Minta izin mengisi daya",
+        "poin": 40
+      },
+      {
+        "teks": "Gunakan perangkat lain",
+        "poin": 30
+      },
+      {
+        "teks": "Pinjam alat pemindai",
+        "poin": 20
+      },
+      {
+        "teks": "Simpan pekerjaan yang sudah ada",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Teman satu kelompok belum memahami instruksi proyek. Apa yang bisa dilakukan?",
+    "jawab": [
+      {
+        "teks": "Baca instruksi bersama",
+        "poin": 40
+      },
+      {
+        "teks": "Jelaskan dengan bahasa sederhana",
+        "poin": 30
+      },
+      {
+        "teks": "Berikan contoh",
+        "poin": 20
+      },
+      {
+        "teks": "Minta penjelasan guru",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Kamu datang terlambat setelah istirahat dan pelajaran sudah dimulai. Apa yang seharusnya dilakukan?",
+    "jawab": [
+      {
+        "teks": "Masuk dengan tertib",
+        "poin": 40
+      },
+      {
+        "teks": "Meminta izin",
+        "poin": 30
+      },
+      {
+        "teks": "Menjelaskan alasan dengan jujur",
+        "poin": 20
+      },
+      {
+        "teks": "Segera mengikuti pelajaran",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Kamu lupa membawa alat tulis saat ujian akan dimulai. Apa langkah yang tepat?",
+    "jawab": [
+      {
+        "teks": "Beri tahu pengawas",
+        "poin": 40
+      },
+      {
+        "teks": "Meminjam dengan izin",
+        "poin": 30
+      },
+      {
+        "teks": "Meminta alat cadangan",
+        "poin": 20
+      },
+      {
+        "teks": "Siap sebelum ujian dimulai",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Kelompok mendapat banyak koreksi pada hasil proyek. Bagaimana memperbaikinya?",
+    "jawab": [
+      {
+        "teks": "Baca semua koreksi",
+        "poin": 40
+      },
+      {
+        "teks": "Kelompokkan jenis kesalahan",
+        "poin": 30
+      },
+      {
+        "teks": "Bagi tugas perbaikan",
+        "poin": 20
+      },
+      {
+        "teks": "Periksa ulang hasil akhir",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Kamu menerima tugas dari beberapa guru sekaligus. Apa yang perlu dilakukan agar tidak ada yang terlewat?",
+    "jawab": [
+      {
+        "teks": "Catat semua tugas",
+        "poin": 40
+      },
+      {
+        "teks": "Catat tenggatnya",
+        "poin": 30
+      },
+      {
+        "teks": "Buat daftar prioritas",
+        "poin": 20
+      },
+      {
+        "teks": "Tandai tugas yang selesai",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Saat praktik komputer, program tidak berjalan sesuai instruksi. Apa langkah awal mencari kesalahan?",
+    "jawab": [
+      {
+        "teks": "Baca pesan kesalahan",
+        "poin": 40
+      },
+      {
+        "teks": "Periksa kode/langkah",
+        "poin": 30
+      },
+      {
+        "teks": "Uji bagian satu per satu",
+        "poin": 20
+      },
+      {
+        "teks": "Perbaiki lalu jalankan lagi",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Kamu salah menghapus bagian penting dari dokumen kelompok. Apa yang bisa dilakukan?",
+    "jawab": [
+      {
+        "teks": "Gunakan undo",
+        "poin": 40
+      },
+      {
+        "teks": "Periksa riwayat versi",
+        "poin": 30
+      },
+      {
+        "teks": "Pulihkan dari cadangan",
+        "poin": 20
+      },
+      {
+        "teks": "Beri tahu anggota kelompok",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Anggota kelompok tidak hadir pada hari presentasi. Bagaimana kelompok menyesuaikan diri?",
+    "jawab": [
+      {
+        "teks": "Hubungi anggota tersebut",
+        "poin": 40
+      },
+      {
+        "teks": "Atur ulang pembagian materi",
+        "poin": 30
+      },
+      {
+        "teks": "Tunjuk pengganti bagian",
+        "poin": 20
+      },
+      {
+        "teks": "Latihan singkat bersama",
+        "poin": 10
+      }
+    ]
+  },
+  {
+    "tanya": "Buat urutan pemecahan masalah ketika hasil tugas digital tidak sesuai yang diminta guru.",
+    "jawab": [
+      {
+        "teks": "Baca ulang instruksi",
+        "poin": 30
+      },
+      {
+        "teks": "Bandingkan hasil dengan instruksi",
+        "poin": 25
+      },
+      {
+        "teks": "Temukan bagian yang berbeda",
+        "poin": 20
+      },
+      {
+        "teks": "Perbaiki hasil",
+        "poin": 15
+      },
+      {
+        "teks": "Periksa kembali sebelum dikumpulkan",
+        "poin": 10
+      }
+    ]
+  }
+];
+
+// ================= STATE =================
+const STORAGE_KEY = 'family100_state_v2';
+let soalUrutan = [];      // urutan index soal (diacak sekali, disimpan agar bisa mundur/lompat)
+let nomorSoal = 0;
+let timDuel = {t1:null, t2:null};
+let giliran = 1;
+let skorUtama = {A:0,B:0,C:0,D:0,E:0};
+let skorSementara = {t1:0,t2:0};
+let sudahBukaSemua = false;
+let kartuStatus = [];      // 'tutup' | 'terlihat' | 'benar'
+let urutanKartu = [];      // urutan tampilan kartu (diacak per soal)
+let strikeSekarang = 0;
+let roundSelesai = false;
+let suaraAktif = true;
+let audioCtx = null;
+
+const timWarna = {A:'var(--teamA)',B:'var(--teamB)',C:'var(--teamC)',D:'var(--teamD)',E:'var(--teamE)'};
+
+// ================= AUDIO (sintesis, tanpa file eksternal) =================
+function getAudioCtx(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; }
+  }
+  return audioCtx;
+}
+function nada(freq, waktu, tunda, tipe, volume){
+  if(!suaraAktif) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = tipe || 'sine';
+  osc.frequency.value = freq;
+  gain.gain.value = volume===undefined?0.12:volume;
+  osc.connect(gain); gain.connect(ctx.destination);
+  const mulai = ctx.currentTime + (tunda||0);
+  osc.start(mulai);
+  gain.gain.exponentialRampToValueAtTime(0.0001, mulai + waktu);
+  osc.stop(mulai + waktu + 0.02);
+}
+function suaraBenar(){ nada(660,.14,0,'triangle'); nada(880,.18,.1,'triangle'); }
+function suaraSalah(){ nada(160,.35,0,'sawtooth',0.1); }
+function suaraRonde(){ nada(523,.12,0,'square',.08); nada(659,.12,.12,'square',.08); nada(784,.2,.24,'square',.08); }
+function suaraBuzz(){ nada(440,.1,0,'square',.12); }
+function suaraMenang(){ [523,659,784,1046].forEach((f,i)=>nada(f,.22,i*.14,'triangle',.1)); }
+function toggleSuara(){
+  suaraAktif = !suaraAktif;
+  document.getElementById('btn-sound').textContent = suaraAktif ? '🔊 Suara: Aktif' : '🔇 Suara: Nonaktif';
+  simpanState();
+}
+
+// ================= TOAST =================
+function toast(pesan, jenis){
+  const stack = document.getElementById('toast-stack');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (jenis||'ok');
+  el.textContent = pesan;
+  stack.appendChild(el);
+  document.getElementById('sr-announcer').textContent = pesan;
+  setTimeout(()=>el.remove(), 2500);
+}
+
+// ================= MODAL KONFIRMASI =================
+function modalKonfirmasi(judul, teks, tombolYa, aksiYa){
+  document.getElementById('modal-title').textContent = judul;
+  document.getElementById('modal-text').textContent = teks;
+  const aksiWrap = document.getElementById('modal-actions');
+  aksiWrap.innerHTML = '';
+  const btnBatal = document.createElement('button');
+  btnBatal.className = 'btn-ghost'; btnBatal.textContent = 'Batal';
+  btnBatal.onclick = tutupModal;
+  const btnYa = document.createElement('button');
+  btnYa.className = 'btn-primary'; btnYa.textContent = tombolYa;
+  btnYa.onclick = ()=>{ tutupModal(); aksiYa(); };
+  aksiWrap.appendChild(btnBatal); aksiWrap.appendChild(btnYa);
+  document.getElementById('modal-back').classList.add('show');
+}
+function tutupModal(){ document.getElementById('modal-back').classList.remove('show'); }
+
+// ================= UTIL =================
+function acak(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function simpanState(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      soalUrutan, nomorSoal, skorUtama, suaraAktif
+    }));
+  }catch(e){/* abaikan jika penyimpanan penuh/diblokir */}
+}
+function muatState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const s = JSON.parse(raw);
+    if(!s.soalUrutan || s.soalUrutan.length !== soalDataAsli.length) return false;
+    soalUrutan = s.soalUrutan; nomorSoal = s.nomorSoal||0; skorUtama = s.skorUtama||skorUtama;
+    suaraAktif = s.suaraAktif !== false;
+    return true;
+  }catch(e){ return false; }
+}
+
+// ================= SETUP TIM =================
+function pilihTimDuel(tim){
+  if(timDuel.t1 === tim) timDuel.t1 = null;
+  else if(timDuel.t2 === tim) timDuel.t2 = null;
+  else if(!timDuel.t1) timDuel.t1 = tim;
+  else if(!timDuel.t2) timDuel.t2 = tim;
+  else { toast('Sudah pilih 2 tim. Klik salah satu tim untuk membatalkan.','bad'); return; }
+
+  ['A','B','C','D','E'].forEach(t=>{
+    document.getElementById('pilih-'+t).classList.toggle('selected', timDuel.t1===t || timDuel.t2===t);
+  });
+  document.getElementById('tim1-nama').textContent = timDuel.t1 ? 'TIM '+timDuel.t1 : 'Pilih Tim 1';
+  document.getElementById('tim1-nama').style.color = timDuel.t1 ? timWarna[timDuel.t1] : 'var(--ink-dim)';
+  document.getElementById('tim2-nama').textContent = timDuel.t2 ? 'TIM '+timDuel.t2 : 'Pilih Tim 2';
+  document.getElementById('tim2-nama').style.color = timDuel.t2 ? timWarna[timDuel.t2] : 'var(--ink-dim)';
+  document.getElementById('btn-mulai').disabled = !(timDuel.t1 && timDuel.t2);
+}
+
+function mulaiDuel(){
+  if(!timDuel.t1 || !timDuel.t2){ toast('Pilih 2 tim dahulu.','bad'); return; }
+  tampilkanRebutan();
+}
+
+// ================= REBUTAN (BUZZER) =================
+function tampilkanRebutan(){
+  const b1 = document.getElementById('buzzer-t1');
+  const b2 = document.getElementById('buzzer-t2');
+  document.getElementById('buzzer-t1-nama').textContent = 'TIM ' + timDuel.t1;
+  document.getElementById('buzzer-t2-nama').textContent = 'TIM ' + timDuel.t2;
+  b1.style.background = timWarna[timDuel.t1];
+  b2.style.background = timWarna[timDuel.t2];
+  document.getElementById('buzzer-screen').classList.add('show');
+}
+function pilihPemenangRebutan(nomorTim){
+  document.getElementById('buzzer-screen').classList.remove('show');
+  giliran = nomorTim;
+  const pemenang = nomorTim===1 ? timDuel.t1 : timDuel.t2;
+  toast(`TIM ${pemenang} duluan menjawab!`, 'ok');
+  suaraBuzz();
+  document.getElementById('kotak-giliran').classList.add('show');
+  document.getElementById('btn-buka-semua').disabled = false;
+  document.getElementById('btn-salah').disabled = false;
+  muatSoal();
+  perbaruiGiliran();
+}
+document.addEventListener('keydown', (e)=>{
+  const k = e.key.toLowerCase();
+  if(document.getElementById('buzzer-screen').classList.contains('show')){
+    if(k==='f') pilihPemenangRebutan(1);
+    else if(k==='j') pilihPemenangRebutan(2);
+    return;
+  }
+  if(document.getElementById('modal-back').classList.contains('show') || document.getElementById('winner-screen').classList.contains('show')) return;
+
+  if(k==='x' && !document.getElementById('btn-salah').disabled){
+    tandaiSalah(); return;
+  }
+  if(k==='l' && !document.getElementById('btn-buka-semua').disabled){
+    bukaSemuaJawaban(); return;
+  }
+  if(/^[1-9]$/.test(k)){
+    const posisi = parseInt(k,10) - 1;
+    if(posisi < urutanKartu.length){ pilihJawaban(urutanKartu[posisi]); }
+  }
+});
+
+// ================= SOAL =================
+function soalAktif(){ return soalDataAsli[soalUrutan[nomorSoal]]; }
+
+function muatSoal(){
+  skorSementara = {t1:0,t2:0};
+  sudahBukaSemua = false;
+  roundSelesai = false;
+  strikeSekarang = 0;
+  document.getElementById('round-over').classList.remove('show');
+  perbaruiStrike();
+
+  const soal = soalAktif();
+  kartuStatus = soal.jawab.map(()=> 'tutup');
+  urutanKartu = acak(soal.jawab.map((_,i)=>i));
+
+  document.getElementById('nomor').textContent = nomorSoal+1;
+  document.getElementById('soal').textContent = soal.tanya;
+  document.getElementById('sementara-tim1').textContent = '0';
+  document.getElementById('sementara-tim2').textContent = '0';
+  if(timDuel.t1){ document.getElementById('sementara-tim1-nama').textContent='TIM '+timDuel.t1; document.getElementById('sementara-tim1-nama').style.color = timWarna[timDuel.t1]; }
+  if(timDuel.t2){ document.getElementById('sementara-tim2-nama').textContent='TIM '+timDuel.t2; document.getElementById('sementara-tim2-nama').style.color = timWarna[timDuel.t2]; }
+  document.getElementById('btn-buka-semua').disabled = false;
+  document.getElementById('btn-buka-semua').textContent = 'Tampilkan Semua Jawaban';
+  document.getElementById('btn-salah').disabled = false;
+
+  gambarKartu();
+  perbaruiNavigasi();
+  simpanState();
+}
+
+function gambarKartu(){
+  const soal = soalAktif();
+  const wadah = document.getElementById('daftar-jawaban');
+  wadah.innerHTML = '';
+  urutanKartu.forEach((idxAsli, posisi)=>{
+    const j = soal.jawab[idxAsli];
+    const status = kartuStatus[idxAsli];
+    const div = document.createElement('div');
+    div.id = 'kartu-'+idxAsli;
+    div.setAttribute('role','button');
+    div.setAttribute('tabindex','0');
+    if(status === 'tutup'){
+      div.className = 'kartu tutup';
+      div.innerHTML = `<span class="teks">❓ Jawaban ${posisi+1}</span><span class="poin">???</span>`;
+    } else if(status === 'terlihat'){
+      div.className = 'kartu terlihat';
+      div.innerHTML = `<span class="teks"><span style="opacity:.6;font-weight:600;">[${posisi+1}]</span> ${j.teks}</span><span class="poin">${j.poin}</span>`;
+    } else if(status === 'benar'){
+      div.className = 'kartu benar';
+      div.innerHTML = `<span class="teks">✅ ${j.teks}</span><span class="poin">+${j.poin}</span>`;
+    } else {
+      div.className = 'kartu terbuang';
+      div.innerHTML = `<span class="teks">${j.teks}</span><span class="poin">${j.poin}</span>`;
+    }
+    const klik = ()=> pilihJawaban(idxAsli);
+    div.onclick = klik;
+    div.onkeydown = (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); klik(); } };
+    wadah.appendChild(div);
+  });
+}
+
+function bukaSemuaJawaban(){
+  if(sudahBukaSemua || roundSelesai) return;
+  sudahBukaSemua = true;
+  document.getElementById('btn-buka-semua').textContent = '✅ Sudah Ditampilkan';
+  document.getElementById('btn-buka-semua').disabled = true;
+  kartuStatus = kartuStatus.map(s => s==='tutup' ? 'terlihat' : s);
+  gambarKartu();
+}
+
+function pilihJawaban(idx){
+  if(roundSelesai) return;
+  if(!sudahBukaSemua){ toast('Klik dulu "Tampilkan Semua Jawaban".','bad'); return; }
+  if(kartuStatus[idx] !== 'terlihat') return;
+
+  const soal = soalAktif();
+  const data = soal.jawab[idx];
+  kartuStatus[idx] = 'benar';
+  gambarKartu();
+  suaraBenar();
+
+  const timSekarang = giliran===1 ? timDuel.t1 : timDuel.t2;
+  if(giliran===1){ skorSementara.t1 += data.poin; document.getElementById('sementara-tim1').textContent = skorSementara.t1; }
+  else { skorSementara.t2 += data.poin; document.getElementById('sementara-tim2').textContent = skorSementara.t2; }
+  skorUtama[timSekarang] += data.poin;
+  const elSkor = document.getElementById('skor-'+timSekarang);
+  elSkor.textContent = skorUtama[timSekarang];
+  elSkor.classList.remove('bump'); void elSkor.offsetWidth; elSkor.classList.add('bump');
+  toast(`+${data.poin} poin untuk TIM ${timSekarang}`, 'ok');
+  simpanState();
+
+  // jawaban benar TIDAK memindah giliran (sesuai aturan Family Feud asli)
+  cekPapanPenuh();
+}
+
+function cekPapanPenuh(){
+  const semuaTerjawab = kartuStatus.every(s => s==='benar' || s==='terbuang');
+  if(semuaTerjawab){ selesaikanRonde(false); }
+}
+
+function tandaiSalah(){
+  if(roundSelesai) return;
+  if(!sudahBukaSemua){ toast('Klik dulu "Tampilkan Semua Jawaban".','bad'); return; }
+  strikeSekarang++;
+  perbaruiStrike();
+  suaraSalah();
+  toast('Jawaban tidak ada di papan (X)', 'bad');
+  if(strikeSekarang >= 3){
+    selesaikanRonde(true);
+  } else {
+    gantiGiliran();
+  }
+  simpanState();
+}
+
+function perbaruiStrike(){
+  for(let i=1;i<=3;i++){
+    document.getElementById('strike-'+i).classList.toggle('hit', i<=strikeSekarang);
+  }
+}
+
+function selesaikanRonde(karenaStrike){
+  roundSelesai = true;
+  kartuStatus = kartuStatus.map(s => (s==='tutup'||s==='terlihat') ? 'terbuang' : s);
+  gambarKartu();
+  document.getElementById('btn-buka-semua').disabled = true;
+  document.getElementById('btn-salah').disabled = true;
+  document.getElementById('round-over').classList.add('show');
+  document.getElementById('round-over').textContent = karenaStrike
+    ? 'Ronde selesai — 3 kesalahan tercatat. Lanjut ke soal berikutnya.'
+    : 'Ronde selesai — semua jawaban di papan sudah terjawab!';
+  suaraRonde();
+}
+
+function gantiGiliran(){
+  giliran = giliran===1 ? 2 : 1;
+  perbaruiGiliran();
+}
+function perbaruiGiliran(){
+  const timSekarang = giliran===1 ? timDuel.t1 : timDuel.t2;
+  document.getElementById('giliran-sekarang').textContent = timSekarang ? 'TIM '+timSekarang : '—';
+  document.getElementById('giliran-sekarang').style.color = timSekarang ? timWarna[timSekarang] : 'var(--gold)';
+}
+
+// ================= NAVIGASI SOAL =================
+function perbaruiNavigasi(){
+  document.getElementById('btn-prev').disabled = nomorSoal <= 0;
+  document.getElementById('progress-fill').style.width = Math.max(2,((nomorSoal+1)/soalDataAsli.length*100)) + '%';
+  const sel = document.getElementById('pilih-nomor');
+  if(sel.options.length !== soalDataAsli.length){
+    sel.innerHTML = soalDataAsli.map((_,i)=>`<option value="${i}">Soal ${i+1}</option>`).join('');
+  }
+  sel.value = nomorSoal;
+}
+
+function siapkanRondeBaru(){
+  timDuel = {t1:null, t2:null};
+  document.getElementById('tim1-nama').textContent = 'Pilih Tim 1';
+  document.getElementById('tim1-nama').style.color = 'var(--ink-dim)';
+  document.getElementById('tim2-nama').textContent = 'Pilih Tim 2';
+  document.getElementById('tim2-nama').style.color = 'var(--ink-dim)';
+  document.getElementById('btn-mulai').disabled = true;
+  ['A','B','C','D','E'].forEach(t=> document.getElementById('pilih-'+t).classList.remove('selected'));
+  document.getElementById('kotak-giliran').classList.remove('show');
+  document.getElementById('btn-buka-semua').disabled = true;
+  document.getElementById('btn-salah').disabled = true;
+  document.getElementById('soal').textContent = 'Pilih 2 tim, lalu klik "Mulai Duel!" untuk memulai.';
+  document.getElementById('daftar-jawaban').innerHTML = '';
+  document.getElementById('round-over').classList.remove('show');
+  document.getElementById('buzzer-screen').classList.remove('show');
+}
+
+function mintaSoalBerikutnya(){
+  if(nomorSoal >= soalDataAsli.length - 1){ tampilkanPemenang(); return; }
+  modalKonfirmasi('Lanjut ke soal berikutnya?','Poin sementara ronde ini akan dihapus dan tim perlu dipilih ulang.','Lanjut', ()=>{
+    nomorSoal++; siapkanRondeBaru(); simpanState(); perbaruiNavigasi();
+  });
+}
+function soalSebelumnya(){
+  if(nomorSoal<=0) return;
+  modalKonfirmasi('Kembali ke soal sebelumnya?','Poin sementara ronde ini akan dihapus dan tim perlu dipilih ulang.','Kembali', ()=>{
+    nomorSoal--; siapkanRondeBaru(); simpanState(); perbaruiNavigasi();
+  });
+}
+function lompatKeSoal(nilai){
+  const target = parseInt(nilai,10);
+  if(target === nomorSoal) return;
+  modalKonfirmasi('Lompat ke soal ini?','Poin sementara ronde ini akan dihapus dan tim perlu dipilih ulang.','Lompat', ()=>{
+    nomorSoal = target; siapkanRondeBaru(); simpanState(); perbaruiNavigasi();
+  });
+  document.getElementById('pilih-nomor').value = nomorSoal;
+}
+
+// ================= RESET =================
+function mintaResetSkor(){
+  modalKonfirmasi('Reset skor semua tim?','Nomor soal saat ini tidak berubah, hanya skor A—E yang dikembalikan ke 0.','Reset Skor', ()=>{
+    skorUtama = {A:0,B:0,C:0,D:0,E:0};
+    ['A','B','C','D','E'].forEach(t=> document.getElementById('skor-'+t).textContent='0');
+    simpanState();
+    toast('Skor semua tim direset.','ok');
+  });
+}
+function mintaResetTotal(){
+  modalKonfirmasi('Ulang permainan dari awal?','Semua skor dihapus dan soal diacak ulang dari Soal 1.','Ulang Total', ()=>{
+    localStorage.removeItem(STORAGE_KEY);
+    acakUlangSoal();
+    skorUtama = {A:0,B:0,C:0,D:0,E:0};
+    nomorSoal = 0;
+    ['A','B','C','D','E'].forEach(t=> document.getElementById('skor-'+t).textContent='0');
+    siapkanRondeBaru();
+    perbaruiNavigasi();
+    simpanState();
+    toast('Permainan diulang dari awal.','ok');
+  });
+}
+function acakUlangSoal(){ soalUrutan = acak(soalDataAsli.map((_,i)=>i)); }
+
+// ================= PEMENANG =================
+function tampilkanPemenang(){
+  const peringkat = Object.entries(skorUtama).sort((a,b)=>b[1]-a[1]);
+  const podium = document.getElementById('podium');
+  podium.innerHTML = peringkat.map(([tim,poin],i)=>`
+    <div class="podium-row ${i===0?'top1':''}">
+      <span class="rank">#${i+1}</span>
+      <span class="nm" style="color:${timWarna[tim]}; font-weight:800;">TIM ${tim}</span>
+      <span class="pts">${poin} poin</span>
+    </div>`).join('');
+  document.getElementById('winner-screen').classList.add('show');
+  suaraMenang();
+  mulaiConfetti();
+}
+function tutupLayarPemenang(){
+  document.getElementById('winner-screen').classList.remove('show');
+  hentikanConfetti();
+}
+
+// ================= CONFETTI (canvas ringan) =================
+let confettiRAF = null;
+function mulaiConfetti(){
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const warnaList = ['#f5c542','#3b82f6','#ef4444','#22c55e','#a855f7'];
+  const partikel = Array.from({length:130}, ()=>({
+    x: Math.random()*canvas.width, y: -20-Math.random()*canvas.height*0.5,
+    vy: 2+Math.random()*3, vx: -1.5+Math.random()*3, size: 4+Math.random()*5,
+    warna: warnaList[Math.floor(Math.random()*warnaList.length)], rot: Math.random()*360, vr: -6+Math.random()*12
+  }));
+  let mulaiWaktu = performance.now();
+  function frame(t){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    partikel.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.warna; ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+      ctx.restore();
+      if(p.y>canvas.height+20) p.y=-20;
+    });
+    if(t-mulaiWaktu < 4500){ confettiRAF = requestAnimationFrame(frame); }
+    else { ctx.clearRect(0,0,canvas.width,canvas.height); }
+  }
+  confettiRAF = requestAnimationFrame(frame);
+}
+function hentikanConfetti(){
+  if(confettiRAF) cancelAnimationFrame(confettiRAF);
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+}
+
+// ================= FULLSCREEN =================
+function toggleFullscreen(){
+  if(!document.fullscreenElement){ document.documentElement.requestFullscreen?.(); }
+  else{ document.exitFullscreen?.(); }
+}
+
+// ================= INIT =================
+(function init(){
+  document.getElementById('total-soal').textContent = soalDataAsli.length;
+  const dipulihkan = muatState();
+  if(!dipulihkan){ acakUlangSoal(); }
+  document.getElementById('btn-sound').textContent = suaraAktif ? '🔊 Suara: Aktif' : '🔇 Suara: Nonaktif';
+  ['A','B','C','D','E'].forEach(t=> document.getElementById('skor-'+t).textContent = skorUtama[t]);
+  siapkanRondeBaru();
+  perbaruiNavigasi();
+})();
+</script>
+</body>
+</html>
