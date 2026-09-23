@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAMILY 100 — ALGORITMA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+        
+        :root {
+            --merah:#ff4757; --biru:#3742fa; --kuning:#ffa502; --hijau:#2ed573; --ungu:#a55eea;
+            --gelap:#1e3c72; --gelap2:#2a5298; --emas:#ffd700; --salah:#ff3838; --benar:#32ff7e;
+            --putih:rgba(255,255,255,0.95);
+        }
+
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height:100vh; 
+            color:white; 
+            padding:15px;
+            position:relative;
+            overflow-x:hidden;
+        }
+
+        .partikel {
+            position:fixed;
+            width:10px;
+            height:10px;
+            background:rgba(255,255,255,0.3);
+            border-radius:50%;
+            animation:terbang 15s infinite linear;
+            pointer-events:none;
+        }
+        @keyframes terbang {
+            0% { transform:translateY(100vh) rotate(0deg); opacity:0; }
+            10% { opacity:1; }
+            90% { opacity:1; }
+            100% { transform:translateY(-100vh) rotate(720deg); opacity:0; }
+        }
+
+        .container { max-width:1300px; margin:0 auto; position:relative; z-index:10; }
+
+        h1 { 
+            text-align:center; font-size:2.8rem; margin:15px 0; font-weight:800;
+            background:linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            animation:berkilau 3s ease-in-out infinite;
+        }
+        @keyframes berkilau {
+            0%,100% { filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
+            50% { filter:drop-shadow(0 4px 20px rgba(255,215,0,0.8)); }
+        }
+
+        .babak-info { 
+            text-align:center; font-size:1.4rem; color:var(--emas); margin-bottom:20px; font-weight:700;
+            padding:10px 20px; background:rgba(255,255,255,0.1); backdrop-filter:blur(10px);
+            border-radius:15px; display:inline-block; position:relative; left:50%; transform:translateX(-50%);
+            border:2px solid rgba(255,215,0,0.3);
+        }
+        
+        .skor-bar { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:20px; }
+        .tim-kartu { 
+            border-radius:18px; padding:15px 10px; text-align:center; transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor:pointer; background:rgba(255,255,255,0.15); backdrop-filter:blur(10px);
+            border:2px solid rgba(255,255,255,0.2); position:relative; overflow:hidden;
+        }
+        .tim-kartu::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:5px;
+            background:linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+        }
+        .tim-kartu.aktif { 
+            transform:translateY(-8px) scale(1.03); 
+            box-shadow:0 15px 40px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.4);
+            border:3px solid var(--emas); animation:berdenyut 1.5s ease-in-out infinite;
+        }
+        @keyframes berdenyut {
+            0%,100% { box-shadow:0 15px 40px rgba(0,0,0,0.3), 0 0 30px rgba(255,215,0,0.5); }
+            50% { box-shadow:0 15px 40px rgba(0,0,0,0.3), 0 0 50px rgba(255,215,0,0.8); }
+        }
+        .tim-kartu:hover:not(.aktif) { transform:translateY(-5px); box-shadow:0 10px 25px rgba(0,0,0,0.2); }
+        .tim-kartu.merah { border-top:5px solid var(--merah); }
+        .tim-kartu.biru { border-top:5px solid var(--biru); }
+        .tim-kartu.kuning { border-top:5px solid var(--kuning); color:white; }
+        .tim-kartu.hijau { border-top:5px solid var(--hijau); }
+        .tim-kartu.ungu { border-top:5px solid var(--ungu); }
+        
+        .tim-nama { font-weight:700; font-size:1rem; margin-bottom:5px; text-shadow:0 1px 3px rgba(0,0,0,0.3); }
+        .tim-poin { 
+            font-size:1.8rem; font-weight:800; margin:8px 0; text-shadow:0 2px 5px rgba(0,0,0,0.3); transition:all 0.3s;
+        }
+        .tim-poin.bertambah { animation:poinNaik 0.6s ease-out; color:var(--emas); }
+        @keyframes poinNaik {
+            0% { transform:scale(1); } 50% { transform:scale(1.4); } 100% { transform:scale(1); }
+        }
+        .strike-container { display:flex; justify-content:center; gap:5px; margin-top:5px; }
+        .strike { 
+            display:inline-block; width:24px; height:24px; border-radius:50%; background:rgba(0,0,0,0.2); 
+            font-weight:700; line-height:24px; font-size:0.8rem; transition:all 0.3s;
+            border:2px solid rgba(255,255,255,0.3);
+        }
+        .strike.x { background:var(--salah); animation:goyang 0.5s ease-in-out; box-shadow:0 0 15px rgba(255,56,56,0.6); }
+        @keyframes goyang {
+            0%,100% { transform:translateX(0); } 25% { transform:translateX(-5px) rotate(-5deg); }
+            75% { transform:translateX(5px) rotate(5deg); }
+        }
+
+        .papan { 
+            background:linear-gradient(145deg, rgba(255,255,255,0.98), rgba(240,248,255,0.95)); 
+            border-radius:22px; padding:30px; color:#2c3e50; margin-bottom:20px; 
+            box-shadow:0 20px 60px rgba(0,0,0,0.3); border:3px solid rgba(255,215,0,0.3); position:relative;
+        }
+        .papan::before {
+            content:''; position:absolute; top:-3px; left:-3px; right:-3px; bottom:-3px;
+            background:linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #45b7d1, #ffd700);
+            border-radius:22px; z-index:-1; background-size:400% 400%;
+            animation:pelangi 8s ease infinite; opacity:0.5;
+        }
+        @keyframes pelangi {
+            0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; }
+        }
+        
+        .pertanyaan { 
+            font-size:1.5rem; font-weight:800; margin-bottom:25px; text-align:center; color:var(--gelap);
+            padding:15px 20px; background:linear-gradient(135deg, #667eea, #764ba2);
+            color:white; border-radius:15px; box-shadow:0 8px 25px rgba(102,126,234,0.4);
+        }
+        
+        .jawaban-baris { 
+            display:flex; align-items:center; background:linear-gradient(135deg, #f5f7fa, #e4e8ec); 
+            margin:10px 0; border-radius:12px; height:58px; overflow:hidden;
+            transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow:0 4px 15px rgba(0,0,0,0.1);
+        }
+        .jawaban-baris:hover { transform:translateX(5px); box-shadow:0 6px 20px rgba(0,0,0,0.15); }
+        
+        .nomor { 
+            width:50px; background:linear-gradient(135deg, var(--gelap), var(--gelap2)); 
+            color:white; text-align:center; line-height:58px; font-weight:800; font-size:1.2rem;
+        }
+        
+        .jawaban { flex:1; padding:0 18px; font-size:1.15rem; font-weight:600; transition:all 0.5s; }
+        
+        .nilai { 
+            width:70px; background:linear-gradient(135deg, #ffd700, #ffed4e); 
+            color:#2c3e50; text-align:center; line-height:58px; font-weight:800; font-size:1.2rem;
+            text-shadow:0 1px 2px rgba(255,255,255,0.5);
+        }
+        
+        .tersembunyi { 
+            background:linear-gradient(135deg, #bdc3c7, #95a5a6); color:transparent; position:relative;
+        }
+        .tersembunyi::after {
+            content:'?'; position:absolute; left:50%; top:50%; transform:translate(-50%, -50%);
+            color:white; font-size:1.5rem; font-weight:800; text-shadow:0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .terbuka { 
+            background:linear-gradient(135deg, #d4fc79, #96e6a1); color:#2c3e50;
+            animation:muncul 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .terbuka.rahasia { 
+            background:linear-gradient(135deg, #ffeaa7, #fdcb6e); 
+            animation:muncul 0.6s ease-out;
+        }
+        @keyframes muncul {
+            0% { transform:scale(0.8) rotateX(90deg); opacity:0; }
+            100% { transform:scale(1) rotateX(0deg); opacity:1; }
+        }
+
+        .kontrol { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:20px 0; align-items:center; }
+        
+        button { 
+            padding:14px 22px; font-size:1rem; border:none; border-radius:12px; cursor:pointer; font-weight:700; 
+            transition:all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow:0 6px 20px rgba(0,0,0,0.2); position:relative; overflow:hidden;
+        }
+        button::before {
+            content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
+            background:linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition:left 0.5s;
+        }
+        button:hover::before { left:100%; }
+        button:hover { transform:translateY(-4px) scale(1.03); box-shadow:0 10px 30px rgba(0,0,0,0.3); }
+        button:active { transform:translateY(-1px) scale(0.98); }
+        
+        .btn-hijau { background:linear-gradient(135deg, #11998e, #38ef7d); color:white; }
+        .btn-biru { background:linear-gradient(135deg, #2193b0, #6dd5ed); color:white; }
+        .btn-merah { background:linear-gradient(135deg, #eb3349, #f45c43); color:white; }
+        .btn-emas { background:linear-gradient(135deg, #f5af19, #f12711); color:white; }
+        .btn-ungu { background:linear-gradient(135deg, #a55eea, #6c5ce7); color:white; }
+        .btn-abu { background:linear-gradient(135deg, #485563, #29323c); color:white; }
+        
+        .input-jawab { 
+            padding:14px 20px; font-size:1.05rem; border-radius:12px; border:3px solid rgba(255,255,255,0.3); 
+            width:280px; background:rgba(255,255,255,0.95); color:#2c3e50; font-weight:600;
+            transition:all 0.3s; box-shadow:0 4px 15px rgba(0,0,0,0.1);
+        }
+        .input-jawab:focus {
+            outline:none; border-color:var(--emas);
+            box-shadow:0 0 0 4px rgba(255,215,0,0.2), 0 6px 20px rgba(0,0,0,0.15); transform:translateY(-2px);
+        }
+        .input-jawab::placeholder { color:#95a5a6; font-weight:400; }
+        
+        .layar { display:none; animation:fadeIn 0.6s ease-out; }
+        .layar.aktif { display:block; }
+        @keyframes fadeIn {
+            from { opacity:0; transform:translateY(20px); }
+            to { opacity:1; transform:translateY(0); }
+        }
+        
+        .setup { text-align:center; padding:60px 30px; }
+        
+        .pemenang { 
+            text-align:center; font-size:2.5rem; margin-top:30px; display:none; padding:30px;
+            background:linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,107,107,0.2));
+            backdrop-filter:blur(10px); border-radius:20px; border:3px solid var(--emas);
+            animation:menang 1s ease-in-out infinite alternate;
+        }
+        @keyframes menang { from { transform:scale(1); } to { transform:scale(1.02); } }
+        #namaPemenang {
+            background:linear-gradient(45deg, #ffd700, #ff6b6b, #ffd700);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text; font-weight:800;
+        }
+        
+        .info-cara { 
+            background:rgba(255,255,255,0.15); backdrop-filter:blur(15px); border-radius:18px; 
+            padding:25px; margin-bottom:25px; font-size:0.95rem; line-height:1.8;
+            border:2px solid rgba(255,255,255,0.2); text-align:left; max-width:800px;
+            margin-left:auto; margin-right:auto;
+        }
+        .info-cara h3 {
+            color:var(--emas); font-size:1.3rem; margin-bottom:15px; text-align:center;
+            text-shadow:0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .popup-latar { 
+            position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); 
+            display:flex; align-items:center; justify-content:center; z-index:9999;
+            backdrop-filter:blur(5px); animation:fadeIn 0.3s ease-out;
+        }
+        .popup-kotak { 
+            background:linear-gradient(145deg, #ffffff, #f0f4f8); border-radius:22px; padding:40px 35px; 
+            max-width:500px; color:#2c3e50; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,0.4);
+            border:3px solid transparent; background-clip:padding-box; position:relative;
+            animation:munculPopup 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .popup-kotak::before {
+            content:''; position:absolute; top:-3px; left:-3px; right:-3px; bottom:-3px;
+            background:linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #a55eea, #ffd700);
+            border-radius:22px; z-index:-1; background-size:400% 400%;
+            animation:pelangi 6s ease infinite;
+        }
+        @keyframes munculPopup {
+            from { transform:scale(0.5) rotate(-10deg); opacity:0; }
+            to { transform:scale(1) rotate(0deg); opacity:1; }
+        }
+        .popup-kotak h2 { color:var(--gelap); margin-bottom:18px; font-size:1.6rem; font-weight:800; }
+        .popup-kotak p { margin-bottom:22px; font-size:1.05rem; line-height:1.7; color:#34495e; }
+        .popup-tim { 
+            font-size:1.8rem; font-weight:800; margin:15px 0 25px; padding:15px; border-radius:12px;
+            background:linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,107,107,0.1));
+        }
+        .sembunyi { display:none !important; }
+
+        .info-sisa { 
+            text-align:center; margin:10px 0; font-size:1rem; font-weight:600; 
+            color:var(--emas); text-shadow:0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width:768px) {
+            .skor-bar { grid-template-columns:repeat(2,1fr); }
+            h1 { font-size:1.8rem; }
+            .pertanyaan { font-size:1.1rem; }
+            .jawaban { font-size:0.95rem; }
+            .input-jawab { width:100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="partikelContainer"></div>
+<div class="container">
+
+    <div id="popupInstruksi" class="popup-latar sembunyi">
+        <div class="popup-kotak">
+            <h2 id="popupJudul"></h2>
+            <p id="popupTeks"></p>
+            <div id="popupTim" class="popup-tim"></div>
+            <button class="btn-emas" onclick="tutupPopup()">SIAP ✅</button>
+        </div>
+    </div>
+
+    <div id="layarAwal" class="layar aktif">
+        <div class="setup">
+            <h1>🎮 FAMILY 100 — ALGORITMA</h1>
+            <p style="margin:20px 0; font-size:1.2rem; font-weight:600;">
+                5 Tim · 8 Anggota/Tim · 80 Menit Seru!
+            </p>
+            
+            <div class="info-cara">
+                <h3>📖 CARA MAIN</h3>
+                <p><strong>🎯 Babak 1 — Pembukaan (Serentak):</strong> Semua tim diskusi 30 detik → tulis jawaban → dibaca berurutan. Yang cocok dapat poin!</p>
+                <p><strong>⏭️ Babak 2 — Bergilir:</strong> Urutan Merah→Biru→Kuning→Hijau→Ungu. Salah 3× → gugur. Giliran lanjut ke tim berikut.</p>
+                <p><strong>⚡ Babak 3 — Berebut:</strong> Sisa tim rebut jawaban yang belum keluar. Salah langsung ganti tim. Bertahan sampai akhir → +20 poin!</p>
+                <p><strong>🔥 Babak 4 — Akhir ×2:</strong> Poin dikalikan 2! Penentu kemenangan, siapa pun bisa menang!</p>
+                <p style="margin-top:12px; color:#ffd700; font-weight:700; text-align:center;">
+                    💡 Jawaban mirip / salah ketik / tambahan kata → TETAP DIHITUNG!
+                </p>
+                <p style="margin-top:8px; color:#a55eea; font-weight:700; text-align:center;">
+                    🔮 TIDAK ADA YANG BISA? Klik "Tampilkan Sisa" → semua jawaban langsung terlihat!
+                </p>
+            </div>
+            
+            <button class="btn-emas" onclick="mulaiGame()" style="font-size:1.4rem; padding:18px 50px; border-radius:15px;">
+                ▶ MULAI PERMAINAN
+            </button>
+        </div>
+    </div>
+
+    <div id="layarMain" class="layar">
+        <h1>🎲 FAMILY 100 — ALGORITMA</h1>
+        <div class="babak-info" id="namaBabak">BABAK 1 — Pembukaan</div>
+        <div class="info-sisa" id="infoSisa"></div>
+
+        <div class="skor-bar">
+            <div class="tim-kartu merah" id="tim0" onclick="pilihTim(0)">
+                <div class="tim-nama">🔴 Merah</div>
+                <div class="tim-poin" id="poin0">0</div>
+                <div class="strike-container">
+                    <div class="strike" id="s0-1"></div>
+                    <div class="strike" id="s0-2"></div>
+                    <div class="strike" id="s0-3"></div>
+                </div>
+            </div>
+            <div class="tim-kartu biru" id="tim1" onclick="pilihTim(1)">
+                <div class="tim-nama">🔵 Biru</div>
+                <div class="tim-poin" id="poin1">0</div>
+                <div class="strike-container">
+                    <div class="strike" id="s1-1"></div>
+                    <div class="strike" id="s1-2"></div>
+                    <div class="strike" id="s1-3"></div>
+                </div>
+            </div>
+            <div class="tim-kartu kuning" id="tim2" onclick="pilihTim(2)">
+                <div class="tim-nama">🟡 Kuning</div>
+                <div class="tim-poin" id="poin2">0</div>
+                <div class="strike-container">
+                    <div class="strike" id="s2-1"></div>
+                    <div class="strike" id="s2-2"></div>
+                    <div class="strike" id="s2-3"></div>
+                </div>
+            </div>
+            <div class="tim-kartu hijau" id="tim3" onclick="pilihTim(3)">
+                <div class="tim-nama">🟢 Hijau</div>
+                <div class="tim-poin" id="poin3">0</div>
+                <div class="strike-container">
+                    <div class="strike" id="s3-1"></div>
+                    <div class="strike" id="s3-2"></div>
+                    <div class="strike" id="s3-3"></div>
+                </div>
+            </div>
+            <div class="tim-kartu ungu" id="tim4" onclick="pilihTim(4)">
+                <div class="tim-nama">🟣 Ungu</div>
+                <div class="tim-poin" id="poin4">0</div>
+                <div class="strike-container">
+                    <div class="strike" id="s4-1"></div>
+                    <div class="strike" id="s4-2"></div>
+                    <div class="strike" id="s4-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="papan">
+            <div class="pertanyaan" id="pertanyaan"></div>
+            <div id="daftarJawaban"></div>
+        </div>
+
+        <div class="kontrol">
+            <input type="text" id="inputJawab" class="input-jawab" placeholder="Ketik jawaban disini..." onkeydown="if(event.key==='Enter') cekJawaban()">
+            <button class="btn-hijau" onclick="cekJawaban()">✅ Jawab</button>
+            <button class="btn-biru" onclick="gantiGiliran()">🔄 Ganti Giliran</button>
+            <button class="btn-merah" onclick="tambahSalah()">❌ Salah</button>
+            <button class="btn-ungu" onclick="tampilkanSisa()">🔮 Tampilkan Sisa</button>
+            <button class="btn-abu" onclick="beriBonus()">🎁 +20 Poin</button>
+            <button class="btn-emas" onclick="soalBerikutnya()">➡️ Soal Berikutnya</button>
+        </div>
+
+        <div class="pemenang" id="pemenang">
+            🏆 TIM <span id="namaPemenang"></span> — PEMENANG! 🏆
+        </div>
+    </div>
+</div>
+
+<script>
+function buatPartikel() {
+    const container = document.getElementById('partikelContainer');
+    for(let i=0; i<20; i++) {
+        const p = document.createElement('div');
+        p.className = 'partikel';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDelay = Math.random() * 15 + 's';
+        p.style.animationDuration = (10 + Math.random() * 10) + 's';
+        p.style.width = (5 + Math.random() * 10) + 'px';
+        p.style.height = p.style.width;
+        container.appendChild(p);
+    }
+}
+buatPartikel();
+
+const daftarSoal = [
+    {
+        babak: "BABAK 1 — Pembukaan",
+        judulPopup: "🎯 BABAK 1 DIMULAI!",
+        teksPopup: "Semua tim diskusi <strong>30 detik</strong> secara serentak!<br>Tulis jawaban terbaik di kertas → kumpulkan ke pembaca.<br>Jawaban mirip/sama arti = tetap dapat poin!",
+        soal: "Langkah sebelum berangkat sekolah?",
+        pengali: 1,
+        jawaban: [
+            {teks: "Bangun", poin:30, kata:["bangun pagi", "terjaga", "bangun tidur", "membangun", "bangunlah"]},
+            {teks: "Mandi", poin:25, kata:["mandi pagi", "cuci badan", "bersihkan diri", "basuh badan", "mandi dulu"]},
+            {teks: "Sarapan", poin:20, kata:["makan pagi", "makan dulu", "isi perut", "makan sarapan", "sarapan pagi"]},
+            {teks: "Seragam", poin:15, kata:["baju sekolah", "pakai baju", "berpakaian", "pakaian seragam", "baju seragam"]},
+            {teks: "Tas", poin:10, kata:["tas sekolah", "membawa tas", "menyiapkan tas", "siapkan tas", "tasnya", "bawa tas"]}
+        ]
+    },
+    {
+        babak: "BABAK 1 — Pembukaan",
+        judulPopup: "✍️ SOAL BERIKUTNYA!",
+        teksPopup: "Diskusi bareng tim selama 30 detik → tulis jawaban terbaikmu!",
+        soal: "Langkah membuat teh?",
+        pengali: 1,
+        jawaban: [
+            {teks: "Gelas", poin:30, kata:["siapkan gelas", "cangkir", "wadah air", "siapkan cangkir", "gelasnya"]},
+            {teks: "Teh", poin:25, kata:["masukkan teh", "kantong teh", "daun teh", "tehnya", "seduh teh"]},
+            {teks: "Gula", poin:20, kata:["tambah gula", "gula pasir", "manis", "masukkan gula", "gulanya"]},
+            {teks: "Air", poin:15, kata:["air panas", "tuang air", "tuangkan air", "isi air", "air mendidih"]},
+            {teks: "Aduk", poin:10, kata:["aduk rata", "diaduk", "kocok", "aduk hingga larut", "aduklah"]}
+        ]
+    },
+    {
+        babak: "BABAK 1 — Pembukaan · Soal Terakhir",
+        judulPopup: "📝 SOAL TERAKHIR BABAK 1",
+        teksPopup: "Semua tim siap? Diskusi cepat 30 detik!",
+        soal: "Langkah mencuci tangan?",
+        pengali: 1,
+        jawaban: [
+            {teks: "Basahi", poin:30, kata:["basahi tangan", "bilas air", "aliri air", "basahkan tangan", "basuh tangan"]},
+            {teks: "Sabun", poin:25, kata:["pakai sabun", "sabun tangan", "beri sabun", "pakai sabunnya", "sabunlah"]},
+            {teks: "Gosok", poin:20, kata:["gosok tangan", "sabun merata", "bersihkan", "pijat gosok", "gosoklah"]},
+            {teks: "Bilas", poin:15, kata:["bilas bersih", "cuci air", "buang busa", "dibilas", "bilaslah"]},
+            {teks: "Keringkan", poin:10, kata:["lap tangan", "serbet", "tisu", "dikeringkan", "keringkan tangan"]}
+        ]
+    },
+    {
+        babak: "BABAK 2 — Bergilir",
+        judulPopup: "⏭️ BABAK 2 DIMULAI — GILIRAN TIM!",
+        teksPopup: "Urutan: 🔴 Merah → 🔵 Biru → 🟡 Kuning → 🟢 Hijau → 🟣 Ungu<br>3× salah = gugur!",
+        soal: "Langkah menyikat gigi?",
+        pengali: 1,
+        jawaban: [
+            {teks: "Sikat gigi", poin:30, kata:["siapkan sikat", "ambil sikat gigi", "sikatnya"]},
+            {teks: "Pasta gigi", poin:25, kata:["odol", "beri pasta", "oleskan pasta"]},
+            {teks: "Sikat gigi", poin:20, kata:["menyikat gigi", "gosok gigi", "sikat perlahan"]},
+            {teks: "Kumur", poin:15, kata:["berkumur", "bilas mulut", "cuci mulut"]},
+            {teks: "Bilas", poin:10, kata:["bilas sikat", "bersihkan sikat", "cuci sikat"]}
+        ]
+    },
+    {
+        babak: "BABAK 2 — Bergilir",
+        judulPopup: "🔄 LANJUT BABAK 2!",
+        teksPopup: "Tim yang menyala = giliranmu!",
+        soal: "Langkah mandi?",
+        pengali: 1,
+        jawaban: [
+            {teks: "Siapkan alat", poin:30, kata:["siapkan pakaian", "siapkan handuk", "siapkan perlengkapan"]},
+            {teks: "Basahi badan", poin:25, kata:["siram air", "basahkan tubuh"]},
+            {teks: "Sabun", poin:20, kata:["pakai sabun badan", "pakai sampo", "sabun seluruh"]},
+            {teks: "Bilas bersih", poin:15, kata:["buang busa", "siram air bersih"]},
+            {teks: "Keringkan", poin:10, kata:["pakai handuk", "lap badan", "berpakaian"]}
+        ]
+    },
+    {
+        babak: "BABAK 2 — Bergilir",
+        judulPopup: "💪 LANJUT BABAK 2!",
+        teksPopup: "Semua wajib berpartisipasi!",
+        soal: "Langkah memakai sepatu?",
+        pengali: 1,
+        jawaban: [
+            {teks: "Kaus kaki", poin:30, kata:["kaos kaki", "pakai kaus kaki", "pasang kaus kaki"]},
+            {teks: "Masukkan kaki", poin:25, kata:["pakai sepatu", "kenakan sepatu"]},
+            {teks: "Atur posisi", poin:20, kata:["pas di kaki", "sesuaikan", "rapikan sepatu"]},
+            {teks: "Ikat tali", poin:15, kata:["kencangkan tali", "pasang perekat", "ikat kencang"]},
+            {teks: "Rapikan", poin:10, kata:["cek kiri kanan", "siap jalan"]}
+        ]
+    },
+    {
+        babak: "BABAK 2 — Bergilir · Terakhir",
+        judulPopup: "⏱️ SOAL TERAKHIR BABAK 2!",
+        teksPopup: "Berikan yang terbaik!",
+        soal: "Langkah membuat mi instan?",
+        pengali: 1,
+        jawaban: [
+            {teks: "Rebus air", poin:30, kata:["didihkan air", "panaskan air", "air mendidih"]},
+            {teks: "Masukkan mi", poin:25, kata:["masukkan mie", "rendam mi"]},
+            {teks: "Tunggu matang", poin:20, kata:["biarkan sebentar", "rebus sampai lunak"]},
+            {teks: "Masukkan bumbu", poin:15, kata:["tambah bumbu", "tuang bumbu"]},
+            {teks: "Aduk rata", poin:10, kata:["campur rata", "siap disajikan"]}
+        ]
+    },
+    {
+        babak: "BABAK 3 — Berebut",
+        judulPopup: "⚡ BABAK 3 — REBUTAN!",
+        teksPopup: "Siapa cepat dia dapat!",
+        soal: "Langkah sebelum tidur?",
+        pengali: 1,
+        jawaban: [
+            {teks: "Bersihkan diri", poin:30, kata:["cuci muka", "cuci kaki", "mandi sore", "sikat gigi"]},
+            {teks: "Sikat gigi", poin:25, kata:["bersihkan mulut", "gosok gigi"]},
+            {teks: "Rapikan tempat tidur", poin:20, kata:["siapkan kasur", "rapikan ranjang"]},
+            {teks: "Berdoa", poin:15, kata:["berdoa sebelum tidur", "bacakan doa"]},
+            {teks: "Tidur", poin:10, kata:["beristirahat", "berbaring", "pejamkan mata"]}
+        ]
+    },
+    {
+        babak: "BABAK 3 — Berebut · Terakhir",
+        judulPopup: "🔥⚡ REBUTAN TERAKHIR!",
+        teksPopup: "Bertahan sampai akhir → +20 Poin Bonus!",
+        soal: "Barang yang disiapkan sebelum sekolah?",
+        pengali: 1,
+        jawaban: [
+            {teks: "Buku", poin:30, kata:["buku pelajaran", "buku tulis", "buku paket"]},
+            {teks: "Pulpen", poin:25, kata:["pen", "pena", "bulpen", "bolpen", "alat tulis"]},
+            {teks: "Seragam", poin:20, kata:["baju sekolah", "pakaian seragam"]},
+            {teks: "Tas", poin:15, kata:["tas sekolah", "membawa tas", "siapkan tas"]},
+            {teks: "Alat tulis lain", poin:10, kata:["pensil", "penggaris", "penghapus", "kotak pensil"]}
+        ]
+    },
+    {
+        babak: "🔥 BABAK 4 — AKHIR ×2",
+        judulPopup: "🏆🔥 BABAK PENENTU — POIN DIKALI 2!",
+        teksPopup: "Siapa yang akan juara?",
+        soal: "Langkah menyelesaikan masalah belajar?",
+        pengali: 2,
+        jawaban: [
+            {teks: "Kenali masalah", poin:30, kata:["cari masalah", "ketahui kesulitan", "tentukan persoalan"]},
+            {teks: "Cari penyebab", poin:25, kata:["cari sebab", "tahu alasan", "kenali penyebab"]},
+            {teks: "Cari solusi", poin:20, kata:["cari cara", "temukan jalan keluar", "pikirkan cara"]},
+            {teks: "Lakukan", poin:15, kata:["praktikkan", "jalankan", "kerjakan"]},
+            {teks: "Cek hasil & perbaiki", poin:10, kata:["evaluasi", "tinjau ulang", "perbaiki", "ulangi jika perlu"]}
+        ]
+    }
+];
+
+let skor = [0,0,0,0,0];
+let strike = [0,0,0,0,0];
+let timAktif = 0;
+let soalSkrg = 0;
+let jawabanTerbuka = [];
+let sudahTampilkanSisa = false;
+const namaTim = ["🔴 MERAH", "🔵 BIRU", "🟡 KUNING", "🟢 HIJAU", "🟣 UNGU"];
+const warnaTim = ["#ff4757", "#3742fa", "#ffa502", "#2ed573", "#a55eea"];
+
+function cocokkanJawaban(inputTeks, daftarKata) {
+    const input = inputTeks.toLowerCase().trim();
+    return daftarKata.some(kata => {
+        const k = kata.toLowerCase();
+        return k.includes(input) || input.includes(k);
+    });
+}
+
+function tampilkanPopup(judul, teks, teksTim="") {
+    document.getElementById('popupJudul').textContent = judul;
+    document.getElementById('popupTeks').innerHTML = teks;
+    const elTim = document.getElementById('popupTim');
+    elTim.innerHTML = teksTim;
+    elTim.style.color = teksTim ? warnaTim[timAktif] : 'inherit';
+    document.getElementById('popupInstruksi').classList.remove('sembunyi');
+}
+
+function tutupPopup() {
+    document.getElementById('popupInstruksi').classList.add('sembunyi');
+    document.getElementById('inputJawab').focus();
+}
+
+function tampilkanGiliranTim(idx) {
+    tampilkanPopup(
+        "⬆️ GILIRAN TIM MAJU!",
+        "Siap maju? Diskusi tim selama <strong>20 detik</strong> lalu sampaikan jawaban!<br>Jawaban mirip/salah ketik tetap dihitung ✅<br><br>🔮 TIDAK ADA YANG TAHU? Klik tombol <strong>\"Tampilkan Sisa\"</strong> untuk melihat jawabannya!",
+        namaTim[idx]
+    );
+}
+
+function mulaiGame() {
+    document.getElementById('layarAwal').classList.remove('aktif');
+    setTimeout(() => {
+        document.getElementById('layarMain').classList.add('aktif');
+        soalSkrg = 0;
+        skor = [0,0,0,0,0];
+        strike = [0,0,0,0,0];
+        perbaruiSkor();
+        muatSoal();
+    }, 300);
+}
+
+function muatSoal() {
+    const soal = daftarSoal[soalSkrg];
+    jawabanTerbuka = [];
+    sudahTampilkanSisa = false;
+    document.getElementById('namaBabak').textContent = soal.babak;
+    document.getElementById('pertanyaan').textContent = soal.soal;
+    const daftar = document.getElementById('daftarJawaban');
+    daftar.innerHTML = '';
+    soal.jawaban.forEach((j, i) => {
+        const baris = document.createElement('div');
+        baris.className = 'jawaban-baris';
+        baris.style.animationDelay = (i * 0.1) + 's';
+        baris.innerHTML = `
+            <div class="nomor">${i+1}</div>
+            <div class="jawaban tersembunyi" id="jwb-${i}">${j.teks}</div>
+            <div class="nilai">${j.poin * soal.pengali}</div>
+        `;
+        daftar.appendChild(baris);
+    });
+    strike = [0,0,0,0,0];
+    for(let t=0;t<5;t++){
+        for(let s=1;s<=3;s++){
+            document.getElementById(`s${t}-${s}`).classList.remove('x');
+        }
+    }
+    perbaruiInfoSisa();
+    setTimeout(() => {
+        tampilkanPopup(soal.judulPopup, soal.teksPopup);
+    }, 500);
+    pilihTim(0);
+    document.getElementById('inputJawab').value = '';
+    document.getElementById('pemenang').style.display = 'none';
+}
+
+function perbaruiInfoSisa() {
+    const soal = daftarSoal[soalSkrg];
+    const sisa = soal.jawaban.length - jawabanTerbuka.length;
+    document.getElementById('infoSisa').textContent = 
+        sisa > 0 
+            ? `🔮 Jawaban tersisa: ${sisa} — klik "Tampilkan Sisa" jika semua bingung!` 
+            : '✅ Semua jawaban sudah terbuka!';
+}
+
+function tampilkanSisa() {
+    if(sudahTampilkanSisa) {
+        alert('Semua jawaban sudah ditampilkan! 😊');
+        return;
+    }
+    const soal = daftarSoal[soalSkrg];
+    let jumlahDibuka = 0;
+    soal.jawaban.forEach((j, i) => {
+        if(!jawabanTerbuka.includes(i)) {
+            jawabanTerbuka.push(i);
+            const el = document.getElementById(`jwb-${i}`);
+            el.classList.remove('tersembunyi');
+            el.classList.add('terbuka', 'rahasia');
+            jumlahDibuka++;
+        }
+    });
+    sudahTampilkanSisa = true;
+    perbaruiInfoSisa();
+    alert(`🔮 ${jumlahDibuka} jawaban ditampilkan untuk diketahui bersama!`);
+}
+
+function pilihTim(idx) {
+    timAktif = idx;
+    document.querySelectorAll('.tim-kartu').forEach((el,i)=>{
+        el.classList.toggle('aktif', i===idx);
+    });
+    setTimeout(() => {
+        tampilkanGiliranTim(idx);
+    }, 150);
+}
+
+function gantiGiliran() {
+    timAktif = (timAktif + 1) % 5;
+    pilihTim(timAktif);
+}
+
+function cekJawaban() {
+    const input = document.getElementById('inputJawab').value.trim();
+    if(!input) return;
+    const soal = daftarSoal[soalSkrg];
+    let ketemu = false;
+    soal.jawaban.forEach((j, i) => {
+        if(!jawabanTerbuka.includes(i)) {
+            const semuaKata = [j.teks, ...(j.kata || [])];
+            if (cocokkanJawaban(input, semuaKata)) {
+                jawabanTerbuka.push(i);
+                const el = document.getElementById(`jwb-${i}`);
+                el.classList.remove('tersembunyi');
+                el.classList.add('terbuka');
+                skor[timAktif] += j.poin * soal.pengali;
+                perbaruiSkor(true);
+                ketemu = true;
+            }
+        }
+    });
+    if(!ketemu) tambahSalah();
+    document.getElementById('inputJawab').value = '';
+    perbaruiInfoSisa();
+    if(jawabanTerbuka.length === soal.jawaban.length) {
+        setTimeout(() => {
+            alert('🎉✅ Semua jawaban terbuka! Luar biasa!');
+        }, 500);
+    }
+}
+
+function tambahSalah() {
+    if(strike[timAktif] >= 3) return;
+    strike[timAktif]++;
+    const elStrike = document.getElementById(`s${timAkt
