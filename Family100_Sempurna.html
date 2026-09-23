@@ -9,10 +9,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg-0:#0a0f1e; --bg-1:#111a30; --panel:#16213e; --panel-2:#1c2b4d;
-  --line: rgba(255,255,255,0.08);
-  --ink:#eef2ff; --ink-dim:#93a0c4;
-  --gold:#f5c542; --gold-deep:#c9962c;
+  --bg-0:#fff7d6; --bg-1:#e8f7ff; --panel:#ffffff; --panel-2:#f3f8ff;
+  --line: rgba(49,72,130,0.16);
+  --ink:#18254b; --ink-dim:#63749c;
+  --gold:#ffbd19; --gold-deep:#ff8a00;
   --red:#ef4444;
   --teamA:#3b82f6; --teamB:#ef4444; --teamC:#22c55e; --teamD:#f59e0b; --teamE:#a855f7;
   --radius-lg:22px; --radius-md:14px; --radius-sm:9px;
@@ -269,6 +269,151 @@ html,body{height:100%;}
 #confetti-canvas{position:fixed; inset:0; pointer-events:none; z-index:96;}
 
 .sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);}
+
+/* ===== BRIGHT ARCADE REMASTER ===== */
+:root{
+  --teamA:#2878ff; --teamB:#ff4d6d; --teamC:#13b978; --teamD:#ff9f1c; --teamE:#9855ed;
+}
+body{
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 8% 8%,rgba(255,199,64,.45),transparent 24rem),
+    radial-gradient(circle at 92% 12%,rgba(91,198,255,.35),transparent 25rem),
+    radial-gradient(circle at 80% 85%,rgba(201,151,255,.25),transparent 26rem),
+    linear-gradient(145deg,#fff8dc 0%,#e8f8ff 48%,#f7eaff 100%);
+  background-attachment:fixed;
+}
+body:before{
+  content:"✦   ★   ✦   ●   ★   ✦";
+  position:fixed; top:12px; left:3%; right:3%; pointer-events:none;
+  color:rgba(255,159,28,.23); font-size:clamp(20px,4vw,42px);
+  letter-spacing:clamp(12px,4vw,50px); white-space:nowrap; overflow:hidden;
+  z-index:-1; animation:sky-drift 18s linear infinite;
+}
+@keyframes sky-drift{from{transform:translateX(-2%)}to{transform:translateX(2%)}}
+.wrap{max-width:1200px;padding-top:28px}
+.hero{
+  position:relative; padding:24px 16px 26px; margin-bottom:20px;
+  border:3px solid #fff; border-radius:30px;
+  background:linear-gradient(115deg,#fff 0%,#fff4c5 48%,#e6f7ff 100%);
+  box-shadow:0 12px 0 #dce9ff,0 20px 45px rgba(52,93,163,.16);
+  overflow:hidden;
+}
+.hero:before,.hero:after{position:absolute;font-size:clamp(30px,6vw,58px);animation:floaty 3s ease-in-out infinite}
+.hero:before{content:"🌟";left:4%;top:12%}
+.hero:after{content:"🚀";right:4%;bottom:5%;animation-delay:1s}
+.hero h1{
+  color:#3454c8; text-shadow:2px 3px 0 #ffe18b,0 7px 18px rgba(68,99,190,.18);
+  font-size:clamp(1.55rem,4.5vw,2.9rem); line-height:1.2;
+}
+.hero p{color:#596b96;font-weight:600}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-9px) rotate(5deg)}}
+.toolbar{gap:10px}
+.chip-btn{
+  background:#fff;color:#40527f;border:2px solid #dce6ff;
+  box-shadow:0 4px 0 #dce6ff;font-weight:800;padding:10px 16px;
+}
+.chip-btn:hover{color:#244cc0;border-color:#86b9ff;transform:translateY(-2px)}
+.panel,.board{
+  background:linear-gradient(145deg,#fff 0%,#f3f8ff 65%,#fff8e7 100%);
+  border:2px solid #fff; border-radius:26px;
+  box-shadow:0 9px 0 #dce7ff,0 16px 35px rgba(52,93,163,.13);
+}
+.panel h3{color:#3756c5;font-size:1.08rem}
+.team-btn{
+  background:linear-gradient(145deg,#fff,#f4f8ff);color:#34446e;
+  box-shadow:0 5px 0 #dce6f8;border:2px solid transparent;
+}
+.team-btn:hover{transform:translateY(-3px) rotate(-1deg);box-shadow:0 8px 0 #dce6f8}
+.team-btn.selected{background:#fff5bf;box-shadow:0 0 0 3px #ffc629 inset,0 5px 0 #f0d98b}
+.btn-primary{
+  background:linear-gradient(135deg,#ffe34f,#ff9f1c);color:#603400;
+  border:2px solid #fff;box-shadow:0 6px 0 #e88914,0 10px 22px #ffcf6a88;
+}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 9px 0 #e88914,0 14px 25px #ffcf6a88}
+.turn-banner{
+  background:linear-gradient(90deg,#fff1a8,#fff,#dff4ff);
+  border:2px solid #fff;box-shadow:0 5px 0 #dbe7ff;color:#34446e;
+}
+.turn-banner .who{color:#d87900}
+.strike-x{background:#e7edfa;color:#7b88a8}
+.board{padding:clamp(14px,3vw,28px)}
+.progress-pill{background:#eaf1ff;color:#53658e}
+.progress-pill b{color:#3156c7}
+.progress-bar{height:11px;background:#e4ebfa;border:2px solid #fff}
+.progress-bar>i{background:linear-gradient(90deg,#3dd6b0,#36a3ff,#a66bff,#ffbf35);border-radius:99px}
+.soal-box{
+  position:relative;background:linear-gradient(135deg,#fff1b8,#fff,#e4f6ff);
+  border:3px solid #fff;border-radius:22px;padding:clamp(20px,4vw,34px);
+  box-shadow:inset 0 0 0 2px #dbe8ff,0 6px 0 #d9e7ff;
+}
+.soal-box:before{content:"💡 TANTANGAN!";display:block;color:#e58a00;font-size:.75rem;font-weight:900;letter-spacing:.12em;margin-bottom:10px}
+.soal-box h2{color:#253e91}
+.icon-btn{background:#fff;color:#40527f;border:2px solid #dce6ff;box-shadow:0 3px 0 #dce6ff}
+.icon-btn:hover{background:#eef6ff;transform:translateY(-1px)}
+.kartu{
+  min-height:60px;border-radius:17px;box-shadow:0 5px 0 rgba(39,76,153,.14);
+  border:2px solid #fff;font-size:1rem;
+}
+.kartu.tutup{
+  color:#fff;background:linear-gradient(120deg,#427aff,#6659ec 60%,#a05be9);
+  border-color:#fff;box-shadow:0 6px 0 #344fc4,0 10px 18px #526ce833;
+}
+.kartu.tutup:before{content:"✨";margin-right:12px}
+.kartu.tutup:hover{transform:translateY(-4px) scale(1.01);box-shadow:0 10px 0 #344fc4,0 14px 20px #526ce844}
+.kartu.terlihat{background:linear-gradient(120deg,#e8f8ff,#f2edff);color:#34446e;border-color:#cbdcff}
+.kartu.benar{
+  color:#543700;background:linear-gradient(120deg,#fff080,#ffc83d,#ffad31);
+  border-color:#fff;box-shadow:0 5px 0 #e5a326;
+}
+.kartu.terbuang{background:#edf1f8;color:#9ba6bf;border-color:#e2e8f3;box-shadow:none}
+.btn-reveal{background:linear-gradient(135deg,#24d6a0,#09a977);box-shadow:0 5px 0 #078b65}
+.btn-strike{background:#fff0f1;color:#d52d4d;border:2px solid #ffc5ce;box-shadow:0 4px 0 #f5c4ce}
+.round-over{background:#fff0f1;border:2px dashed #ff9baa;color:#c52e4b}
+.sementara{border-color:#dce6fa}
+.sementara .box{background:#fff;border:2px solid #e0eaff;border-radius:16px;padding:10px 16px;box-shadow:0 4px 0 #e0eaff}
+.sementara .nm{color:#53658e!important}
+.sementara .val{color:#3156c7}
+.score-card{
+  background:linear-gradient(145deg,#fff,#f4f8ff);border:2px solid #fff;
+  box-shadow:0 6px 0 #dce7ff,0 12px 22px rgba(52,93,163,.10);
+}
+.score-card .nm{letter-spacing:.05em}
+.score-card .val{color:#3156c7}
+.score-card:hover{transform:translateY(-4px) rotate(-1deg)}
+.hint{color:#5f7197;background:#ffffffa8;border:1px solid #fff;border-radius:16px;padding:14px;line-height:1.8}
+.toast{background:#fff;color:#34446e;border:2px solid #dce6ff;box-shadow:0 8px 24px #334b7c24}
+.modal-card{background:linear-gradient(145deg,#fff,#eef7ff);border:3px solid #fff;box-shadow:0 12px 0 #dce7ff,0 25px 60px #24437b30}
+.modal-card h4{color:#3454c8}
+.modal-card p{color:#63749c}
+.btn-ghost{color:#40527f;border:2px solid #dce6ff;background:#fff}
+#buzzer-screen{background:linear-gradient(135deg,#fff4bd,#dff5ff,#f0e5ff)}
+.buzzer-title{color:#3156c7;font-size:clamp(1.1rem,3vw,1.6rem)}
+.buzzer-sub{color:#63749c}
+.buzzer-half{border:5px solid #fff;border-radius:26px;margin:12px;box-shadow:0 10px 0 #294a9d55,0 18px 30px #294a9d22}
+#buzzer-t1{background:linear-gradient(145deg,#4b8bff,#2857db)}
+#buzzer-t2{background:linear-gradient(145deg,#ff7187,#e52e59)}
+.buzzer-half .kbd{background:#ffffff2b}
+.buzzer-vs{background:#fff;color:#ff9f1c;border-color:#ffca42;box-shadow:0 4px 0 #e6eaf5}
+#winner-screen{background:linear-gradient(135deg,#fff1a8ee,#e4f6ffee,#f1e3ffee)}
+.winner-card{background:#ffffffd9;border:3px solid #fff;border-radius:30px;padding:clamp(20px,4vw,34px);box-shadow:0 12px 0 #dce7ff,0 25px 60px #294a9d2b}
+.winner-card h2{color:#3156c7;text-shadow:2px 2px 0 #ffe18b}
+.podium-row{background:#fff;color:#34446e;border:2px solid #e0eaff;box-shadow:0 4px 0 #e0eaff}
+.podium-row.top1{background:linear-gradient(110deg,#fff3a8,#fff);border-color:#ffc629;box-shadow:0 5px 0 #f1d16c}
+@media(max-width:640px){
+ .wrap{padding:14px 11px 28px}
+ .hero{padding:24px 12px;border-radius:23px}
+ .hero:before{left:2%;top:3%;font-size:26px}
+ .hero:after{right:2%;bottom:0;font-size:28px}
+ .team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .score-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .kartu{padding:13px 12px}
+ .buzzer-half{min-height:35vh}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+}
+
 </style>
 </head>
 <body>
