@@ -7,7 +7,7 @@
 const firebaseConfig = {
   apiKey: "AIzaSyCkar1kZteBf35w-UoJEfrf7zQ6AxJ0cao",
   authDomain: "family100-online-fa8e0.firebaseapp.com",
-  databaseURL: "https://family100-online-fa8e0-default-rtdb.firebaseio.com",
+  databaseURL: "https://family100-online-fa8e0-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "family100-online-fa8e0",
   storageBucket: "family100-online-fa8e0.firebasestorage.app",
   messagingSenderId: "965235375216",
