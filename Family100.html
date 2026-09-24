@@ -263,6 +263,45 @@ button:hover{transform:translateY(-3px)}button:active{transform:translateY(3px);
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
 
+
+/* === MODE FAMILY 100 TV — TAMBAHAN, FITUR LAMA TETAP === */
+.tv-tools{
+  margin:14px auto 0; max-width:1100px; padding:14px;
+  border:1px solid rgba(255,255,255,.12); border-radius:18px;
+  background:rgba(10,15,30,.78); box-shadow:0 10px 30px rgba(0,0,0,.18);
+}
+.tv-tools-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tv-tools-title{font-weight:900;color:#fff;font-size:1.05rem}
+.tv-tools-sub{color:#aab4ca;font-size:.85rem;margin-top:3px}
+.tv-tools-actions{display:flex;gap:8px;flex-wrap:wrap}
+.tv-tools button{border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer}
+.btn-tv{background:#20e6ff;color:#07111d}
+.btn-tv2{background:#ffd43b;color:#161616}
+.tv-answer-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.tv-answer-btn{
+  min-height:52px;border:1px solid rgba(255,255,255,.12);border-radius:12px;
+  background:#151d31;color:#fff;padding:9px;text-align:left;cursor:pointer;
+  transition:.18s ease;font-weight:800
+}
+.tv-answer-btn:hover{transform:translateY(-2px);background:#202c48}
+.tv-answer-btn.opened{background:#173d32;color:#83f7c0;opacity:.7;cursor:not-allowed}
+.tv-answer-btn .tv-num{display:inline-flex;width:27px;height:27px;align-items:center;justify-content:center;
+  border-radius:8px;background:#293650;margin-right:7px;font-weight:900}
+.tv-answer-btn.opened .tv-num{background:#22c981;color:#062016}
+.tv-hint{margin-top:9px;color:#9da9c0;font-size:.82rem}
+.tv-badge{
+  display:inline-block;padding:5px 9px;border-radius:999px;background:rgba(32,230,255,.12);
+  color:#55efff;font-size:.76rem;font-weight:900;margin-left:7px
+}
+body.tv-mode .tv-tools, body.tv-mode .footer-note{display:none!important}
+body.tv-mode .kontrol{display:none!important}
+body.tv-mode #layarAwal{display:none!important}
+body.tv-mode #layarMain{display:block!important;opacity:1!important}
+body.tv-mode #popupInstruksi{display:none!important}
+body.tv-mode .game-head{position:sticky;top:0;z-index:20}
+body.tv-mode .papan{min-height:62vh}
+@media(max-width:800px){.tv-answer-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 </style>
 </head>
 <body>
@@ -362,6 +401,22 @@ button:hover{transform:translateY(-3px)}button:active{transform:translateY(3px);
       <button class="btn-abu" onclick="beriBonus()">🎁 +20 POIN</button>
       <button class="btn-emas" onclick="soalBerikutnya()">➡️ SOAL BERIKUTNYA</button>
     </div>
+
+
+<div class="tv-tools" id="tvTools">
+  <div class="tv-tools-head">
+    <div>
+      <div class="tv-tools-title">📺 MODE FAMILY 100 TV <span class="tv-badge">TAMBAHAN</span></div>
+      <div class="tv-tools-sub">Siswa menjawab secara lisan. Guru cukup klik jawaban yang cocok.</div>
+    </div>
+    <div class="tv-tools-actions">
+      <button class="btn-tv" type="button" onclick="bukaLayarTV()">📺 BUKA LAYAR TV</button>
+      <button class="btn-tv2" type="button" onclick="sinkronTV()">🔄 SINKRONKAN</button>
+    </div>
+  </div>
+  <div class="tv-answer-grid" id="tvAnswerGrid"></div>
+  <div class="tv-hint">⌨️ Tekan <b>SPACE</b> = SALAH/X &nbsp; • &nbsp; Klik jawaban = buka + tambah poin &nbsp; • &nbsp; Fitur input jawaban lama tetap tersedia di atas.</div>
+</div>
 
     <div class="pemenang" id="pemenang">🏆 TIM <span id="namaPemenang"></span> — PEMENANG! 🏆</div>
     <div class="footer-note">✨ Main bersama • belajar bersama • rayakan setiap jawaban benar ✨</div>
@@ -854,6 +909,160 @@ function cekPemenang() {
     }
   }
 })();
+
+/* =========================================================
+   MODE FAMILY 100 TV — lapisan tambahan, tidak mengganti
+   logika game lama.
+   ========================================================= */
+const TV_CHANNEL = 'family100-tv-sync-v1';
+const tvChannel = ('BroadcastChannel' in window) ? new BroadcastChannel(TV_CHANNEL) : null;
+const isTVMode = new URLSearchParams(location.search).get('tv') === '1';
+
+function renderPanelTV(){
+  const grid = document.getElementById('tvAnswerGrid');
+  if(!grid || !daftarSoal || !daftarSoal[soalSkrg]) return;
+  const soal = daftarSoal[soalSkrg];
+  grid.innerHTML = '';
+  soal.jawaban.forEach((j,i)=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='tv-answer-btn' + (jawabanTerbuka.includes(i)?' opened':'');
+    b.disabled=jawabanTerbuka.includes(i);
+    b.innerHTML=`<span class="tv-num">${i+1}</span>${j.teks}<br><small>${j.poin * soal.pengali} poin</small>`;
+    b.onclick=()=>bukaJawabanDariPanel(i);
+    grid.appendChild(b);
+  });
+}
+
+function bukaJawabanDariPanel(index){
+  const soal=daftarSoal[soalSkrg];
+  if(!soal || jawabanTerbuka.includes(index)) return;
+  const j=soal.jawaban[index];
+  jawabanTerbuka.push(index);
+  const el=document.getElementById(`jwb-${index}`);
+  if(el){el.classList.remove('tersembunyi');el.classList.add('terbuka');}
+  mainSuaraBenar();
+  skor[timAktif]+=j.poin*soal.pengali;
+  perbaruiSkor();
+  perbaruiInfoSisa();
+  renderPanelTV();
+  kirimSinkronTV();
+  if(jawabanTerbuka.length===soal.jawaban.length){
+    setTimeout(()=>{
+      if(soalSkrg < daftarSoal.length-1) alert('✅ Semua jawaban terbuka! Klik Soal Berikutnya →');
+      else cekPemenang();
+    },300);
+  }
+}
+
+function snapshotTV(){
+  return {
+    soalSkrg, skor:[...skor], strike:[...strike], gugur:[...gugur],
+    timAktif, jawabanTerbuka:[...jawabanTerbuka],
+    sudahLihatkan
+  };
+}
+
+function kirimSinkronTV(){
+  if(tvChannel) tvChannel.postMessage({type:'state', state:snapshotTV()});
+}
+
+function terapkanSinkronTV(st){
+  if(!st) return;
+  if(typeof st.soalSkrg==='number' && st.soalSkrg!==soalSkrg){
+    soalSkrg=st.soalSkrg;
+    muatSoal();
+  }
+  skor=[...st.skor];
+  strike=[...st.strike];
+  gugur=[...st.gugur];
+  timAktif=st.timAktif;
+  jawabanTerbuka=[...st.jawabanTerbuka];
+  sudahLihatkan=!!st.sudahLihatkan;
+  perbaruiSkor();
+  perbaruiInfoSisa();
+  document.querySelectorAll('.tim-kartu').forEach((el,i)=>el.classList.toggle('aktif',i===timAktif));
+  const soal=daftarSoal[soalSkrg];
+  soal.jawaban.forEach((j,i)=>{
+    const el=document.getElementById(`jwb-${i}`);
+    if(!el) return;
+    el.classList.toggle('tersembunyi',!jawabanTerbuka.includes(i));
+    el.classList.toggle('terbuka',jawabanTerbuka.includes(i));
+  });
+  for(let t=0;t<5;t++){
+    for(let x=1;x<=3;x++){
+      const el=document.getElementById(`s${t}-${x}`);
+      if(el) el.classList.toggle('x', strike[t]>=x);
+    }
+  }
+  if(isTVMode){
+    document.getElementById('layarAwal').classList.remove('aktif');
+    document.getElementById('layarMain').classList.add('aktif');
+    document.getElementById('popupInstruksi').classList.add('sembunyi');
+  }
+}
+
+function bukaLayarTV(){
+  const w=window.open(location.href.split('?')[0]+'?tv=1','Family100TV','width=1400,height=900');
+  if(!w) alert('Popup diblokir browser. Izinkan pop-up untuk file ini lalu klik Buka Layar TV lagi.');
+  setTimeout(kirimSinkronTV,400);
+}
+
+function sinkronTV(){
+  renderPanelTV();
+  kirimSinkronTV();
+}
+
+document.addEventListener('keydown',(e)=>{
+  if(isTVMode) return;
+  if(e.code==='Space' && !['INPUT','TEXTAREA','BUTTON'].includes(document.activeElement.tagName)){
+    e.preventDefault();
+    tambahSalah();
+    kirimSinkronTV();
+  }
+});
+
+if(tvChannel){
+  tvChannel.onmessage=(e)=>{
+    if(e.data?.type==='state') terapkanSinkronTV(e.data.state);
+  };
+}
+
+if(isTVMode){
+  document.body.classList.add('tv-mode');
+  window.addEventListener('load',()=>{
+    document.getElementById('layarAwal').classList.remove('aktif');
+    document.getElementById('layarMain').classList.add('aktif');
+    document.getElementById('popupInstruksi').classList.add('sembunyi');
+    setTimeout(()=>tvChannel && tvChannel.postMessage({type:'request'}),300);
+  });
+}
+
+if(tvChannel){
+  tvChannel.onmessage=(e)=>{
+    if(e.data?.type==='request' && !isTVMode) kirimSinkronTV();
+    if(e.data?.type==='state') terapkanSinkronTV(e.data.state);
+  };
+}
+
+/* Patch existing functions at runtime so every old action also updates TV. */
+const _muatSoal = muatSoal;
+muatSoal = function(){ _muatSoal(); renderPanelTV(); kirimSinkronTV(); };
+
+const _pilihTim = pilihTim;
+pilihTim = function(idx){ _pilihTim(idx); renderPanelTV(); kirimSinkronTV(); };
+
+const _tambahSalah = tambahSalah;
+tambahSalah = function(){ _tambahSalah(); renderPanelTV(); kirimSinkronTV(); };
+
+const _beriBonus = beriBonus;
+beriBonus = function(){ _beriBonus(); renderPanelTV(); kirimSinkronTV(); };
+
+const _soalBerikutnya = soalBerikutnya;
+soalBerikutnya = function(){ _soalBerikutnya(); renderPanelTV(); kirimSinkronTV(); };
+
+window.addEventListener('load',()=>setTimeout(renderPanelTV,250));
+
 </script>
 
 </body>
