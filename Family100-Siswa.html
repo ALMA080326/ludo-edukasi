@@ -298,7 +298,7 @@ body.siswa .tim-kartu{cursor:default}body.siswa .tim-kartu:hover{transform:none}
 @keyframes bigX{0%{transform:scale(.3);opacity:0}18%{transform:scale(1);opacity:1}75%{opacity:1}100%{transform:scale(1.15);opacity:0}}
 .join-kotak input{width:100%;padding:14px;border-radius:14px;border:3px solid #d9d4ff;margin:14px 0;text-align:center;font-size:1.6rem;font-weight:900;letter-spacing:.3em;text-transform:uppercase;font-family:inherit;color:#18223b}
 .join-kotak input:focus{outline:none;border-color:#5a35ee}
-.keluar{display:block;text-align:center;color:rgba(255,255,255,.6);font-size:.72rem;margin:6px 0;cursor:pointer;text-decoration:underline}
+.keluar{display:block;margin:12px auto 4px;padding:9px 16px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(10,16,34,.28);color:rgba(255,255,255,.78);font:800 .72rem Poppins,sans-serif;cursor:pointer;text-decoration:none;box-shadow:none}.keluar:hover{color:#fff;background:rgba(224,36,63,.78);transform:translateY(-1px)}
 
 </style>
 </head>
@@ -363,7 +363,7 @@ body.siswa .tim-kartu{cursor:default}body.siswa .tim-kartu:hover{transform:none}
 
     <div class="pemenang" id="pemenang">🏆 TIM <span id="namaPemenang"></span> — PEMENANG! 🏆</div>
     <div class="footer-note">✨ Main bersama • belajar bersama • rayakan setiap jawaban benar ✨</div>
-    <a class="keluar" onclick="keluarRuang()">keluar dari ruang</a>
+    <button class="keluar" type="button" onclick="logoutSiswa()">🚪 LOGOUT / KELUAR DARI RUANG</button>
   </div>
 </div>
 
@@ -510,15 +510,31 @@ async function joinRoom(autoCode){
     }, err => { banner('🔴 ' + err.message); });
   }catch(e){ joinMsg('🔴 Gagal terhubung: ' + e.message, true); }
 }
-function keluarRuang(){
-  if(roomRef) roomRef.off();
-  roomRef = null; roomCode = ''; prev = null; questionKey = null;
-  try{ localStorage.removeItem(NG_SAVED); }catch(e){}
-  $('layarMain').classList.remove('aktif');
-  $('joinScreen').style.display = '';
-  $('code').value = ''; joinMsg('');
-  showConn();
+async function logoutSiswa(){
+  if(!confirm('Keluar dari ruang dan logout dari akun siswa ini?')) return;
+  try{
+    if(roomRef) roomRef.off();
+    roomRef = null; roomCode = ''; prev = null; questionKey = null;
+    try{ localStorage.removeItem(NG_SAVED); }catch(e){}
+    $('layarMain').classList.remove('aktif');
+    $('joinScreen').style.display = '';
+    $('code').value = ''; joinMsg('Sedang logout…');
+    online = false;
+    showConn();
+
+    if(typeof firebase !== 'undefined' && firebase.apps.length){
+      await firebase.auth().signOut();
+    }
+    db = null;
+    joinMsg('✅ Berhasil logout. Masukkan kode ruang untuk bergabung lagi.');
+  }catch(e){
+    db = null;
+    joinMsg('⚠️ Ruang sudah ditinggalkan, tetapi logout gagal: ' + e.message, true);
+  }
 }
+
+/* Alias lama tetap tersedia agar kode lain yang memanggil keluarRuang() tidak rusak. */
+function keluarRuang(){ return logoutSiswa(); }
 
 /* ---------- tampilan ---------- */
 function arr5(a, f){ return [0,1,2,3,4].map(i => f((a || [])[i])); }
