@@ -973,28 +973,46 @@ function kirimSinkronTV(){
   if(tvChannel) tvChannel.postMessage({type:'state', state:snapshotTV()});
 }
 
+function renderTVSoalDisplay(){
+  const soal=daftarSoal[soalSkrg];
+  if(!soal) return;
+
+  // TV harus membangun isi papan sendiri. Sebelumnya papan kosong
+  // karena halaman TV tidak menjalankan muatSoal() ketika nomor soal sama.
+  const namaBabakEl=document.getElementById('namaBabak');
+  const pertanyaanEl=document.getElementById('pertanyaan');
+  const daftar=document.getElementById('daftarJawaban');
+  if(namaBabakEl) namaBabakEl.textContent=soal.babak;
+  if(pertanyaanEl) pertanyaanEl.textContent=soal.soal;
+  if(!daftar) return;
+
+  daftar.innerHTML='';
+  soal.jawaban.forEach((j,i)=>{
+    const baris=document.createElement('div');
+    baris.className='jawaban-baris';
+    const terbuka=jawabanTerbuka.includes(i);
+    baris.innerHTML=`
+      <div class="nomor">${i+1}</div>
+      <div class="jawaban ${terbuka?'terbuka':'tersembunyi'}" id="jwb-${i}">${j.teks}</div>
+      <div class="nilai">${j.poin * soal.pengali}</div>`;
+    daftar.appendChild(baris);
+  });
+  perbaruiInfoSisa();
+}
+
 function terapkanSinkronTV(st){
   if(!st) return;
-  if(typeof st.soalSkrg==='number' && st.soalSkrg!==soalSkrg){
-    soalSkrg=st.soalSkrg;
-    muatSoal();
-  }
-  skor=[...st.skor];
-  strike=[...st.strike];
-  gugur=[...st.gugur];
-  timAktif=st.timAktif;
-  jawabanTerbuka=[...st.jawabanTerbuka];
+  if(typeof st.soalSkrg==='number') soalSkrg=st.soalSkrg;
+  skor=[...(st.skor||skor)];
+  strike=[...(st.strike||strike)];
+  gugur=[...(st.gugur||gugur)];
+  timAktif=typeof st.timAktif==='number'?st.timAktif:timAktif;
+  jawabanTerbuka=[...(st.jawabanTerbuka||[])];
   sudahLihatkan=!!st.sudahLihatkan;
+
+  renderTVSoalDisplay();
   perbaruiSkor();
-  perbaruiInfoSisa();
   document.querySelectorAll('.tim-kartu').forEach((el,i)=>el.classList.toggle('aktif',i===timAktif));
-  const soal=daftarSoal[soalSkrg];
-  soal.jawaban.forEach((j,i)=>{
-    const el=document.getElementById(`jwb-${i}`);
-    if(!el) return;
-    el.classList.toggle('tersembunyi',!jawabanTerbuka.includes(i));
-    el.classList.toggle('terbuka',jawabanTerbuka.includes(i));
-  });
   for(let t=0;t<5;t++){
     for(let x=1;x<=3;x++){
       const el=document.getElementById(`s${t}-${x}`);
@@ -1040,6 +1058,7 @@ if(isTVMode){
     document.getElementById('layarAwal').classList.remove('aktif');
     document.getElementById('layarMain').classList.add('aktif');
     document.getElementById('popupInstruksi').classList.add('sembunyi');
+    renderTVSoalDisplay();
     setTimeout(()=>tvChannel && tvChannel.postMessage({type:'request'}),300);
   });
 }
