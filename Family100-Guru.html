@@ -286,6 +286,22 @@ button:hover{transform:translateY(-3px)}button:active{transform:translateY(3px);
 .ng-answer{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 #ngAnswerPanel{margin:14px auto 0;max-width:1100px;padding:14px;border-radius:18px;background:rgba(8,14,30,.88);border:1px solid rgba(255,255,255,.13)}
 
+
+.ng-type-row{display:flex;gap:8px;margin:6px 0 8px}
+.ng-type-input{flex:1;min-width:0;padding:12px 14px;border-radius:14px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.95);color:#18223b;font:700 1rem 'Poppins',sans-serif;outline:none}
+.ng-type-input:focus{border-color:#ffd43b;box-shadow:0 0 0 4px rgba(255,212,59,.25)}
+.ng-step-hint{font-size:.8rem;color:#ffe66d;font-weight:700;margin:0 2px 8px}
+.ng-answer.chip{cursor:default}
+.ng-answer.chip.klik{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ng-answer.chip.klik:hover{border-color:#ffd43b;background:rgba(255,212,59,.16)}
+.ng-answer.chip.klik:active{transform:scale(.98)}
+.ng-answer.chip:not(.open){opacity:.9;border-style:dashed}
+.ng-answer.chip .ng-by{font-size:.72rem;font-weight:800;color:#63f2a5}
+.ng-undo{margin-left:auto;padding:3px 9px;border-radius:10px;border:0;background:#ff4d67;color:#fff;font:800 .72rem 'Poppins',sans-serif;cursor:pointer}
+.ng-soalpoin{margin-top:12px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+.ng-soalpoin .ttl{font-size:.78rem;font-weight:800;color:#ffe66d;margin-bottom:8px}
+.ng-soalpoin .row{display:flex;flex-wrap:wrap;gap:8px}
+.ng-soalpoin .tm{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.12);font-size:.82rem;font-weight:800}
 </style>
 </head>
 <body>
@@ -316,16 +332,18 @@ button:hover{transform:translateY(-3px)}button:active{transform:translateY(3px);
         <h1>FAMILY 100 <span>ALGORITMA EDITION</span></h1>
         <p class="hero-sub">Jawab cepat, kumpulkan poin, rebut kemenangan! Pengalaman kuis bergaya game modern untuk membuat pembelajaran terasa lebih hidup. 🤩🔥</p>
         <div class="feature-row">
-          <div class="feature-chip">🏆 5 Tim</div><div class="feature-chip">🧠 10 Soal</div>
-          <div class="feature-chip">⚡ Rebutan</div><div class="feature-chip">🔥 Final ×2</div>
+          <div class="feature-chip">🏆 5 Tim</div><div class="feature-chip">🧠 11 Soal</div>
+          <div class="feature-chip">⚡ Rebutan</div><div class="feature-chip">🎲 Soal Acak</div>
         </div>
         <div class="info-cara">
           <h3>📖 CARA MAIN — SIAP JADI JUARA?</h3>
-          <p><strong>🎯 Babak 1 (4 Soal):</strong> Semua tim jawab bareng → cocok = dapat poin!</p>
-          <p><strong>⏭️ Babak 2 (2 Soal):</strong> Urutan Merah→Biru→Kuning→Hijau→Ungu. Salah 3× = gugur.</p>
-          <p><strong>⚡ Babak 3 (2 Soal):</strong> Berebut! Bertahan sampai akhir → +20 poin!</p>
-          <p><strong>🔥 Babak 4 (2 Soal ×2):</strong> Poin dikalikan 2! Penentuan Juara!</p>
-          <p style="margin-top:10px;font-weight:800">💡 Siswa menjawab lisan, guru klik jawaban yang cocok!</p>
+          <p><strong>🎯 Babak 1 — Pemanasan (1 Soal × 5 Jawaban):</strong> Tiap tim menjawab bergantian. Klik kartu tim, lalu klik/ketik jawabannya.</p>
+          <p><strong>🔄 Babak 2 — Semua Tim (5 Soal × 8 Jawaban):</strong> Semua tim berebut! Klik kartu tim yang menjawab, lalu ketik jawabannya.</p>
+          <p><strong>⚡ Babak 3 — Rebutan (3 Soal × 8 Jawaban):</strong> Tim mana pun boleh mengisi jawaban yang belum terbuka!</p>
+          <p><strong>🏆 Babak 4 — Final (2 Soal × 10 Jawaban):</strong> Soal penentu juara!</p>
+          <p><strong>🔢 Urutan algoritma:</strong> jawaban disusun sebagai langkah algoritma yang runtut dan lengkap.</p>
+          <p><strong>🎲 11 soal</strong> — diacak dari bank soal setiap kali mulai atau main ulang.</p>
+          <p style="margin-top:10px;font-weight:800">💡 Siswa menjawab lisan, guru mengetik jawabannya — kunci jawaban selalu terlihat di panel guru.</p>
         </div>
         <button class="play-btn" onclick="mulaiGame()">▶ MULAI PERMAINAN</button>
       </div>
@@ -361,6 +379,8 @@ button:hover{transform:translateY(-3px)}button:active{transform:translateY(3px);
   <div class="ng-status" id="ngStatus">⚪ Menyambung ke Firebase…</div>
 </div>
 
+    <div id="modeInfo" style="text-align:center;margin:0 0 10px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);font-weight:800;font-size:.9rem"></div>
+
     <div class="skor-bar">
       <div class="tim-kartu merah" id="tim0" onclick="pilihTim(0)">
         <div class="tim-nama">🔴 MERAH</div><div class="tim-poin" id="poin0">0</div>
@@ -390,8 +410,14 @@ button:hover{transform:translateY(-3px)}button:active{transform:translateY(3px);
     </div>
 
 <div id="ngAnswerPanel">
-  <div class="panel-guru-label">👆 KLIK JAWABAN YANG DISEBUTKAN SISWA</div>
+  <div class="panel-guru-label">🔑 KUNCI JAWABAN (hanya guru) — KLIK LANGKAH YANG DISEBUTKAN, ATAU KETIK DI BAWAH</div>
+  <div class="ng-type-row">
+    <input type="text" id="ngJawabInput" class="ng-type-input" placeholder="Ketik jawaban tim, lalu Enter…" autocomplete="off" autocapitalize="sentences" enterkeyhint="send">
+    <button type="button" class="btn-emas" onclick="jawabDariKetikan()">✅ KIRIM</button>
+  </div>
+  <div class="ng-step-hint" id="ngStepHint"></div>
   <div class="ng-answer-grid" id="ngAnswerGrid"></div>
+  <div id="ngSoalPoin" class="ng-soalpoin"></div>
 </div>
 
     <div class="kontrol" id="panelKontrolGuru">
@@ -400,13 +426,19 @@ button:hover{transform:translateY(-3px)}button:active{transform:translateY(3px);
       <button class="btn-merah" onclick="tambahSalah()">❌ SALAH / SPACE</button>
       <button class="btn-cokelat" onclick="lihatkanJawaban()">👁️ BUKA SEMUA</button>
       <button class="btn-abu" onclick="beriBonus()">🎁 +20 POIN</button>
+      <button class="btn-merah" onclick="kurangiPoin()">➖ −5 POIN</button>
+      <button class="btn-biru" id="btnUrutan" onclick="toggleUrutan()">🔢 KUNCI URUTAN BUKA: OFF</button>
+      <button class="btn-cokelat" onclick="gantiSoalIni()">🎲 GANTI SOAL</button>
+      <button class="btn-abu" onclick="mulaiUlang()">🔄 ACAK ULANG</button>
       <button class="btn-emas" onclick="soalBerikutnya()">➡️ SOAL BERIKUTNYA</button>
     </div>
 
 
 
 
-<div class="pemenang" id="pemenang">🏆 TIM <span id="namaPemenang"></span> — PEMENANG! 🏆</div>
+<div id="rekapPanel" style="margin:16px 0;padding:14px 16px;border-radius:20px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25)"><div class="panel-guru-label">🧹 NILAI PER BABAK &amp; RESET</div><div id="rekapTabel" style="overflow-x:auto"></div><div style="margin-top:10px;text-align:center"><button type="button" class="btn-abu" onclick="resetSemuaNilai()">↺ RESET SEMUA NILAI</button></div></div>
+
+<div class="pemenang" id="pemenang">🏆 TIM <span id="namaPemenang"></span> — PEMENANG! 🏆<div style="margin-top:10px"><button class="btn-emas" onclick="mulaiUlang()">🔄 MAIN LAGI (SOAL ACAK BARU)</button></div></div>
     <div class="footer-note">✨ Main bersama • belajar bersama • rayakan setiap jawaban benar ✨</div>
   </div>
 </div>
@@ -427,7 +459,7 @@ function mainSuaraSalah() {
     a.play().catch(()=>{});
 }
 
-const daftarSoal = [
+const BANK_SOAL_LAMA = [
     // === BABAK 1 — 4 Soal ===
     {
         babak: "BABAK 1 — Pembukaan",
@@ -863,6 +895,201 @@ function cekPemenang() {
 })();
 </script>
 
+<script>
+/* ===== BANK SOAL + SESI ACAK (3 babak x 5 soal x 8 jawaban) ===== */
+const PTS8 = [25,20,15,12,10,8,6,4];
+const BANK_DOCX = [["Langkah sebelum berangkat sekolah?", ["Bangun tidur", "Mandi", "Sikat gigi", "Pakai seragam", "Sarapan", "Cek isi tas", "Pakai sepatu", "Pamit orang tua"]], ["Langkah membuat teh?", ["Panaskan air", "Siapkan gelas", "Masukkan kantong teh", "Tuang air panas", "Diamkan sebentar", "Angkat kantong teh", "Tambah gula", "Aduk rata"]], ["Langkah mencuci tangan?", ["Buka keran", "Basahi tangan", "Ambil sabun", "Gosok telapak tangan", "Gosok sela jari", "Bilas dengan air", "Tutup keran", "Keringkan tangan"]], ["Langkah menyikat gigi?", ["Siapkan sikat", "Buka tutup pasta", "Oleskan pasta", "Tutup pasta", "Sikat semua sisi gigi", "Berkumur", "Bilas sikat", "Simpan sikat"]], ["Langkah mandi?", ["Siapkan handuk", "Buka baju", "Basahi badan", "Pakai sabun", "Keramas", "Bilas badan", "Keringkan badan", "Pakai baju"]], ["Langkah memakai sepatu?", ["Ambil sepatu", "Pakai kaus kaki", "Buka tali sepatu", "Masukkan kaki", "Tarik tali", "Ikat tali", "Rapikan simpul", "Cek nyaman"]], ["Langkah membuat mi instan?", ["Siapkan panci", "Rebus air", "Buka kemasan", "Masukkan mi", "Tunggu matang", "Tiriskan", "Campur bumbu", "Sajikan"]], ["Langkah makan?", ["Cuci tangan", "Ambil piring", "Ambil makanan", "Duduk", "Berdoa", "Makan", "Bereskan piring", "Cuci tangan lagi"]], ["Langkah sebelum tidur?", ["Rapikan barang", "Sikat gigi", "Cuci muka dan kaki", "Ganti baju tidur", "Atur alarm", "Berdoa", "Matikan lampu", "Tidur"]], ["Barang yang disiapkan sebelum sekolah?", ["Buku", "Pulpen", "Seragam", "Tas", "Alat tulis", "Sepatu", "Bekal", "Botol minum"]], ["Langkah menyalakan HP?", ["Cek baterai", "Tekan power", "Tahan beberapa detik", "Tunggu logo", "Geser layar", "Masukkan PIN", "Tunggu layar utama", "Buka aplikasi"]], ["Langkah membuka WhatsApp?", ["Buka kunci HP", "Cari ikon WhatsApp", "Tekan ikon", "Tunggu terbuka", "Cek internet", "Buka daftar chat", "Pilih chat", "Baca pesan"]], ["Langkah mengirim pesan WhatsApp?", ["Buka WhatsApp", "Tekan ikon chat", "Cari kontak", "Pilih kontak", "Ketik pesan", "Periksa pesan", "Tekan kirim", "Cek centang terkirim"]], ["Langkah mengambil foto?", ["Buka kamera", "Bersihkan lensa", "Arahkan ke objek", "Atur posisi", "Atur cahaya", "Tekan fokus", "Tekan tombol foto", "Cek hasil foto"]], ["Langkah mematikan komputer?", ["Simpan pekerjaan", "Tutup aplikasi", "Klik Start", "Klik Power", "Pilih Shutdown", "Tunggu sampai mati", "Matikan monitor", "Cabut perangkat tambahan"]], ["Langkah menyalakan komputer?", ["Cek kabel listrik", "Colok kabel", "Nyalakan monitor", "Tekan tombol power", "Tunggu booting", "Pilih akun", "Masukkan password", "Buka aplikasi"]], ["Langkah membuka Google?", ["Nyalakan perangkat", "Sambungkan internet", "Buka browser", "Klik kolom alamat", "Ketik google.com", "Tekan enter", "Tunggu halaman", "Halaman Google terbuka"]], ["Langkah mencari sesuatu di Google?", ["Buka Google", "Klik kolom pencarian", "Ketik kata kunci", "Tekan enter", "Lihat hasil", "Pilih hasil", "Baca isinya", "Catat informasi"]], ["Langkah menyimpan file?", ["Selesaikan pekerjaan", "Klik menu File", "Pilih Save As", "Pilih folder", "Beri nama file", "Pilih format", "Klik Simpan", "Cek file tersimpan"]], ["Langkah mencetak tugas?", ["Buka file", "Periksa isi", "Isi kertas printer", "Klik File", "Pilih Print", "Pilih printer", "Klik Cetak", "Ambil hasil cetak"]], ["Langkah membuat folder?", ["Buka lokasi", "Klik kanan area kosong", "Pilih New", "Pilih Folder", "Ketik nama folder", "Tekan enter", "Cek folder muncul", "Pindahkan file"]], ["Langkah mengganti nama file?", ["Buka folder", "Pilih file", "Klik kanan", "Pilih Rename", "Hapus nama lama", "Ketik nama baru", "Tekan enter", "Cek nama file"]], ["Langkah menghapus foto?", ["Buka galeri", "Pilih foto", "Cek foto benar", "Backup jika perlu", "Tekan hapus", "Konfirmasi hapus", "Buka folder sampah", "Kosongkan sampah"]], ["Langkah membuat PPT?", ["Buka PowerPoint", "Pilih tema", "Buat slide judul", "Tambah slide", "Isi materi", "Tambah gambar", "Simpan file", "Latihan tampil"]], ["Langkah presentasi?", ["Maju ke depan", "Ucapkan salam", "Perkenalkan diri", "Sebut topik", "Jelaskan isi", "Sampaikan kesimpulan", "Tanya jawab", "Ucapkan terima kasih"]], ["Langkah mengerjakan tugas?", ["Baca soal", "Pahami perintah", "Siapkan alat", "Cari referensi", "Catat poin", "Kerjakan", "Periksa jawaban", "Kumpulkan"]], ["Langkah mengumpulkan tugas?", ["Selesaikan tugas", "Periksa hasil", "Simpan file", "Beri nama file", "Buka menu pengumpulan", "Unggah file", "Klik kirim", "Cek konfirmasi"]], ["Langkah meminjam buku?", ["Cari buku", "Ambil buku", "Ke meja petugas", "Tunjukkan kartu", "Catat peminjaman", "Terima buku", "Baca di rumah", "Kembalikan tepat waktu"]], ["Langkah membeli makanan di kantin?", ["Antre", "Lihat menu", "Pilih makanan", "Pesan", "Bayar", "Terima pesanan", "Cari tempat duduk", "Makan"]], ["Langkah mencuci piring?", ["Kumpulkan piring", "Buang sisa makanan", "Basahi piring", "Beri sabun", "Gosok piring", "Bilas piring", "Tiriskan", "Keringkan"]], ["Langkah menyapu lantai?", ["Angkat barang", "Ambil sapu", "Sapu dari sudut", "Kumpulkan sampah", "Ambil pengki", "Buang sampah", "Simpan sapu", "Kembalikan barang"]], ["Langkah membuang sampah?", ["Kumpulkan sampah", "Pilah sampah", "Ikat kantong", "Bawa keluar", "Buka tutup tong", "Masukkan kantong", "Tutup tong", "Cuci tangan"]], ["Langkah menyiram tanaman?", ["Siapkan gayung", "Isi air", "Bawa ke tanaman", "Cek tanah", "Siram pelan", "Rapikan pot", "Simpan gayung", "Cuci tangan"]], ["Langkah membuat jus?", ["Cuci buah", "Kupas buah", "Potong buah", "Masukkan ke blender", "Tambah air", "Tutup blender", "Nyalakan blender", "Tuang ke gelas"]], ["Langkah memasak nasi?", ["Takar beras", "Cuci beras", "Beri air", "Masukkan ke rice cooker", "Colok kabel", "Tekan cook", "Tunggu matang", "Aduk nasi"]], ["Langkah membuat telur goreng?", ["Siapkan wajan", "Panaskan minyak", "Pecahkan telur", "Beri garam", "Goreng", "Balik telur", "Angkat", "Tiriskan"]], ["Langkah memakai seragam?", ["Ambil seragam", "Pakai baju", "Kancingkan baju", "Pakai celana atau rok", "Pasang ikat pinggang", "Pakai kaos kaki", "Pakai sepatu", "Pasang atribut"]], ["Langkah masuk kelas?", ["Ketuk pintu", "Ucap salam", "Masuk kelas", "Cari tempat duduk", "Duduk", "Keluarkan buku", "Berdoa", "Perhatikan guru"]], ["Langkah belajar?", ["Siapkan alat", "Baca materi", "Pahami isi", "Catat poin", "Kerjakan latihan", "Ulangi materi", "Tanya yang belum paham", "Evaluasi hasil"]], ["Langkah membuat jadwal belajar?", ["Cek tugas", "Tentukan waktu", "Pilih pelajaran", "Atur urutan", "Sisipkan istirahat", "Tulis jadwal", "Pasang pengingat", "Patuhi jadwal"]], ["Jika lupa password?", ["Coba ingat", "Klik Lupa Password", "Masukkan email", "Buka email", "Masukkan kode", "Buat password baru", "Simpan password", "Login ulang"]], ["Jika internet tidak tersambung?", ["Cek Wi-Fi", "Cek kuota data", "Cek mode pesawat", "Cek kabel router", "Restart perangkat", "Restart router", "Coba lagi", "Hubungi provider"]], ["Jika laptop tidak menyala?", ["Cek stopkontak", "Cek charger", "Cek baterai", "Cabut perangkat tambahan", "Tahan tombol power", "Tunggu 30 detik", "Nyalakan lagi", "Bawa ke servis"]], ["Jika file tugas hilang?", ["Cari di folder", "Gunakan Search", "Cek Download", "Cek Recycle Bin", "Cek flashdisk", "Cek backup", "Tanya teman", "Kerjakan ulang"]], ["Jika printer kehabisan kertas?", ["Hentikan cetak", "Ambil kertas", "Buka tray", "Rapikan kertas", "Isi kertas", "Tutup tray", "Tekan resume", "Periksa hasil"]], ["Jika memori HP penuh?", ["Cek memori", "Hapus file tak perlu", "Hapus cache", "Uninstall aplikasi", "Pindahkan foto", "Backup ke cloud", "Kosongkan sampah", "Cek memori lagi"]], ["Mengirim tugas lewat Google Classroom?", ["Buka Classroom", "Pilih kelas", "Buka tugas", "Klik Tambahkan", "Pilih file", "Unggah", "Klik Serahkan", "Cek status"]], ["Mengirim file lewat WhatsApp?", ["Buka WhatsApp", "Pilih kontak", "Buka chat", "Klik lampiran", "Pilih Dokumen", "Pilih file", "Klik kirim", "Cek terkirim"]], ["Membuat akun media sosial?", ["Unduh aplikasi", "Buka aplikasi", "Klik Daftar", "Isi data", "Pilih username", "Buat password", "Verifikasi", "Atur profil"]], ["Membuat password aman?", ["Huruf", "Angka", "Simbol", "Panjang", "Rahasiakan", "Huruf besar", "Ganti berkala", "Jangan sama"]], ["Mencari informasi untuk tugas?", ["Tentukan topik", "Pilih kata kunci", "Cari di internet", "Pilih sumber", "Baca isi", "Bandingkan sumber", "Cek kebenaran", "Catat"]], ["Membuat rangkuman pelajaran?", ["Baca materi", "Pahami isi", "Tandai poin penting", "Catat poin", "Ringkas kalimat", "Tulis rangkuman", "Rapikan", "Periksa"]], ["Menyelesaikan tugas kelompok?", ["Pahami tugas", "Diskusi", "Bagi tugas", "Kerjakan bagian", "Kumpulkan bagian", "Gabungkan", "Periksa bersama", "Kumpulkan tugas"]], ["Membagi tugas kelompok?", ["Lihat tugas", "Diskusi", "Bagi bagian", "Pilih anggota", "Tentukan deadline", "Catat pembagian", "Kerjakan", "Cek hasil"]], ["Presentasi kelompok?", ["Siapkan materi", "Buat slide", "Bagi peran", "Latihan", "Presentasi", "Kesimpulan", "Tanya jawab", "Evaluasi"]], ["Jika jawaban tugas salah?", ["Cari yang salah", "Cek soal", "Pelajari penyebab", "Perbaiki jawaban", "Tanya guru", "Catat koreksi", "Periksa ulang", "Kumpulkan ulang"]], ["Jika tidak memahami soal?", ["Baca ulang", "Tandai kata penting", "Catat yang belum paham", "Cari contoh", "Cari referensi", "Diskusi teman", "Tanya guru", "Kerjakan"]], ["Membuat video tugas sekolah?", ["Tentukan ide", "Tulis skenario", "Siapkan alat", "Rekam", "Edit", "Periksa hasil", "Simpan", "Unggah"]], ["Mengedit foto sederhana?", ["Buka aplikasi", "Pilih foto", "Crop", "Atur cahaya", "Beri filter", "Periksa hasil", "Simpan hasil", "Bagikan"]], ["Mengunduh aplikasi?", ["Sambungkan internet", "Buka Play Store", "Cari aplikasi", "Pilih aplikasi", "Cek ulasan", "Klik Install", "Tunggu selesai", "Buka aplikasi"]], ["Memperbarui aplikasi?", ["Sambungkan internet", "Buka Play Store", "Cari aplikasi", "Pilih aplikasi", "Cek versi", "Klik Update", "Tunggu selesai", "Buka aplikasi"]], ["Menghubungkan HP ke Wi-Fi?", ["Buka Pengaturan", "Pilih Wi-Fi", "Aktifkan Wi-Fi", "Tunggu daftar jaringan", "Pilih jaringan", "Masukkan password", "Klik sambung", "Tes internet"]], ["Mengirim file lewat Bluetooth?", ["Aktifkan Bluetooth", "Pilih file", "Klik Bagikan", "Pilih Bluetooth", "Pilih perangkat", "Klik Kirim", "Terima di perangkat tujuan", "Cek hasil"]], ["Membuat tabel di Word?", ["Buka Word", "Klik tab Insert", "Klik Table", "Pilih ukuran", "Tabel muncul", "Isi data", "Atur border", "Simpan"]], ["Membuat daftar bullet?", ["Ketik daftar", "Blok teks", "Klik tab Home", "Klik Bullets", "Pilih gaya", "Cek tampilan", "Atur jarak", "Simpan"]], ["Mencari file di laptop?", ["Buka File Explorer", "Pilih lokasi", "Klik kolom Search", "Ketik nama file", "Tekan enter", "Tunggu hasil", "Pilih file", "Buka file"]], ["Mengubah nama file tugas?", ["Buka folder tugas", "Pilih file tugas", "Klik kanan", "Pilih Rename", "Ketik nama baru", "Tekan enter", "Cek nama file", "Buka file untuk memastikan"]], ["Memindahkan file ke flashdisk?", ["Colok flashdisk", "Tunggu terdeteksi", "Pilih file", "Klik Copy", "Buka flashdisk", "Klik Paste", "Tunggu selesai", "Eject dan cabut"]], ["Mencetak dokumen?", ["Buka dokumen", "Periksa isi", "Isi kertas printer", "Klik Print", "Pilih printer", "Atur halaman", "Klik Cetak", "Ambil hasil"]], ["Membeli barang online?", ["Buka aplikasi", "Cari barang", "Cek ulasan", "Pilih barang", "Masukkan keranjang", "Isi alamat", "Bayar", "Terima barang"]], ["Memesan makanan online?", ["Buka aplikasi", "Pilih restoran", "Pilih makanan", "Klik Pesan", "Isi alamat", "Pilih pembayaran", "Bayar", "Terima makanan"]], ["Memesan ojek online?", ["Buka aplikasi", "Cek lokasi jemput", "Isi tujuan", "Pilih kendaraan", "Cek tarif", "Klik Pesan", "Tunggu driver", "Bayar"]], ["Jika barang online salah?", ["Cek pesanan", "Foto barang", "Simpan bukti", "Hubungi penjual", "Ajukan komplain", "Ajukan retur", "Kirim balik barang", "Tunggu refund"]], ["Jika salah mengirim pesan?", ["Cek pesan", "Tekan lama pesan", "Pilih hapus untuk semua", "Hubungi penerima", "Jelaskan", "Minta maaf", "Kirim pesan benar", "Konfirmasi"]], ["Menyelesaikan masalah dengan teman?", ["Tenangkan diri", "Dengarkan", "Bicara baik-baik", "Diskusi", "Cari solusi", "Minta maaf", "Sepakati", "Saling memaafkan"]], ["Lupa membawa tugas?", ["Jelaskan ke guru", "Minta izin", "Minta waktu", "Hubungi rumah", "Minta kirim file", "Buka file", "Kumpulkan susulan", "Ingat lain kali"]], ["Tugas belum selesai, deadline dekat?", ["Tenangkan diri", "Catat sisa tugas", "Tentukan prioritas", "Bagi waktu", "Kurangi bermain", "Fokus", "Minta bantuan", "Kumpulkan"]], ["Tidak paham tugas?", ["Baca ulang", "Tandai bagian sulit", "Catat pertanyaan", "Cari contoh", "Tonton video", "Cari referensi", "Diskusi", "Tanya guru"]], ["Kelompok tidak kompak?", ["Kumpul bersama", "Diskusi", "Musyawarah", "Sepakati aturan", "Tentukan ketua", "Bagi tugas", "Saling bantu", "Evaluasi"]], ["Teman tidak mengerjakan tugas kelompok?", ["Ingatkan", "Tanya alasan", "Dengarkan", "Tegur baik-baik", "Tawarkan bantuan", "Beri tenggat", "Bagi ulang tugas", "Lapor guru"]], ["File tugas tidak bisa dibuka?", ["Cek file", "Buka ulang", "Restart aplikasi", "Cek format", "Ganti aplikasi", "Konversi format", "Cari backup", "Minta kirim ulang"]], ["Komputer sekolah bermasalah?", ["Cek kabel", "Cek listrik", "Cek monitor", "Cek mouse dan keyboard", "Restart", "Coba komputer lain", "Lapor guru", "Hubungi teknisi"]], ["Internet sekolah mati saat kuis?", ["Tetap tenang", "Cek Wi-Fi", "Cek sinyal", "Muat ulang halaman", "Pindah tempat", "Pakai data seluler", "Lapor guru", "Minta kuis susulan"]], ["Salah mengirim tugas?", ["Cek ulang", "Tarik kiriman", "Kirim tugas benar", "Cek hasil", "Jelaskan", "Hubungi guru", "Minta maaf", "Konfirmasi"]], ["Salah file yang dikumpulkan?", ["Cek nama file", "Cari file benar", "Batalkan kiriman", "Kirim ulang", "Cek hasil", "Jelaskan", "Hubungi guru", "Konfirmasi"]], ["Tidak bisa login akun belajar?", ["Cek internet", "Cek username", "Cek password", "Cek huruf besar kecil", "Coba lagi", "Reset password", "Hubungi admin", "Tanya guru"]], ["Baterai habis saat belajar?", ["Simpan pekerjaan", "Aktifkan hemat baterai", "Matikan layar", "Cari charger", "Cari stopkontak", "Pinjam charger", "Gunakan power bank", "Lanjut belajar"]], ["PPT tidak bisa dibuka?", ["Buka ulang", "Cek file", "Cek versi", "Ganti aplikasi", "Pindah perangkat", "Pakai backup", "Minta file lagi", "Buat ulang"]], ["Proyektor tidak tampil?", ["Nyalakan proyektor", "Cek kabel", "Cek input", "Cek lampu", "Atur layar", "Restart", "Ganti laptop", "Lapor guru"]], ["Printer tidak mencetak?", ["Cek kertas", "Cek tinta", "Cek kabel", "Cek koneksi", "Cek antrean", "Install driver", "Restart", "Lapor guru"]], ["Teman tidak paham materi?", ["Jelaskan", "Sabar", "Beri contoh", "Gunakan gambar", "Diskusi", "Ulangi", "Latihan", "Tanya guru"]], ["Diskusi hampir selesai tapi tugas belum beres?", ["Cek sisa tugas", "Bagi tugas", "Fokus", "Percepat", "Minta bantuan", "Gabungkan", "Periksa", "Kumpulkan"]], ["Dua tugas deadline bersamaan?", ["Catat", "Cek tenggat", "Tentukan prioritas", "Buat jadwal", "Bagi waktu", "Kerjakan", "Periksa", "Kumpulkan"]], ["Terlambat masuk kelas?", ["Ketuk pintu", "Minta maaf", "Minta izin", "Jelaskan", "Masuk", "Duduk", "Ikuti pelajaran", "Catat ketinggalan"]], ["Tidak membawa alat tulis?", ["Cek tas", "Pinjam teman", "Minta ke guru", "Ke koperasi", "Beli", "Catat di HP", "Kerjakan tugas", "Siapkan besok"]], ["Jawaban berbeda dengan teman?", ["Cek soal", "Cek cara", "Cek hitungan", "Bandingkan", "Diskusi", "Cek referensi", "Tanya guru", "Pilih yang benar"]], ["Tugas kelompok banyak salah?", ["Cari salah", "Diskusi", "Bagi revisi", "Perbaiki", "Tanya guru", "Cek ulang", "Kumpulkan", "Evaluasi"]], ["Banyak tugas dari guru?", ["Catat semua", "Cek deadline", "Tentukan prioritas", "Buat jadwal", "Kerjakan", "Centang selesai", "Istirahat", "Evaluasi"]], ["Sering terlambat sekolah?", ["Kurangi HP malam", "Tidur awal", "Siapkan tas", "Siapkan seragam", "Pasang alarm", "Bangun awal", "Atur waktu", "Berangkat awal"]], ["Langkah menyelesaikan masalah belajar?", ["Cari masalah", "Catat masalah", "Cari sebab", "Cari solusi", "Tanya guru", "Lakukan solusi", "Evaluasi", "Ulangi"]]];
+/* soal lama bertipe "langkah": jawaban diurutkan sesuai langkah yang tepat */
+const NON_LANGKAH = ["Benda yang berbentuk bulat?","Hal yang membuat kita senang?","Cara menjaga kebersihan diri?","Hal yang dilakukan saat hujan?","Cara bekerja sama dalam kelompok?","Barang yang disiapkan sebelum sekolah?","Membuat password aman?"];
+const URUT_LAMA = {"Langkah sebelum berangkat sekolah?": ["Bangun tidur", "Mandi", "Sikat gigi", "Pakai seragam", "Sarapan", "Cek isi tas", "Pakai sepatu", "Pamit orang tua"], "Langkah membuat teh?": ["Panaskan air", "Siapkan gelas", "Masukkan kantong teh", "Tuang air panas", "Diamkan sebentar", "Angkat kantong teh", "Tambah gula", "Aduk rata"], "Langkah menyikat gigi?": ["Siapkan sikat", "Buka tutup pasta", "Oleskan pasta", "Tutup pasta", "Sikat semua sisi gigi", "Berkumur", "Bilas sikat", "Simpan sikat"], "Langkah sebelum tidur?": ["Rapikan barang", "Sikat gigi", "Cuci muka dan kaki", "Ganti baju tidur", "Atur alarm", "Berdoa", "Matikan lampu", "Tidur"], "Langkah menyelesaikan masalah belajar?": ["Cari masalah", "Catat masalah", "Cari sebab", "Cari solusi", "Tanya guru", "Lakukan solusi", "Evaluasi", "Ulangi"]};
+BANK_SOAL_LAMA.forEach(q => {
+  const u = URUT_LAMA[q.soal]; if(!u) return;
+  q.jawaban = u.map((t,i) => ({teks:t, poin:PTS8[i], kata:[t.toLowerCase()]}));
+});
+BANK_SOAL_LAMA.forEach(q => { q.langkah = !NON_LANGKAH.includes(q.soal); });
+const BANK_SOAL = BANK_SOAL_LAMA.concat(BANK_DOCX.map(b => ({
+  soal: b[0], pengali: 1, langkah: !NON_LANGKAH.includes(b[0]),
+  jawaban: b[1].map((t,i) => ({teks:t, poin:PTS8[i], kata:[t.toLowerCase()]}))
+})));
+/* ---- bank tambahan: 5 jawaban (Babak 1) & 10 jawaban (Babak 4), urutan = langkah algoritma ---- */
+const PTS5 = [30,25,20,15,10], PTS10 = [25,20,17,14,12,10,8,6,4,2];
+const BANK_5 = [["Langkah mencuci muka?", ["Buka keran", "Basahi wajah", "Pakai sabun muka", "Bilas sampai bersih", "Keringkan dengan handuk"]], ["Langkah menelepon teman?", ["Buka aplikasi telepon", "Pilih nama kontak", "Tekan tombol panggil", "Sampaikan pesan", "Akhiri panggilan"]], ["Langkah menanam biji?", ["Siapkan pot", "Isi dengan tanah", "Tanam biji", "Siram air", "Letakkan di tempat terang"]], ["Langkah menyeberang jalan?", ["Berhenti di tepi jalan", "Lihat kanan dan kiri", "Pastikan kendaraan berhenti", "Menyeberang dengan tertib", "Sampai di seberang dengan aman"]], ["Langkah membuat susu cokelat?", ["Siapkan gelas", "Tuang bubuk cokelat", "Tuang air panas", "Aduk sampai larut", "Tambahkan susu"]], ["Langkah menggunakan kalkulator?", ["Nyalakan kalkulator", "Ketik angka pertama", "Pilih tanda operasi", "Ketik angka kedua", "Tekan tombol sama dengan"]], ["Langkah mengisi baterai HP?", ["Siapkan charger", "Colok kabel ke HP", "Colok charger ke listrik", "Tunggu baterai terisi", "Cabut charger"]], ["Langkah menulis surat?", ["Siapkan kertas dan pulpen", "Tulis salam pembuka", "Tulis isi surat", "Tulis salam penutup", "Tanda tangani surat"]], ["Langkah merebus telur?", ["Siapkan panci berisi air", "Masukkan telur", "Rebus sampai matang", "Angkat dan tiriskan", "Kupas kulit telur"]], ["Langkah membuat pesawat kertas?", ["Siapkan kertas", "Lipat menjadi dua", "Lipat kedua sudut ke tengah", "Lipat sayap ke bawah", "Terbangkan pesawat"]]];
+const BANK_10 = [["Langkah membuat nasi goreng?", ["Siapkan bahan", "Iris bawang", "Panaskan minyak di wajan", "Tumis bawang sampai harum", "Masukkan telur dan orak-arik", "Masukkan nasi", "Tambahkan bumbu", "Aduk sampai rata", "Angkat dari kompor", "Sajikan di piring"]], ["Langkah membuat presentasi PowerPoint?", ["Tentukan topik", "Cari bahan materi", "Buka PowerPoint", "Pilih desain slide", "Buat slide judul", "Isi slide materi", "Tambahkan gambar", "Periksa tulisan", "Simpan file", "Latihan presentasi"]], ["Langkah mengerjakan tugas sampai dikumpulkan?", ["Baca perintah tugas", "Catat tenggat waktu", "Kumpulkan bahan", "Susun kerangka", "Kerjakan tugas", "Periksa hasil", "Perbaiki kesalahan", "Simpan file", "Kirim tugas", "Pastikan terkirim"]], ["Langkah membuat program sederhana?", ["Pahami masalah", "Tentukan input", "Tentukan output", "Susun langkah penyelesaian", "Tulis kode", "Jalankan program", "Cari kesalahan", "Perbaiki kesalahan", "Uji dengan data lain", "Simpan program"]], ["Langkah mencuci pakaian dengan mesin cuci?", ["Pisahkan pakaian", "Periksa isi kantong", "Masukkan pakaian", "Tuang deterjen", "Isi air", "Pilih program cuci", "Tekan tombol start", "Tunggu sampai selesai", "Angkat pakaian", "Jemur pakaian"]], ["Langkah bepergian naik bus?", ["Tentukan tujuan", "Cari halte terdekat", "Tunggu bus datang", "Naik bus", "Bayar tiket", "Duduk atau berpegangan", "Perhatikan halte tujuan", "Tekan tombol berhenti", "Periksa barang bawaan", "Turun dengan hati-hati"]], ["Langkah melakukan percobaan IPA?", ["Tentukan tujuan percobaan", "Siapkan alat dan bahan", "Buat dugaan awal", "Rakit alat", "Lakukan percobaan", "Amati hasil", "Catat data", "Analisis data", "Tarik kesimpulan", "Buat laporan"]]];
+BANK_5.forEach(b => BANK_SOAL.push({soal:b[0], pengali:1, langkah:true, jawaban:b[1].map((t,i) => ({teks:t, poin:PTS5[i], kata:[t.toLowerCase()]}))}));
+BANK_10.forEach(b => BANK_SOAL.push({soal:b[0], pengali:1, langkah:true, jawaban:b[1].map((t,i) => ({teks:t, poin:PTS10[i], kata:[t.toLowerCase()]}))}));
+const BABAK_CFG = [
+  {no:1, nama:'🎯 Pemanasan', mode:'rebutan', jumlah:1, n:5, info:'1 soal · 5 jawaban. Tiap tim menjawab bergantian.'},
+  {no:2, nama:'🔄 Semua Tim', mode:'rebutan', jumlah:5, n:8, info:'Semua tim berebut! 8 jawaban per soal. Klik kartu tim yang menjawab.'},
+  {no:3, nama:'⚡ Rebutan', mode:'serang', jumlah:3, n:8, info:'Rebutan! Tim mana pun boleh mengisi jawaban yang belum terbuka (8 jawaban).'},
+  {no:4, nama:'🏆 Final', mode:'rebutan', jumlah:2, n:10, info:'FINAL! 10 jawaban per soal — siapa juara?'}
+];
+const TOTAL_SOAL = 11;
+let daftarSoal = [], sesiIdx = [], gameId = '';
+const kosongBabak = () => [0,1,2,3].map(() => [0,0,0,0,0]);
+let skorBabak = kosongBabak();
+let urutanAktif = false;
+const normSoal = t => t.toLowerCase().replace(/[^a-z0-9 ]/g,'').trim();
+function acak(a){
+  const r = a.slice();
+  for(let i = r.length-1; i > 0; i--){
+    const x = new Uint32Array(1); crypto.getRandomValues(x);
+    const j = x[0] % (i+1); [r[i], r[j]] = [r[j], r[i]];
+  }
+  return r;
+}
+function bangunDariIndeks(idx){
+  const out = []; let p = 0;
+  BABAK_CFG.forEach(b => {
+    for(let k = 0; k < b.jumlah; k++){
+      const q = BANK_SOAL[idx[p++]];
+      let judul, teks;
+      if(k === 0){ judul = 'BABAK ' + b.no + ' — ' + b.nama.toUpperCase() + '!'; teks = b.jumlah + ' Soal · ' + b.info + (b.mode === 'giliran' ? ' Sekarang: ' + namaTim[0] : ''); }
+      else { judul = '📝 SOAL ' + (k+1) + ' DARI ' + b.jumlah; teks = b.mode === 'giliran' ? namaTim[k] + ' · diskusi 20 detik lalu sampaikan jawaban!' : b.info; }
+      out.push({babak:'BABAK ' + b.no + ' — ' + b.nama, babakNo:b.no, mode:b.mode, urut:k+1, jumlahBabak:b.jumlah,
+        timGiliran: b.mode === 'giliran' ? k : -1, langkah: q.langkah !== false, judulPopup:judul, teksPopup:teks, soal:q.soal, pengali:1, jawaban:q.jawaban});
+    }
+  });
+  return out;
+}
+function sesiValid(idx){
+  if(!Array.isArray(idx) || idx.length !== TOTAL_SOAL) return false;
+  let p = 0;
+  for(const b of BABAK_CFG) for(let k = 0; k < b.jumlah; k++){ const q = BANK_SOAL[idx[p++]]; if(!q || q.jawaban.length !== b.n) return false; }
+  return true;
+}
+function bangunSesi(){
+  const pakai = new Set(), idx = [];
+  BABAK_CFG.forEach(b => {
+    const pool = acak(BANK_SOAL.map((q,i) => i).filter(i => BANK_SOAL[i].jawaban.length === b.n && BANK_SOAL[i].langkah !== false));
+    let ambil = 0;
+    for(const i of pool){
+      const n = normSoal(BANK_SOAL[i].soal);
+      if(pakai.has(n)) continue;
+      pakai.add(n); idx.push(i);
+      if(++ambil === b.jumlah) break;
+    }
+  });
+  sesiIdx = idx;
+  gameId = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  return bangunDariIndeks(idx);
+}
+function perbaruiModeInfo(){
+  const s = daftarSoal[soalSkrg], el = document.getElementById('modeInfo'); if(!s || !el) return;
+  const tim = timAktif >= 0 ? 'Tim menjawab: ' + namaTim[timAktif] : 'klik kartu tim yang menjawab';
+  if(s.mode === 'giliran') el.textContent = '🎯 GILIRAN ' + namaTim[s.timGiliran] + ' — 3× salah = giliran selesai';
+  else if(s.mode === 'serang') el.textContent = '⚡ SERANG BALIK — ' + tim + ' (tim mana pun boleh mengisi jawaban tersisa)';
+  else if(s.babakNo === 1) el.textContent = '🎯 PEMANASAN — ' + tim;
+  else if(s.babakNo === 4) el.textContent = '🏆 FINAL — ' + tim;
+  else el.textContent = '🔄 SEMUA TIM BEREBUT — ' + tim;
+}
+function tampilkanGiliranTim(idx){
+  const s = daftarSoal[soalSkrg];
+  if(s && s.mode === 'giliran') tampilkanPopup('⬆️ GILIRAN TIM!', 'Diskusi 20 detik lalu sampaikan jawaban!', namaTim[idx]);
+  else tampilkanPopup('🙋 TIM MENJAWAB', 'Sebutkan jawabanmu!', namaTim[idx]);
+}
+function pilihTim(idx, senyap){
+  const s = daftarSoal[soalSkrg];
+  if(s && s.mode === 'giliran' && idx !== s.timGiliran){ toast('🎯 Babak Giliran Tim: soal ini milik ' + namaTim[s.timGiliran]); return; }
+  timAktif = idx;
+  document.querySelectorAll('.tim-kartu').forEach((el,i) => el.classList.toggle('aktif', i === idx));
+  perbaruiModeInfo();
+  if(!senyap) setTimeout(() => tampilkanGiliranTim(idx), 150);
+}
+function gantiGiliran(){
+  const s = daftarSoal[soalSkrg];
+  if(s && s.mode === 'giliran'){ toast('🎯 Giliran Tim: tim sudah ditentukan per soal.'); return; }
+  pilihTim((timAktif + 6) % 5);
+}
+function resetSkor(){
+  skorBabak = kosongBabak();
+  soalSkrg = 0; skor = [0,0,0,0,0]; strike = [0,0,0,0,0]; gugur = [false,false,false,false,false]; perbaruiSkor();
+}
+function mulaiGame(){
+  daftarSoal = bangunSesi();
+  document.getElementById('layarAwal').classList.remove('aktif');
+  setTimeout(() => { document.getElementById('layarMain').classList.add('aktif'); resetSkor(); muatSoal(); }, 300);
+}
+function mulaiUlang(){
+  if(!confirm('Mulai ulang? Skor direset dan 11 soal diacak baru dari bank soal.')) return;
+  daftarSoal = bangunSesi(); resetSkor(); muatSoal(); toast('🎲 Soal diacak ulang!');
+}
+function gantiSoalIni(){
+  if(jawabanTerbuka.length > 0){ toast('⚠️ Sudah ada jawaban terbuka — soal tidak bisa diganti.'); return; }
+  const pakaiI = new Set(sesiIdx), pakaiT = new Set(sesiIdx.map(i => normSoal(BANK_SOAL[i].soal)));
+  const kand = BANK_SOAL.map((q,i) => i).filter(i => !pakaiI.has(i) && !pakaiT.has(normSoal(BANK_SOAL[i].soal)) && BANK_SOAL[i].jawaban.length === daftarSoal[soalSkrg].jawaban.length && BANK_SOAL[i].langkah !== false);
+  if(!kand.length){ toast('Bank soal habis.'); return; }
+  sesiIdx[soalSkrg] = acak(kand)[0];
+  daftarSoal = bangunDariIndeks(sesiIdx);
+  muatSoal(); toast('🎲 Soal diganti dari bank!');
+}
+function muatSoal(){
+  const soal = daftarSoal[soalSkrg];
+  jawabanTerbuka = []; sudahLihatkan = false;
+  document.getElementById('namaBabak').textContent = soal.babak + ' • Soal ' + soal.urut + '/' + soal.jumlahBabak;
+  document.getElementById('pertanyaan').textContent = soal.soal;
+  const daftar = document.getElementById('daftarJawaban'); daftar.innerHTML = '';
+  soal.jawaban.forEach((j, i) => {
+    const baris = document.createElement('div'); baris.className = 'jawaban-baris';
+    baris.innerHTML = '<div class="nomor">' + (i+1) + '</div><div class="jawaban tersembunyi" id="jwb-' + i + '">' + j.teks + '</div><div class="nilai">' + (j.poin * soal.pengali) + '</div>';
+    daftar.appendChild(baris);
+  });
+  strike = [0,0,0,0,0]; gugur = [false,false,false,false,false];
+  for(let t = 0; t < 5; t++) for(let s = 1; s <= 3; s++) document.getElementById('s' + t + '-' + s).classList.remove('x');
+  perbaruiInfoSisa();
+  document.getElementById('pemenang').style.display = 'none';
+  pilihTim(soal.mode === 'giliran' ? soal.timGiliran : -1, true);
+  renderRekap();
+  setTimeout(() => tampilkanPopup(soal.judulPopup, soal.teksPopup, soal.mode === 'giliran' ? namaTim[soal.timGiliran] : ''), 400);
+}
+/* ===== URUTAN ALGORITMA (langkah harus dibuka berurutan) ===== */
+function babakIdx(){ const s = daftarSoal[soalSkrg]; return ((s && s.babakNo) || 1) - 1; }
+function terkunci(i){
+  const s = daftarSoal[soalSkrg];
+  if(!urutanAktif || !s || s.langkah === false) return false;
+  for(let k = 0; k < i; k++) if(!jawabanTerbuka.includes(k)) return true;
+  return false;
+}
+function toggleUrutan(){
+  urutanAktif = !urutanAktif;
+  const b = document.getElementById('btnUrutan'); if(b) b.textContent = '🔢 KUNCI URUTAN BUKA: ' + (urutanAktif ? 'ON' : 'OFF');
+  if(typeof ngRenderButtons === 'function') ngRenderButtons();
+  toast(urutanAktif ? '🔢 Jawaban harus dibuka berurutan sesuai langkah algoritma.' : '🔓 Urutan langkah dimatikan — jawaban boleh dibuka bebas.');
+}
+/* ===== NILAI PER BABAK + RESET ===== */
+const NAMA_BABAK_PENDEK = ['🎯 Pemanasan','🔄 Semua Tim','⚡ Rebutan','🏆 Final'];
+function renderRekap(){
+  const el = document.getElementById('rekapTabel'); if(!el) return;
+  const cur = babakIdx(), pendek = ['🔴','🔵','🟡','🟢','🟣'];
+  let h = '<table style="width:100%;border-collapse:collapse;font-size:.85rem;text-align:center"><tr><th style="text-align:left;padding:6px">Babak</th>' + pendek.map(p => '<th style="padding:6px">' + p + '</th>').join('') + '<th style="padding:6px">Aksi</th></tr>';
+  for(let b = 0; b < 4; b++){
+    const total = skorBabak[b].reduce((a,c) => a + c, 0);
+    h += '<tr style="' + (b === cur ? 'background:rgba(255,212,59,.22);' : '') + 'border-top:1px solid rgba(255,255,255,.2)"><td style="text-align:left;padding:6px;font-weight:800">' + NAMA_BABAK_PENDEK[b] + (b === cur ? ' ◀' : '') + '</td>' + skorBabak[b].map(v => '<td style="padding:6px;font-weight:800">' + v + '</td>').join('') + '<td style="padding:6px"><button type="button" class="btn-merah" style="padding:5px 10px;font-size:.75rem" onclick="resetBabak(' + (b+1) + ')"' + (total === 0 ? ' disabled style="opacity:.45;padding:5px 10px;font-size:.75rem"' : '') + '>↺ RESET</button></td></tr>';
+  }
+  h += '<tr style="border-top:2px solid rgba(255,255,255,.4)"><td style="text-align:left;padding:6px;font-weight:900">TOTAL</td>' + skor.map(v => '<td style="padding:6px;font-weight:900;color:#ffe66d">' + v + '</td>').join('') + '<td></td></tr></table>';
+  el.innerHTML = h;
+}
+function resetBabak(no){
+  const n = no - 1, jml = skorBabak[n].reduce((a,c) => a + c, 0);
+  if(jml === 0){ toast('Nilai Babak ' + no + ' sudah kosong.'); return; }
+  if(!confirm('Reset semua nilai hasil kerja BABAK ' + no + ' (' + NAMA_BABAK_PENDEK[n] + ')? Nilai babak lain tidak berubah.')) return;
+  for(let t = 0; t < 5; t++){ skor[t] = Math.max(0, skor[t] - skorBabak[n][t]); skorBabak[n][t] = 0; }
+  perbaruiSkor();
+  if(typeof ngWrite === 'function') ngWrite();
+  toast('↺ Nilai Babak ' + no + ' direset.');
+}
+function resetSemuaNilai(){
+  if(!confirm('Reset SEMUA nilai (Babak 1–4 + bonus) menjadi 0?')) return;
+  skorBabak = kosongBabak();
+  skor = [0,0,0,0,0];
+  perbaruiSkor();
+  if(typeof ngWrite === 'function') ngWrite();
+  toast('↺ Semua nilai direset.');
+}
+const _perbaruiSkorAsli = perbaruiSkor;
+perbaruiSkor = function(){ _perbaruiSkorAsli(); renderRekap(); };
+daftarSoal = bangunSesi();   // sesi awal (pratinjau); diacak ulang saat MULAI / MAIN LAGI
+</script>
+
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
@@ -921,13 +1148,15 @@ function ngSnapshot(){
     currentQuestion: soalSkrg,
     totalQuestions: daftarSoal.length,
     questionText: s.soal,
-    currentRound: s.babak,
+    currentRound: s.babak + ' • Soal ' + s.urut + '/' + s.jumlahBabak,
+    roundMode: s.mode, roundScores: skorBabak.map(a => [...a]), langkahAktif: urutanAktif, gameId: gameId, session: sesiIdx.slice(),
     questionMultiplier: s.pengali,
     activeTeam: timAktif,
     scores: [...skor],
     strikes: [...strike],
     eliminatedTeams: [...gugur],
     openedAnswers: opened,
+    answerTeams: (oleh || []).slice(), questionBonus: (bonusSoal || []).slice(),
     /* teks jawaban HANYA dikirim kalau sudah dibuka, supaya siswa tidak bisa mengintip */
     answers: s.jawaban.map((j, i) => ({ points: j.poin * s.pengali, text: opened[i] ? j.teks : '' })),
     gameStatus: ngGameStatus,
@@ -941,30 +1170,134 @@ function ngWrite(){
 }
 
 /* ---------- 8 tombol jawaban ---------- */
+let oleh = [], bonusSoal = [0,0,0,0,0];
 function ngRenderButtons(){
   const grid = document.getElementById('ngAnswerGrid'); if(!grid) return;
   const s = daftarSoal[soalSkrg]; if(!s) return;
+  if(oleh.length !== s.jawaban.length) oleh = s.jawaban.map((_, i) => (jawabanTerbuka.includes(i) && typeof oleh[i] === 'number') ? oleh[i] : -1);
   grid.innerHTML = '';
   s.jawaban.forEach((j, i) => {
     const done = jawabanTerbuka.includes(i);
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'ng-answer' + (done ? ' open' : '');
-    b.disabled = done;
-    b.innerHTML = '<span class="ng-num">' + (i + 1) + '</span><b>' + j.teks + '</b> <span class="ng-pts">— ' + (j.poin * s.pengali) + '</span>';
-    b.onclick = () => bukaJawabanDariPanel(i);
+    const b = document.createElement('div');
+    b.className = 'ng-answer chip' + (done ? ' open' : ' klik');
+    const t = oleh[i];
+    if(!done) b.onclick = () => bukaJawabanDariPanel(i, true);
+    b.innerHTML = '<span class="ng-num">' + (i + 1) + '</span><b>' + j.teks + '</b> <span class="ng-pts">— ' + (j.poin * s.pengali) + '</span>'
+      + (done ? '<span class="ng-by">✓ ' + (t >= 0 ? namaTim[t] : 'dibuka guru') + '</span><button type="button" class="ng-undo" onclick="event.stopPropagation();batalkanJawaban(' + i + ')">↩ HAPUS</button>' : '');
     grid.appendChild(b);
   });
+  const h = document.getElementById('ngStepHint');
+  if(h){
+    let nx = 0; while(nx < s.jawaban.length && jawabanTerbuka.includes(nx)) nx++;
+    h.textContent = nx >= s.jawaban.length ? '✅ Semua langkah sudah terbuka.'
+      : (urutanAktif && s.langkah !== false ? '🔢 Jawaban harus sesuai urutan algoritma — sekarang: langkah ke-' + (nx + 1) : '🔓 Urutan bebas — ketik langkah mana pun.');
+  }
+  ngRenderPoinSoal();
 }
-function bukaJawabanDariPanel(index){
+/* ---------- poin per soal + hapus (kalau salah klik tim) ---------- */
+function poinSoalTim(t){
+  const s = daftarSoal[soalSkrg]; let p = bonusSoal[t] || 0;
+  s.jawaban.forEach((j, i) => { if(jawabanTerbuka.includes(i) && oleh[i] === t) p += j.poin * s.pengali; });
+  return p;
+}
+function kurangiPoin(){
+  if(timAktif < 0){ toast('👆 Pilih dulu tim yang dikurangi poinnya (klik kartu tim).'); return; }
+  const t = timAktif, d = Math.min(5, skor[t]);
+  if(d <= 0){ toast('Poin ' + namaTim[t] + ' sudah 0.'); return; }
+  skor[t] -= d; skorBabak[babakIdx()][t] -= d; bonusSoal[t] = (bonusSoal[t] || 0) - d;
+  mainSuaraSalah(); perbaruiSkor(); ngRenderPoinSoal();
+  toast('➖ ' + namaTim[t] + ' dikurangi ' + d + ' poin.');
+  ngWrite();
+}
+function ngRenderPoinSoal(){
+  const el = document.getElementById('ngSoalPoin'); if(!el || !daftarSoal[soalSkrg]) return;
+  let total = 0, h = '<div class="ttl">🧮 POIN SOAL INI — salah klik tim? Tekan 🗑️ HAPUS (2×), pilih tim yang benar, lalu klik/ketik jawabannya lagi.</div><div class="row">';
+  for(let t = 0; t < 5; t++){
+    const p = poinSoalTim(t); total += Math.abs(p);
+    h += '<div class="tm">' + namaTim[t] + ': ' + p + (p !== 0 ? ' <button type="button" class="ng-undo" style="margin-left:4px" onclick="hapusPoinTimSoal(' + t + ')">' + (_hapusMenunggu === 'tim' + t ? '⚠️ KETUK LAGI' : '🗑️ HAPUS') + '</button>' : '') + '</div>';
+  }
+  h += '</div>' + (total > 0 ? '<div style="margin-top:8px"><button type="button" class="btn-merah" style="padding:7px 12px;font-size:.78rem" onclick="hapusSemuaPoinSoal()">' + (_hapusMenunggu === 'semua' ? '⚠️ KETUK LAGI UNTUK HAPUS SEMUA' : '🗑️ HAPUS SEMUA POIN SOAL INI') + '</button></div>' : '');
+  el.innerHTML = h;
+}
+function tutupJawabanInternal(i){
+  const soal = daftarSoal[soalSkrg], j = soal.jawaban[i], t = oleh[i], pts = j.poin * soal.pengali, bi = babakIdx();
+  if(t >= 0){ skor[t] = Math.max(0, skor[t] - pts); skorBabak[bi][t] = Math.max(0, skorBabak[bi][t] - pts); }
+  jawabanTerbuka = jawabanTerbuka.filter(x => x !== i); oleh[i] = -1;
+  const el = document.getElementById('jwb-' + i);
+  if(el){ el.classList.remove('terbuka'); el.classList.add('tersembunyi'); delete el.dataset.fx; }
+  sudahLihatkan = false;
+  const w = document.getElementById('pemenang'); if(w) w.style.display = 'none';
+}
+function selesaiUbahPoin(){ perbaruiSkor(); perbaruiInfoSisa(); ngRenderButtons(); ngWrite(); }
+function batalkanJawaban(i){
+  if(!jawabanTerbuka.includes(i)) return;
+  const s = daftarSoal[soalSkrg], t = oleh[i];
+  tutupJawabanInternal(i); selesaiUbahPoin();
+  toast('↩ Langkah ' + (i + 1) + ' ditutup' + (t >= 0 ? ', poin ' + namaTim[t] + ' dikurangi ' + (s.jawaban[i].poin * s.pengali) : '') + '.');
+}
+let _hapusMenunggu = '';
+function ketukDua(kunci){
+  if(_hapusMenunggu === kunci){ _hapusMenunggu = ''; return true; }
+  _hapusMenunggu = kunci; ngRenderPoinSoal();
+  clearTimeout(window._hapusT); window._hapusT = setTimeout(() => { _hapusMenunggu = ''; ngRenderPoinSoal(); }, 4000);
+  return false;
+}
+function hapusPoinTimSoal(t){
+  const p = poinSoalTim(t); if(p === 0){ toast('Tim ini belum punya poin di soal ini.'); return; }
+  if(!ketukDua('tim' + t)) return;
+  const bi = babakIdx();
+  const bn = bonusSoal[t] || 0;   // bonus/penalti dibatalkan dulu, baru jawaban ditutup
+  if(bn){ skor[t] -= bn; skorBabak[bi][t] -= bn; bonusSoal[t] = 0; }
+  daftarSoal[soalSkrg].jawaban.forEach((_, i) => { if(jawabanTerbuka.includes(i) && oleh[i] === t) tutupJawabanInternal(i); });
+  selesaiUbahPoin(); toast('🗑️ Poin ' + namaTim[t] + ' di soal ini dihapus (' + p + ').');
+}
+function hapusSemuaPoinSoal(){
+  let total = 0; for(let t = 0; t < 5; t++) total += Math.abs(poinSoalTim(t));
+  if(total === 0){ toast('Belum ada poin di soal ini.'); return; }
+  if(!ketukDua('semua')) return;
+  const bi = babakIdx();
+  for(let t = 0; t < 5; t++){ const bn = bonusSoal[t] || 0; if(bn){ skor[t] -= bn; skorBabak[bi][t] -= bn; bonusSoal[t] = 0; } }
+  daftarSoal[soalSkrg].jawaban.forEach((_, i) => { if(jawabanTerbuka.includes(i)) tutupJawabanInternal(i); });
+  selesaiUbahPoin(); toast('🗑️ Semua poin soal ini dihapus.');
+}
+/* ---------- KETIK jawaban → cocokkan ke bank soal (bukan klik langkah) ---------- */
+function jawabDariKetikan(){
+  const inp = document.getElementById('ngJawabInput'); if(!inp) return;
+  const teks = inp.value.trim(); if(!teks) return;
+  const soal = daftarSoal[soalSkrg]; if(!soal) return;
+  if(timAktif < 0){ toast('👆 Pilih dulu tim yang menjawab (klik kartu tim).'); return; }
+  const bersih = t => t.toLowerCase().trim().replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ');
+  const belum = soal.jawaban.map((_, i) => i).filter(i => !jawabanTerbuka.includes(i));
+  if(!belum.length){ toast('✅ Semua langkah sudah terbuka.'); inp.value = ''; return; }
+  // 1) persis sama  2) cocok fuzzy — jika ganda, ambil langkah paling awal (sesuai urutan algoritma)
+  let hit = belum.find(i => bersih(soal.jawaban[i].teks) === bersih(teks));
+  if(hit === undefined) hit = belum.find(i => cocokkanJawaban(teks, [soal.jawaban[i].teks].concat(soal.jawaban[i].kata || [])));
+  if(hit === undefined){
+    mainSuaraSalah();
+    toast('❓ "' + teks + '" tidak ada di bank soal. Tekan ❌ SALAH jika memang salah.');
+    return;
+  }
+  const sebelum = jawabanTerbuka.length;
+  bukaJawabanDariPanel(hit);            // cek urutan, skor, kirim ke Firebase
+  if(jawabanTerbuka.length > sebelum){ inp.value = ''; }
+  inp.focus();
+}
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && e.target && e.target.id === 'ngJawabInput'){ e.preventDefault(); jawabDariKetikan(); }
+});
+function bukaJawabanDariPanel(index, bebas){
   const soal = daftarSoal[soalSkrg];
   if(!soal || jawabanTerbuka.includes(index)) return;
+  if(timAktif < 0){ toast('👆 Pilih dulu tim yang menjawab (klik kartu tim).'); return; }
+  if(soal.mode === 'giliran' && gugur[timAktif]){ toast('Tim ini sudah gugur di soal ini.'); return; }
+  if(!bebas && typeof terkunci === 'function' && terkunci(index)){ let nx = 0; while(jawabanTerbuka.includes(nx)) nx++; toast('🔢 Urutan algoritma: buka langkah ke-' + (nx + 1) + ' dulu.'); return; }
   const j = soal.jawaban[index];
-  jawabanTerbuka.push(index);
+  jawabanTerbuka.push(index); oleh[index] = timAktif;
   const el = document.getElementById('jwb-' + index);
   if(el){ el.classList.remove('tersembunyi'); el.classList.add('terbuka'); }
   mainSuaraBenar();
   skor[timAktif] += j.poin * soal.pengali;
+  skorBabak[babakIdx()][timAktif] += j.poin * soal.pengali;
   perbaruiSkor();
   perbaruiInfoSisa();
   ngRenderButtons();
@@ -979,32 +1312,36 @@ function bukaJawabanDariPanel(index){
 
 /* ---------- aksi guru (versi sinkron) ---------- */
 function tambahSalah(){
-  if(gugur[timAktif] || strike[timAktif] >= 3){ toast('Tim ini sudah gugur. Klik GANTI TIM.'); return; }
+  if(timAktif < 0){ toast('👆 Pilih dulu tim yang salah (klik kartu tim).'); return; }
+  const _m = (daftarSoal[soalSkrg] || {}).mode;
+  if(gugur[timAktif] || strike[timAktif] >= 3){ if(_m === 'giliran'){ toast('Tim ini sudah gugur.'); return; } mainSuaraSalah(); return; }
   mainSuaraSalah();
   strike[timAktif]++;
   const el = document.getElementById('s' + timAktif + '-' + strike[timAktif]);
   if(el) el.classList.add('x');
   let pindah = false;
-  if(strike[timAktif] >= 3 && !gugur[timAktif]){
+  if(_m === 'giliran' && strike[timAktif] >= 3 && !gugur[timAktif]){
     gugur[timAktif] = true;
-    toast('❌ Tim ' + namaTim[timAktif] + ' gugur!');
-    pindah = true;
+    toast('❌ ' + namaTim[timAktif] + ' gugur! Klik BUKA SEMUA lalu SOAL BERIKUTNYA.');
+    pindah = false;
   }
   ngWrite();                                   // X langsung dikirim dulu
   if(pindah) gantiGiliran();
 }
 function beriBonus(){
+  if(timAktif < 0){ toast('👆 Pilih dulu tim penerima bonus.'); return; }
   skor[timAktif] += 20;
-  perbaruiSkor();
+  skorBabak[babakIdx()][timAktif] += 20; bonusSoal[timAktif] = (bonusSoal[timAktif] || 0) + 20;
+  perbaruiSkor(); ngRenderPoinSoal();
   toast('🎁 Tim ' + namaTim[timAktif] + ' mendapat +20 poin!');
   ngWrite();
 }
 
 /* aksi lama yang dibungkus supaya otomatis terkirim */
 const ngOldMuat = muatSoal;
-muatSoal = function(){ ngGameStatus = 'playing'; ngWinner = ''; ngOldMuat(); ngRenderButtons(); ngWrite(); };
+muatSoal = function(){ ngGameStatus = 'playing'; ngWinner = ''; ngOldMuat(); oleh = daftarSoal[soalSkrg].jawaban.map(() => -1); bonusSoal = [0,0,0,0,0]; ngRenderButtons(); ngWrite(); };
 const ngOldPilih = pilihTim;
-pilihTim = function(i){ ngOldPilih(i); ngWrite(); };
+pilihTim = function(i, s){ ngOldPilih(i, s); ngWrite(); };
 const ngOldLihat = lihatkanJawaban;
 lihatkanJawaban = function(){ ngOldLihat(); ngRenderButtons(); ngWrite(); };
 const ngOldCek = cekPemenang;
@@ -1068,20 +1405,24 @@ async function ngResumeRoom(){
 }
 /* pulihkan tampilan guru dari state terakhir di Firebase (jika halaman guru di-refresh) */
 function ngRestore(st){
+  if(sesiValid(st.session)){ sesiIdx = st.session.slice(); gameId = st.gameId || gameId; daftarSoal = bangunDariIndeks(sesiIdx); }
   soalSkrg = st.currentQuestion || 0;
   skor = [0,1,2,3,4].map(i => (st.scores || [])[i] || 0);
   strike = [0,1,2,3,4].map(i => (st.strikes || [])[i] || 0);
+  skorBabak = [0,1,2,3].map(bb => [0,1,2,3,4].map(t => (((st.roundScores || [])[bb] || [])[t]) || 0));
   gugur = [0,1,2,3,4].map(i => !!(st.eliminatedTeams || [])[i]);
-  timAktif = st.activeTeam || 0;
+  timAktif = (typeof st.activeTeam === 'number') ? st.activeTeam : 0;
   const s = daftarSoal[soalSkrg];
   jawabanTerbuka = [];
   (st.openedAnswers || []).forEach((o, i) => { if(o) jawabanTerbuka.push(i); });
   sudahLihatkan = jawabanTerbuka.length === s.jawaban.length;
+  oleh = s.jawaban.map((_, i) => { const v = (st.answerTeams || [])[i]; return (typeof v === 'number') ? v : -1; });
+  bonusSoal = [0,1,2,3,4].map(i => (st.questionBonus || [])[i] || 0);
   ngGameStatus = st.gameStatus || 'playing';
   ngWinner = st.winner || '';
   document.getElementById('layarAwal').classList.remove('aktif');
   document.getElementById('layarMain').classList.add('aktif');
-  document.getElementById('namaBabak').textContent = s.babak;
+  document.getElementById('namaBabak').textContent = s.babak + ' • Soal ' + s.urut + '/' + s.jumlahBabak;
   document.getElementById('pertanyaan').textContent = s.soal;
   const daftar = document.getElementById('daftarJawaban'); daftar.innerHTML = '';
   s.jawaban.forEach((j, i) => {
@@ -1092,7 +1433,8 @@ function ngRestore(st){
   });
   for(let t = 0; t < 5; t++) for(let x = 1; x <= 3; x++) document.getElementById('s' + t + '-' + x).classList.toggle('x', strike[t] >= x);
   document.querySelectorAll('.tim-kartu').forEach((el, i) => el.classList.toggle('aktif', i === timAktif));
-  perbaruiSkor(); perbaruiInfoSisa();
+  perbaruiModeInfo();
+  perbaruiSkor(); perbaruiInfoSisa(); ngRenderButtons();
   if(ngWinner){ document.getElementById('namaPemenang').textContent = ngWinner; document.getElementById('pemenang').style.display = 'block'; }
   else document.getElementById('pemenang').style.display = 'none';
 }

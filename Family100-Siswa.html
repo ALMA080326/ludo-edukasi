@@ -545,14 +545,14 @@ function render(st){
   const elim = arr5(st.eliminatedTeams, v => !!v);
   const opened = Array.isArray(st.openedAnswers) ? st.openedAnswers.map(v => !!v) : [];
   const answers = Array.isArray(st.answers) ? st.answers : [];
-  const active = st.activeTeam || 0;
+  const active = (typeof st.activeTeam === 'number') ? st.activeTeam : 0;
   const waiting = st.gameStatus === 'waiting';
 
   $('namaBabak').textContent = st.currentRound || '';
   $('pertanyaan').textContent = waiting ? '⏳ Menunggu guru memulai permainan…' : (st.questionText || '');
 
   /* baris jawaban: dibangun ulang hanya kalau soal berganti */
-  const key = st.currentQuestion + '|' + answers.length;
+  const key = (st.gameId || '') + '|' + st.currentQuestion + '|' + answers.length;
   const newQuestion = key !== questionKey;
   if(newQuestion){
     questionKey = key;
@@ -562,7 +562,7 @@ function render(st){
       row.innerHTML = '<div class="nomor">' + (i + 1) + '</div><div class="jawaban tersembunyi" id="jwb-' + i + '"></div><div class="nilai" id="nil-' + i + '"></div>';
       daftar.appendChild(row);
     }
-    if(!first && !waiting) banner((st.currentRound || '') + ' • Soal ' + ((st.currentQuestion || 0) + 1));
+    if(!first && !waiting) banner(st.currentRound || '');
   }
   let bukaBaru = false;
   answers.forEach((a, i) => {
@@ -588,7 +588,7 @@ function render(st){
     $('tim' + t).classList.toggle('gugur', elim[t]);
     if(prev && strikes[t] > prev.strikes[t]) strikeBaru = true;
   }
-  if(prev && !newQuestion && active !== prev.active) banner('⬆️ GILIRAN TIM ' + NAMA_TIM[active]);
+  if(prev && !newQuestion && active >= 0 && active !== prev.active) banner('⬆️ GILIRAN TIM ' + NAMA_TIM[active]);
 
   /* pemenang */
   const w = $('pemenang');
