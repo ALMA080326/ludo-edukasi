@@ -2067,7 +2067,7 @@ body::before{
             </div>
             <div class="button-group">
                 <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>✅ JAWAB SEKARANG</button>
-                <button class="btn btn-secondary" onclick="closeQuestion()">✖️ LANJUTKAN</button>
+                <button class="btn btn-secondary" id="continueBtn" onclick="closeQuestion()">✖️ LANJUTKAN</button>
             </div>
         </div>
     </div>
@@ -2797,6 +2797,114 @@ body::before{
             });
         }
 
+        // Panduan bermain: buka/tutup modal
+        function toggleHelp() {
+            const modal = document.getElementById('helpModal');
+            const open = modal.classList.toggle('active');
+            const btn = document.getElementById('helpToggle');
+            if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        // Suara: nyalakan/matikan semua efek suara
+        function toggleSound() {
+            gameState.soundEnabled = !gameState.soundEnabled;
+            document.querySelectorAll('audio').forEach(a => {
+                a.muted = !gameState.soundEnabled;
+                if (!gameState.soundEnabled) { try { a.pause(); } catch (e) {} }
+            });
+            const btn = document.getElementById('soundToggle');
+            if (btn) {
+                btn.classList.toggle('muted', !gameState.soundEnabled);
+                btn.setAttribute('aria-pressed', gameState.soundEnabled ? 'true' : 'false');
+                btn.setAttribute('aria-label', gameState.soundEnabled ? 'Matikan efek suara' : 'Nyalakan efek suara');
+            }
+        }
+
+        // Memilih opsi jawaban (A/B/C/D) pada soal utama
+        function selectOption(index, optionElement) {
+            if (gameState.reviewingQuestion) return;
+            document.querySelectorAll('#optionsContainer .option').forEach(o => o.classList.remove('selected'));
+            optionElement.classList.add('selected');
+            gameState.selectedAnswer = index;
+
+            const group = getCurrentGroup();
+            const item = gameState.questionHistory[group][gameState.historyIndex[group]];
+            if (item) item.selectedAnswer = index;
+
+            document.getElementById('submitBtn').disabled = false;
+            playSfx('soundKlik');
+        }
+
+        // ---- Efek suara (aman jika file audio tidak ada) ----
+        function playSfx(id, loop) {
+            const a = document.getElementById(id);
+            if (!a || gameState.soundEnabled === false) return;
+            try {
+                a.loop = !!loop;
+                a.currentTime = 0;
+                const p = a.play();
+                if (p && p.catch) p.catch(() => {});
+            } catch (e) {}
+        }
+        function stopSfx(id) {
+            const a = document.getElementById(id);
+            if (!a) return;
+            try { a.pause(); a.currentTime = 0; } catch (e) {}
+        }
+        function playDaduBacksound() { playSfx('soundDadu'); }
+        function playBukaSoalBacksound() {
+            if (gameState.bukaSoalStopTimeout) clearTimeout(gameState.bukaSoalStopTimeout);
+            playSfx('soundBukaSoal');
+            gameState.bukaSoalStopTimeout = setTimeout(stopBukaSoalBacksound, 4000);
+        }
+        function stopBukaSoalBacksound() {
+            if (gameState.bukaSoalStopTimeout) {
+                clearTimeout(gameState.bukaSoalStopTimeout);
+                gameState.bukaSoalStopTimeout = null;
+            }
+            stopSfx('soundBukaSoal');
+        }
+        function playVoice(type) {
+            playSfx(type === 'correct' ? 'soundCorrect' : 'soundWrong');
+        }
+
+        // Pesan hitung mundur singkat setelah menjawab
+        function showReadingCountdown(seconds) {
+            const feedback = document.getElementById('feedbackContainer');
+            if (!feedback) return;
+            const old = feedback.querySelector('.reading-countdown');
+            if (old) old.remove();
+            const box = document.createElement('div');
+            box.className = 'reading-countdown';
+            feedback.appendChild(box);
+            let left = seconds;
+            const render = () => {
+                box.textContent = left > 0
+                    ? `📖 Baca hasilnya dulu... ${left}`
+                    : '✅ Tekan LANJUTKAN untuk melanjutkan permainan';
+            };
+            render();
+            const iv = setInterval(() => {
+                left--;
+                render();
+                if (left <= 0) clearInterval(iv);
+            }, 1000);
+        }
+
+        // Animasi besar "Benar!/Salah" di tengah layar
+        let answerBurstTimer = null;
+        function showAnswerBurst(type, title, caption) {
+            const burst = document.getElementById('answerBurst');
+            if (!burst) return;
+            document.getElementById('burstTitle').textContent = title || '';
+            document.getElementById('burstCaption').textContent = caption || '';
+            burst.classList.remove('show', 'correct', 'wrong');
+            void burst.offsetWidth;
+            burst.classList.add(type === 'correct' ? 'correct' : 'wrong', 'show');
+            clearTimeout(answerBurstTimer);
+            answerBurstTimer = setTimeout(() => burst.classList.remove('show'), 1300);
+        }
+
         function rollDice() {
             // Jaga-jaga: kalau kelompok yang sedang giliran ternyata sudah FINISH
             // (mis. karena kondisi balapan lain), langsung lewati tanpa munculkan soal.
@@ -2950,8 +3058,12 @@ body::before{
             const next = document.getElementById('nextQuestionBtn');
             if (!prev || !next) return;
 
-            prev.disabled = idx <= 0;
-            next.disabled = idx >= history.length - 1;
+            const last = history[history.length - 1];
+            const unanswered = !!last && !last.result;
+            prev.disabled = unanswered || idx <= 0;
+            next.disabled = unanswered || idx >= history.length - 1;
+            const cont = document.getElementById('continueBtn');
+            if (cont) cont.disabled = unanswered;
             prev.textContent = `◀ SOAL SEBELUMNYA`;
             next.textContent = `SOAL SESUDAHNYA ▶`;
         }
@@ -2961,6 +3073,8 @@ body::before{
             const history = gameState.questionHistory[group];
             let idx = gameState.historyIndex[group] + direction;
             if (idx < 0 || idx >= history.length) return;
+            const lastItem = history[history.length - 1];
+            if (lastItem && !lastItem.result) return; // soal aktif harus dijawab dulu
 
             stopAnswerTimer();
             cancelScheduledClose();
@@ -3146,6 +3260,13 @@ body::before{
         }
 
         function closeQuestion() {
+            // Soal aktif belum dijawab (dan waktu belum habis): tidak boleh dilewati.
+            const hist = gameState.questionHistory[getCurrentGroup()];
+            const lastQ = hist[hist.length - 1];
+            if (document.getElementById('questionModal').classList.contains('active') && lastQ && !lastQ.result) {
+                if (window.proToast) proToast('Jawab soal dulu sebelum melanjutkan.', '⚠️');
+                return;
+            }
             stopAnswerTimer();
             cancelScheduledClose();
             stopBukaSoalBacksound();
@@ -3328,7 +3449,7 @@ body::before{
             const names = tie.contenders.map(g => `Kelompok ${groups.indexOf(g) + 1} (${groupLabel[g]})`).join(', ');
 
             document.getElementById('tiebreakInfo').textContent =
-                `⚖️ Skor imbang (${gameState.scores[tie.contenders[0]]} benar): ${names}. Rebutan untuk menentukan peringkat!`;
+                `⚖️ Skor imbang (${gameState.scores[tie.contenders[0]]} poin): ${names}. Rebutan untuk menentukan peringkat!`;
             document.getElementById('tiebreakQuestionText').textContent = tie.question.q;
             document.getElementById('tiebreakFeedback').innerHTML = '';
             document.getElementById('tiebreakOptions').innerHTML = '';
@@ -3568,7 +3689,7 @@ body::before{
     if(e.key==='f' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){
       e.preventDefault(); toggleFullscreen();
     }
-    if(e.key==='Escape') document.querySelectorAll('.help-modal.active,.question-modal.active,.tiebreak-modal.active,.winner-modal.active,.finish-modal.active').forEach(x=>x.classList.remove('active'));
+    if(e.key==='Escape') document.querySelectorAll('.help-modal.active').forEach(x=>x.classList.remove('active'));
   });
   window.addEventListener('load',()=>setTimeout(()=>toast('Arena siap. Selamat bermain!','🎮'),700));
 })();
