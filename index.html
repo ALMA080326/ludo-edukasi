@@ -1818,6 +1818,18 @@ body::before{
   .pro-toast-stack{bottom:54px}
 }
 
+ 
+.question-navigation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+.question-navigation .btn {
+  min-height: 44px;
+  font-size: .82rem;
+}
+.score-value small { display:block; margin-top:4px; font-size:.72rem; opacity:.72; }
 </style>
     <style>
         .finish-modal {
@@ -2049,9 +2061,13 @@ body::before{
             <div class="question-text" id="questionText"></div>
             <div id="feedbackContainer"></div>
             <div class="options" id="optionsContainer"></div>
+            <div class="question-navigation">
+                <button class="btn btn-secondary" id="prevQuestionBtn" onclick="navigateQuestion(-1)" disabled>◀ SOAL SEBELUMNYA</button>
+                <button class="btn btn-secondary" id="nextQuestionBtn" onclick="navigateQuestion(1)" disabled>SOAL SESUDAHNYA ▶</button>
+            </div>
             <div class="button-group">
                 <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>✅ JAWAB SEKARANG</button>
-                <button class="btn btn-secondary" onclick="closeQuestion()">✖️👋 TUTUP</button>
+                <button class="btn btn-secondary" onclick="closeQuestion()">✖️ LANJUTKAN</button>
             </div>
         </div>
     </div>
@@ -2247,9 +2263,14 @@ body::before{
         let gameState = {
             positions: { red: 0, blue: 0, yellow: 0, green: 0, purple: 0 },
             scores: { red: 0, blue: 0, yellow: 0, green: 0, purple: 0 },
+            correctCount: { red: 0, blue: 0, yellow: 0, green: 0, purple: 0 },
+            wrongCount: { red: 0, blue: 0, yellow: 0, green: 0, purple: 0 },
             diceValue: 0,
             selectedAnswer: null,
             askedQuestions: { red: new Set(), blue: new Set(), yellow: new Set(), green: new Set(), purple: new Set() },
+            questionHistory: { red: [], blue: [], yellow: [], green: [], purple: [] },
+            historyIndex: { red: -1, blue: -1, yellow: -1, green: -1, purple: -1 },
+            reviewingQuestion: false,
             currentQuestion: null,
             finishOrder: [], // Track urutan finish
             answerTimeLeft: 60,
@@ -2331,16 +2352,26 @@ body::before{
             const scoreList = document.getElementById('scoreList');
             scoreList.innerHTML = '';
 
-            // Urutkan dari skor tertinggi ke terendah
-            const sortedGroups = [...groups].sort((a, b) => gameState.scores[b] - gameState.scores[a]);
+            // Papan skor menampilkan poin, bukan penentu juara.
+            // Urutan FINISH tetap menjadi penentu utama peringkat akhir.
+            const sortedGroups = [...groups].sort((a, b) => {
+                if (gameState.finishOrder.includes(a) && gameState.finishOrder.includes(b)) {
+                    return gameState.finishOrder.indexOf(a) - gameState.finishOrder.indexOf(b);
+                }
+                if (gameState.finishOrder.includes(a)) return -1;
+                if (gameState.finishOrder.includes(b)) return 1;
+                return gameState.scores[b] - gameState.scores[a];
+            });
 
             sortedGroups.forEach((group, index) => {
                 const scoreItem = document.createElement('div');
                 scoreItem.className = `score-item ${group}`;
                 const groupNum = groups.indexOf(group) + 1;
+                const finishPos = gameState.finishOrder.indexOf(group);
+                const status = finishPos >= 0 ? `🏁 Finish #${finishPos + 1}` : '🎯 Berjalan';
                 scoreItem.innerHTML = `
-                    <span><strong>#${index + 1}</strong> Kelompok ${groupNum}</span>
-                    <span class="score-value">${gameState.scores[group]} benar</span>
+                    <span><strong>#${index + 1}</strong> Kelompok ${groupNum}<br><small>${status}</small></span>
+                    <span class="score-value">${gameState.scores[group]} poin</span>
                 `;
                 scoreList.appendChild(scoreItem);
             });
@@ -2380,71 +2411,141 @@ body::before{
 
         function showQuestion() {
             cancelScheduledClose();
-            
+
             const currentGroup = getCurrentGroup();
             const groupData = groupsData[currentGroup];
             const groupNum = groups.indexOf(currentGroup) + 1;
-            
             const groupAsked = gameState.askedQuestions[currentGroup];
 
-            // Jika semua soal kelompok ini sudah pernah keluar, reset agar bisa muncul lagi
+            // Soal yang sudah pernah tampil TIDAK PERNAH di-reset.
+            // Jika bank soal habis, jangan mengulang soal lama.
             if (groupAsked.size >= groupData.questions.length) {
-                groupAsked.clear();
+                document.getElementById('diceResult').textContent = '📚 Bank soal kelompok ini sudah habis';
+                if (window.proToast) proToast(`Bank soal Kelompok ${groupNum} sudah habis. Tidak ada soal yang diulang.`, '📚');
+                document.getElementById('diceBtn').disabled = false;
+                return;
             }
 
-            let rawQuestion;
-            do {
-                rawQuestion = groupData.questions[Math.floor(Math.random() * groupData.questions.length)];
-            } while (groupAsked.has(JSON.stringify(rawQuestion)) && groupAsked.size < groupData.questions.length);
+            const available = groupData.questions.filter(q => !groupAsked.has(JSON.stringify(q)));
+            if (!available.length) {
+                document.getElementById('diceBtn').disabled = false;
+                return;
+            }
 
-            // Bug fix: shuffleOptions() sudah dibuat tapi tidak pernah dipanggil,
-            // sehingga urutan jawaban A/B/C/D selalu sama tiap soal muncul.
+            const rawQuestion = available[Math.floor(Math.random() * available.length)];
             const question = shuffleOptions(rawQuestion);
-            
+            const questionKey = JSON.stringify(rawQuestion);
+
             gameState.currentQuestion = question;
-            groupAsked.add(JSON.stringify(rawQuestion));
             gameState.selectedAnswer = null;
-            
-            document.getElementById('questionHeader').textContent = `SOAL UNTUK KELOMPOK ${groupNum}`;
-            document.getElementById('questionText').textContent = question.q;
-            document.getElementById('feedbackContainer').innerHTML = '';
-            
+            gameState.reviewingQuestion = false;
+            groupAsked.add(questionKey);
+
+            const history = gameState.questionHistory[currentGroup];
+            // Soal baru selalu ditambahkan ke ujung riwayat.
+            history.push({
+                question: question,
+                selectedAnswer: null,
+                result: null,
+                elapsedSeconds: null,
+                points: 0
+            });
+            gameState.historyIndex[currentGroup] = history.length - 1;
+
+            renderQuestionFromHistory(currentGroup, false);
+            document.getElementById('questionModal').classList.add('active');
+            startAnswerTimer();
+            playBukaSoalBacksound();
+        }
+
+        function renderQuestionFromHistory(group, reviewOnly = false) {
+            const history = gameState.questionHistory[group];
+            const idx = gameState.historyIndex[group];
+            const item = history[idx];
+            if (!item) return;
+
+            gameState.currentQuestion = item.question;
+            gameState.selectedAnswer = item.selectedAnswer;
+            gameState.reviewingQuestion = reviewOnly || !!item.result;
+
+            const groupNum = groups.indexOf(group) + 1;
+            document.getElementById('questionHeader').textContent =
+                `SOAL ${idx + 1}/${history.length} — KELOMPOK ${groupNum}`;
+            document.getElementById('questionText').textContent = item.question.q;
+
             const optionsContainer = document.getElementById('optionsContainer');
             optionsContainer.innerHTML = '';
-            
-            question.opts.forEach((opt, idx) => {
+            item.question.opts.forEach((opt, optIdx) => {
                 const option = document.createElement('div');
                 option.className = 'option';
-                const letter = String.fromCharCode(65 + idx);
-                option.dataset.letter = letter;
+                option.dataset.letter = String.fromCharCode(65 + optIdx);
                 option.setAttribute('role', 'button');
                 option.setAttribute('tabindex', '0');
 
-                // Bug fix: dulu ada span.option-letter TAMBAHAN di sini, sehingga
-                // badge huruf tampil dobel (kotak dari CSS ::before + bulat dari span
-                // ini). Badge huruf sekarang cukup ditangani oleh .option::before
-                // (assets/css/game.css) lewat atribut data-letter di atas.
                 const textSpan = document.createElement('span');
                 textSpan.className = 'option-text';
                 textSpan.textContent = opt;
-
                 option.appendChild(textSpan);
-                option.onclick = () => selectOption(idx, option);
-                option.onkeydown = event => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault();
-                        selectOption(idx, option);
-                    }
-                };
+
+                if (item.result === 'correct' && optIdx === item.question.ans) option.classList.add('correct');
+                if (item.result === 'wrong' && optIdx === item.selectedAnswer) option.classList.add('wrong');
+                if (item.selectedAnswer === optIdx && !item.result) option.classList.add('selected');
+
+                if (!gameState.reviewingQuestion) {
+                    option.onclick = () => selectOption(optIdx, option);
+                    option.onkeydown = event => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            selectOption(optIdx, option);
+                        }
+                    };
+                } else {
+                    option.style.cursor = 'default';
+                }
                 optionsContainer.appendChild(option);
             });
-            
-            document.getElementById('submitBtn').disabled = true;
-            document.getElementById('questionModal').classList.add('active');
-            optionsContainer.querySelector('.option')?.focus();
-            
-            startAnswerTimer();
-            playBukaSoalBacksound();
+
+            const feedback = document.getElementById('feedbackContainer');
+            if (item.result === 'correct') {
+                feedback.innerHTML = `<div class="feedback correct"><strong>🎉 JAWABAN BENAR</strong><br>+${item.points} poin</div>`;
+            } else if (item.result === 'wrong') {
+                feedback.innerHTML = `<div class="feedback wrong"><strong>💡 JAWABAN SALAH</strong><br>${item.points} poin</div>`;
+            } else {
+                feedback.innerHTML = '';
+            }
+
+            document.getElementById('submitBtn').disabled = gameState.reviewingQuestion || item.selectedAnswer === null;
+            document.getElementById('submitBtn').textContent = gameState.reviewingQuestion ? '📖 MODE LIHAT' : '✅ JAWAB SEKARANG';
+
+            const timer = document.querySelector('.timer-wrapper');
+            if (timer) timer.style.display = gameState.reviewingQuestion ? 'none' : '';
+            updateQuestionNavigation();
+        }
+
+        function updateQuestionNavigation() {
+            const group = getCurrentGroup();
+            const history = gameState.questionHistory[group];
+            const idx = gameState.historyIndex[group];
+            const prev = document.getElementById('prevQuestionBtn');
+            const next = document.getElementById('nextQuestionBtn');
+            if (!prev || !next) return;
+
+            prev.disabled = idx <= 0;
+            next.disabled = idx >= history.length - 1;
+            prev.textContent = `◀ SOAL SEBELUMNYA`;
+            next.textContent = `SOAL SESUDAHNYA ▶`;
+        }
+
+        function navigateQuestion(direction) {
+            const group = getCurrentGroup();
+            const history = gameState.questionHistory[group];
+            let idx = gameState.historyIndex[group] + direction;
+            if (idx < 0 || idx >= history.length) return;
+
+            stopAnswerTimer();
+            cancelScheduledClose();
+            gameState.historyIndex[group] = idx;
+            renderQuestionFromHistory(group, true);
         }
 
         function startAnswerTimer() {
@@ -2503,257 +2604,86 @@ body::before{
         }
 
         function handleTimeUp() {
-            document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
+            document.querySelectorAll('#optionsContainer .option').forEach(o => o.style.pointerEvents = 'none');
             document.getElementById('submitBtn').disabled = true;
-            
+
+            const group = getCurrentGroup();
+            const history = gameState.questionHistory[group];
+            const idx = gameState.historyIndex[group];
+            const item = history[idx];
+            item.result = 'wrong';
+            item.points = -5;
+            item.elapsedSeconds = 60;
+            gameState.scores[group] = Math.max(0, gameState.scores[group] - 5);
+            gameState.wrongCount[group]++;
+
             const feedback = document.getElementById('feedbackContainer');
-            const kataSemangat = getRandomWord(wrongWords);
-            feedback.innerHTML = `<div class="feedback wrong"><strong>⏰⌛ WAKTU HABIS!</strong> Kesempatan menjawab telah berakhir. 😌<br><br><span class="motivation-line">${addEmojiToSentences(kataSemangat)}</span></div>`;
+            feedback.innerHTML = `<div class="feedback wrong"><strong>⏰⌛ WAKTU HABIS!</strong> −5 poin. Soal ini sudah selesai dan <strong>tidak akan muncul lagi</strong>. Pion tetap di tempat.</div>`;
+            document.getElementById('diceResult').textContent = '⏰ −5 poin';
             showReadingCountdown(2);
             playVoice('wrong');
-            showAnswerBurst('wrong', 'Waktu habis', 'Tetap semangat untuk giliran berikutnya.');
-            
+            showAnswerBurst('wrong', 'Waktu habis −5', 'Soal tidak akan diulang.');
+            gameState.reviewingQuestion = true;
+            updateQuestionNavigation();
             updateScoreBoard();
-            
-            scheduleClose(2000);
-        }
-
-        function selectOption(index, optionElement) {
-            document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-            optionElement.classList.add('selected');
-            gameState.selectedAnswer = index;
-            document.getElementById('submitBtn').disabled = false;
-        }
-
-        const correctWords = [
-            'Luar biasa! Kalian memang jagoan berpikir komputasional!',
-            'Keren banget! Terus pertahankan semangat belajarnya!',
-            'Mantap! Cara berpikir kalian tajam hari ini!',
-            'Hebat! Kalian benar-benar memahami materinya!',
-            'Top! Lanjutkan kerja keras kalian!',
-            'Cerdas sekali! Kalian pantas mendapat pujian ini!',
-            'Fantastis! Jawaban kalian tepat sasaran!',
-            'Keren! Semangat terus, kelompok hebat!'
-        ];
-
-        const wrongWords = [
-            'Jangan menyerah, kesalahan adalah bagian dari belajar!',
-            'Tetap semangat! Kalian pasti bisa di kesempatan berikutnya!',
-            'Tidak apa-apa, coba lagi pada giliran berikutnya.',
-            'Terus belajar, kegagalan adalah awal dari keberhasilan!',
-            'Semangat! Yang penting sudah berusaha dengan baik!',
-            'Tetap percaya diri, kalian bisa lebih baik lagi!',
-            'Jangan patah semangat, ayo coba lagi!',
-            'Belajar dari kesalahan itu keren. Semangat terus!'
-        ];
-
-function addEmojiToSentences(text) {
-  const emojiPool = [
-    '🎉','🥳','✨','🌟','💫','🎊','🎈','🏆','🥇','🏅',
-    '💪','🔥','⚡','🚀','💥','🌈','☀️','🌙','⭐','🌠',
-    '😊','😄','😁','🤩','😎','🤗','😃','😆','🥰','😺',
-    '🧠','💡','🔎','📚','✏️','📝','🎯','🧩','📖','🎓',
-    '👏','🙌','🤝','👍','👌','✌️','🤞','🤟','🤘','👊',
-    '❤️','💙','💚','💛','🧡','💜','🩷','💖','💝','💗',
-    '🎲','🎮','🎯','🕹️','🧸','🎵','🎶','🎤','🎨','🪄',
-    '🌱','🌻','🌺','🌸','🍀','🍎','🍉','🍭','🍬','🍫',
-    '🐯','🦁','🐼','🐨','🐸','🦊','🐱','🐶','🦄','🐝',
-    '👑','💎','🔔','🎁','📣','💯','✅','☑️','❗'
-  ];
-
-  // Acak urutan emoji setiap kali pesan ditampilkan.
-  const shuffled = [...emojiPool].sort(() => Math.random() - 0.5);
-  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-
-  return sentences.map((sentence, index) => {
-    const clean = sentence.trim();
-    if (!clean) return '';
-    const e1 = shuffled[(index * 3) % shuffled.length];
-    const e2 = shuffled[(index * 3 + 1) % shuffled.length];
-
-    // Pola berbeda-beda: 1 emoji, 2 emoji, atau emoji di kedua sisi.
-    if (index % 4 === 0) return `${e1} ${clean} ${e2}`;
-    if (index % 4 === 1) return `${clean} ${e1} ✨`;
-    if (index % 4 === 2) return `${e1} ${clean}`;
-    return `${clean} ${e1} ${e2}`;
-  }).join(' ').trim();
-}
-
-function showReadingCountdown(seconds = 2) {
-            const feedback = document.getElementById('feedbackContainer');
-            if (!feedback) return;
-
-            let countdown = document.createElement('div');
-            countdown.className = 'reading-countdown';
-            countdown.id = 'readingCountdown';
-            countdown.textContent = `📖👀 Waktu membaca pesan: ${seconds} detik`;
-            feedback.appendChild(countdown);
-
-            let left = seconds;
-            const interval = setInterval(() => {
-                left--;
-                if (!document.getElementById('readingCountdown')) {
-                    clearInterval(interval);
-                    return;
-                }
-                if (left <= 0) {
-                    clearInterval(interval);
-                    countdown.textContent = '🔔 Bersiap untuk giliran berikutnya... 🎲✨';
-                } else {
-                    countdown.textContent = `📖👀 Waktu membaca pesan: ${left} detik`;
-                }
-            }, 1000);
-        }
-
-        function getRandomWord(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
-        }
-
-        function playVoice(type) {
-            try {
-                if (!gameState.soundEnabled) return;
-                const audioId = type === 'correct' ? 'soundCorrect' : 'soundWrong';
-                const audioEl = document.getElementById(audioId);
-                if (!audioEl) return;
-                audioEl.currentTime = 0;
-                audioEl.play().catch(e => console.error('Gagal memutar suara:', e));
-            } catch (e) {
-                console.error('Gagal memutar suara:', e);
-            }
-        }
-
-        // Backsound saat soal dibuka: diputar selama maksimal 60 detik (durasi
-        // menjawab), otomatis berhenti kalau soal ditutup lebih cepat.
-        function playBukaSoalBacksound() {
-            try {
-                if (gameState.bukaSoalStopTimeout) {
-                    clearTimeout(gameState.bukaSoalStopTimeout);
-                    gameState.bukaSoalStopTimeout = null;
-                }
-                if (!gameState.soundEnabled) return;
-                const audioEl = document.getElementById('soundBukaSoal');
-                if (!audioEl) return;
-                audioEl.currentTime = 0;
-                audioEl.play().catch(e => console.error('Gagal memutar backsound buka soal:', e));
-
-                gameState.bukaSoalStopTimeout = setTimeout(() => {
-                    stopBukaSoalBacksound();
-                }, 60000);
-            } catch (e) {
-                console.error('Gagal memutar backsound buka soal:', e);
-            }
-        }
-
-        function stopBukaSoalBacksound() {
-            if (gameState.bukaSoalStopTimeout) {
-                clearTimeout(gameState.bukaSoalStopTimeout);
-                gameState.bukaSoalStopTimeout = null;
-            }
-            const audioEl = document.getElementById('soundBukaSoal');
-            if (audioEl) {
-                audioEl.pause();
-                audioEl.currentTime = 0;
-            }
-        }
-
-        // Backsound saat tombol dadu / mulai soal diklik.
-        function playDaduBacksound() {
-            try {
-                if (!gameState.soundEnabled) return;
-                const audioEl = document.getElementById('soundDadu');
-                if (!audioEl) return;
-                audioEl.currentTime = 0;
-                audioEl.play().catch(e => console.error('Gagal memutar backsound dadu:', e));
-            } catch (e) {
-                console.error('Gagal memutar backsound dadu:', e);
-            }
-        }
-
-        // Suara klik untuk SETIAP tombol <button> di game (dadu, jawab, tutup,
-        // cara main, toggle suara, main lagi, lanjutkan, dsb).
-        function playKlikSound() {
-            try {
-                if (!gameState.soundEnabled) return;
-                const audioEl = document.getElementById('soundKlik');
-                if (!audioEl) return;
-                audioEl.currentTime = 0;
-                audioEl.play().catch(e => console.error('Gagal memutar suara klik:', e));
-            } catch (e) {
-                console.error('Gagal memutar suara klik:', e);
-            }
-        }
-
-        document.addEventListener('click', (event) => {
-            if (event.target.closest('button')) {
-                playKlikSound();
-            }
-        }, true);
-
-        function toggleSound() {
-            gameState.soundEnabled = !gameState.soundEnabled;
-            const toggle = document.getElementById('soundToggle');
-            toggle.classList.toggle('muted', !gameState.soundEnabled);
-            toggle.setAttribute('aria-pressed', String(gameState.soundEnabled));
-            toggle.setAttribute('aria-label', gameState.soundEnabled ? 'Matikan efek suara' : 'Aktifkan efek suara');
-            toggle.querySelector('span').textContent = gameState.soundEnabled ? 'Suara aktif' : 'Suara mati';
-        }
-
-        function toggleHelp() {
-            document.getElementById('helpModal').classList.toggle('active');
-        }
-
-        function showAnswerBurst(type, title, caption) {
-            const burst = document.getElementById('answerBurst');
-            burst.className = `answer-burst ${type} show`;
-            document.getElementById('burstTitle').textContent = title;
-            document.getElementById('burstCaption').textContent = caption;
-            window.clearTimeout(showAnswerBurst.timeoutId);
-            showAnswerBurst.timeoutId = window.setTimeout(() => {
-                burst.classList.remove('show');
-            }, 1250);
         }
 
         function submitAnswer() {
-            if (gameState.selectedAnswer === null) return;
-            
+            if (gameState.reviewingQuestion || gameState.selectedAnswer === null) return;
+
             stopAnswerTimer();
             document.getElementById('submitBtn').disabled = true;
-            document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
-            
+            document.querySelectorAll('#optionsContainer .option').forEach(o => o.style.pointerEvents = 'none');
+
+            const group = getCurrentGroup();
+            const history = gameState.questionHistory[group];
+            const idx = gameState.historyIndex[group];
+            const item = history[idx];
             const isCorrect = gameState.selectedAnswer === gameState.currentQuestion.ans;
             const feedback = document.getElementById('feedbackContainer');
-            const options = document.querySelectorAll('.option');
-            
-            if (isCorrect) {
-                options[gameState.currentQuestion.ans].classList.add('correct');
+            const options = document.querySelectorAll('#optionsContainer .option');
 
-                const elapsedSeconds = 60 - gameState.answerTimeLeft;
+            item.selectedAnswer = gameState.selectedAnswer;
+            item.elapsedSeconds = 60 - gameState.answerTimeLeft;
+
+            if (isCorrect) {
+                const elapsedSeconds = item.elapsedSeconds;
                 const steps = calcStepsFromSpeed(elapsedSeconds);
                 gameState.diceValue = steps;
-
-                const kataSemangat = getRandomWord(correctWords);
-                feedback.innerHTML = `<div class="feedback correct"><strong>🎉🥳 JAWABAN BENAR!</strong> Dijawab dalam ${elapsedSeconds} detik → Pion melangkah <strong>${steps} langkah</strong>! 🏃‍♂️💨<br><br><span class="motivation-line">${addEmojiToSentences(kataSemangat)}</span></div>`;
-                document.getElementById('diceResult').textContent = `⚡ ${elapsedSeconds} detik = ${steps} langkah`;
-                showReadingCountdown(2);
-                gameState.scores[getCurrentGroup()]++;
+                item.result = 'correct';
+                item.points = 10;
+                gameState.scores[group] += 10;
+                gameState.correctCount[group]++;
                 gameState.pendingMove = true;
+
+                options[gameState.currentQuestion.ans].classList.add('correct');
+                feedback.innerHTML = `<div class="feedback correct"><strong>🎉🥳 JAWABAN BENAR!</strong> +10 poin · ${elapsedSeconds} detik → Pion melangkah <strong>${steps} langkah</strong>! 🏃‍♂️💨</div>`;
+                document.getElementById('diceResult').textContent = `⚡ +10 poin · ${elapsedSeconds} detik = ${steps} langkah`;
+                showReadingCountdown(2);
                 playVoice('correct');
-                showAnswerBurst('correct', 'Benar!', `Kelompok melaju ${steps} langkah (${elapsedSeconds} detik).`);
+                showAnswerBurst('correct', 'Benar! +10', `Kelompok melaju ${steps} langkah.`);
                 createConfetti(22);
-                
-                scheduleClose(2000);
             } else {
-                const kataSemangat = getRandomWord(wrongWords);
+                item.result = 'wrong';
+                item.points = -5;
+                gameState.scores[group] = Math.max(0, gameState.scores[group] - 5);
+                gameState.wrongCount[group]++;
+
                 options[gameState.selectedAnswer].classList.add('wrong');
-                feedback.innerHTML = `<div class="feedback wrong"><strong>💡🤔 JAWABAN BELUM TEPAT.</strong> Pion tetap di tempat. 🧩🙂<br><br><span class="motivation-line">${addEmojiToSentences(kataSemangat)}</span></div>`;
+                feedback.innerHTML = `<div class="feedback wrong"><strong>💡🤔 JAWABAN SALAH!</strong> −5 poin · Soal ini sudah selesai dan <strong>tidak akan muncul lagi</strong>. Pion tetap di tempat.`;
+                document.getElementById('diceResult').textContent = '❌ −5 poin';
                 showReadingCountdown(2);
                 playVoice('wrong');
-                showAnswerBurst('wrong', 'Belum tepat', 'Coba lagi pada giliran berikutnya.');
-                
-                scheduleClose(2000);
+                showAnswerBurst('wrong', 'Salah −5', 'Soal tidak akan diulang.');
             }
-            
+
+            // Setelah dijawab, soal dikunci sebagai riwayat. Bisa ditinjau dengan
+            // tombol sebelumnya/berikutnya tanpa mengubah skor lagi.
+            gameState.reviewingQuestion = true;
+            updateQuestionNavigation();
             updateScoreBoard();
+
+            // Jangan menutup otomatis; pemain menekan TUTUP/LANJUTKAN setelah selesai melihat hasil.
         }
 
         function movePiece() {
@@ -2801,6 +2731,9 @@ function showReadingCountdown(seconds = 2) {
             stopBukaSoalBacksound();
             let justFinished = null;
             if (gameState.pendingMove) {
+                // Pending move hanya dibuat satu kali saat jawaban benar.
+                // Navigasi riwayat tidak membuat pending move baru, sehingga pion
+                // tetap bergerak tepat satu kali.
                 gameState.pendingMove = false;
                 justFinished = movePiece();
             }
@@ -2862,28 +2795,34 @@ function showReadingCountdown(seconds = 2) {
         }
 
         function showWinner() {
-            // Urutkan kelompok berdasarkan skor (jumlah jawaban benar) tertinggi.
-            // Kelompok dengan skor SAMA dikelompokkan menjadi satu "slot seri"
-            // yang harus diselesaikan lewat Soal Rebutan sebelum peringkat final ditampilkan.
-            const sorted = [...groups].sort((a, b) => gameState.scores[b] - gameState.scores[a]);
+            // URUTAN FINISH ADALAH PENENTU JUARA UTAMA.
+            // Skor tidak boleh membuat kelompok yang belum FINISH menyalip
+            // kelompok yang sudah FINISH.
+            const finished = [...gameState.finishOrder];
+            const unfinished = groups.filter(g => !finished.includes(g));
 
             const slots = [];
             let i = 0;
-            while (i < sorted.length) {
+            const sortedUnfinished = [...unfinished].sort((a, b) => gameState.scores[b] - gameState.scores[a]);
+
+            while (i < sortedUnfinished.length) {
                 let j = i + 1;
-                while (j < sorted.length && gameState.scores[sorted[j]] === gameState.scores[sorted[i]]) {
+                while (j < sortedUnfinished.length &&
+                       gameState.scores[sortedUnfinished[j]] === gameState.scores[sortedUnfinished[i]]) {
                     j++;
                 }
-                const clusterGroups = sorted.slice(i, j);
-                slots.push(clusterGroups.length > 1
-                    ? { type: 'tie', groups: clusterGroups }
-                    : { type: 'single', group: clusterGroups[0] });
+
+                const cluster = sortedUnfinished.slice(i, j);
+                slots.push(cluster.length > 1
+                    ? { type: 'tie', groups: cluster }
+                    : { type: 'single', group: cluster[0] });
                 i = j;
             }
 
             gameState.pendingSlots = slots;
-            gameState.finalOrderGroups = [];
+            gameState.finalOrderGroups = [...finished];
             gameState.tieUsedQuestions = new Set();
+
             processNextSlot();
         }
 
@@ -2892,6 +2831,7 @@ function showReadingCountdown(seconds = 2) {
                 renderFinalStandings(gameState.finalOrderGroups);
                 return;
             }
+
             const slot = gameState.pendingSlots.shift();
             if (slot.type === 'single') {
                 gameState.finalOrderGroups.push(slot.group);
@@ -2915,7 +2855,18 @@ function showReadingCountdown(seconds = 2) {
 
         function getTieQuestionPool() {
             const pool = [];
-            groups.forEach(g => groupsData[g].questions.forEach(q => pool.push(q)));
+            const played = new Set();
+
+            // Jangan gunakan soal yang sudah dimainkan pada babak utama.
+            groups.forEach(g => gameState.askedQuestions[g].forEach(key => played.add(key)));
+
+            groups.forEach(g => groupsData[g].questions.forEach(q => {
+                const key = JSON.stringify(q);
+                if (!played.has(key)) pool.push(q);
+            }));
+
+            // Jika bank soal baru benar-benar habis, tie-break tidak boleh
+            // mengulang soal lama secara diam-diam.
             return pool;
         }
 
@@ -2928,15 +2879,23 @@ function showReadingCountdown(seconds = 2) {
                 return;
             }
 
-            const pool = getTieQuestionPool();
-            let rawQuestion;
-            let attempts = 0;
-            do {
-                rawQuestion = pool[Math.floor(Math.random() * pool.length)];
-                attempts++;
-            } while (gameState.tieUsedQuestions.has(JSON.stringify(rawQuestion)) && attempts < 50);
-            gameState.tieUsedQuestions.add(JSON.stringify(rawQuestion));
+            const pool = getTieQuestionPool().filter(q => !gameState.tieUsedQuestions.has(JSON.stringify(q)));
 
+            if (!pool.length) {
+                // Tidak ada soal baru yang tersedia: jangan mengulang soal utama.
+                // Gunakan urutan poin sebagai fallback yang transparan.
+                tie.order.push(...[...tie.contenders].sort((a,b) => gameState.scores[b] - gameState.scores[a]));
+                finishTieBreak();
+                return;
+            }
+
+            // Soal rebutan dibuat lebih menantang: prioritaskan pertanyaan yang
+            // lebih panjang/berbasis situasi, lalu acak di antara kandidat teratas.
+            const rankedPool = [...pool].sort((a,b) => b.q.length - a.q.length);
+            const hardCandidates = rankedPool.slice(0, Math.min(8, rankedPool.length));
+            const rawQuestion = hardCandidates[Math.floor(Math.random() * hardCandidates.length)];
+
+            gameState.tieUsedQuestions.add(JSON.stringify(rawQuestion));
             tie.question = shuffleOptions(rawQuestion);
             tie.buzzedGroup = null;
             tie.eliminatedThisQuestion = new Set();
@@ -3100,7 +3059,7 @@ function showReadingCountdown(seconds = 2) {
                 rankCard.innerHTML = `
                     <div class="rank-number">${rankLabel}</div>
                     <div class="rank-group">Kelompok ${groupNum}</div>
-                    <div class="rank-score">${gameState.scores[group]} Benar</div>
+                    <div class="rank-score">${gameState.scores[group]} Poin<br><small>Benar: ${gameState.correctCount[group]} · Salah: ${gameState.wrongCount[group]}</small></div>
                     <div style="font-size: 0.9em; color: #666; margin-top: 8px;">${finishLabel}</div>
                 `;
                 rankingContainer.appendChild(rankCard);
