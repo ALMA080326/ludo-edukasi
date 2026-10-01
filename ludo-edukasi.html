@@ -467,19 +467,154 @@ function unlockAudio(){
 // Setiap permainan mengacak seluruh bank sekali. Setiap kartu soal hanya boleh diambil satu kali.
 // BANK SOAL RESMI: seluruh soal berasal dari Bank-Soal-CT-Gabungan-Acak.docx (854 soal unik).
 // Satu soal tidak boleh muncul dua kali dalam satu permainan sampai seluruh deck habis.
-const questionDeck=(()=>{const a=Q.map(q=>q);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a})();
-let deckIndex=0;
-function ask(){
-  while(deckIndex<questionDeck.length){
-    const q=questionDeck[deckIndex++], key=qkey(q[0]);
-    if(S.used.has(key)) continue;
-    const idx=q[1].map((_,i)=>i);
-    for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}
-    S.used.add(key); S.appeared.push(q[0]);
-    return{q:q[0],o:idx.map(i=>q[1][i]),a:idx.indexOf(q[2]),id:q[3]};
+// ============================================================
+// SISTEM MATERI BERURUTAN — 1 MATERI UNTUK 4 PEMAIN
+// Urutan materi: Dekomposisi → Algoritma → Pengenalan Pola → Abstraksi.
+// Soal TIDAK diacak. Soal dikelompokkan berdasarkan materi dan
+// diambil berurutan dari bank asli. Setiap materi diberikan 4 soal:
+// Pemain 1 → soal 1, Pemain 2 → soal 2, Pemain 3 → soal 3,
+// Pemain 4 → soal 4. Setelah 4 giliran, pindah ke materi berikutnya.
+// S.used tetap menjadi pengaman agar soal tidak pernah terulang.
+// ============================================================
+
+const MATERI_ORDER=["Dekomposisi","Algoritma","Pengenalan Pola","Abstraksi","Dasar Berpikir Komputasional"];
+const MATERI_KEYS={
+  "Dekomposisi":["dekomposisi","memecah","memecahkan","membagi","bagian kecil","sub-tugas","subtugas","memisahkan","dipecah"],
+  "Algoritma":["algoritma","urutan langkah","langkah terurut","langkah-langkah","prosedur","prosedur langkah","instruksi berurutan"],
+  "Pengenalan Pola":["pengenalan pola","pola","kesamaan","kemiripan","berulang","hubungan antar","kejadian serupa","situasi serupa"],
+  "Abstraksi":["abstraksi","informasi yang diperlukan","mempertahankan informasi","mengabaikan detail","detail yang tidak diperlukan","menyederhanakan"]
+};
+
+function materiSoal(q){
+  const text=qkey(q[0]);
+  const opts=(q[1]||[]).map(x=>qkey(x));
+  const correct=(typeof q[2]==="number"&&opts[q[2]])?opts[q[2]]:"";
+
+  // Jika kunci jawaban secara eksplisit menyebut salah satu materi,
+  // gunakan itu sebagai klasifikasi utama.
+  for(const m of MATERI_ORDER){
+    const mk=qkey(m);
+    if(correct===mk || correct.includes(mk)) return m;
+  }
+
+  // Jawaban benar yang mendeskripsikan materi juga menjadi sinyal kuat.
+  const correctHints={
+    "Dekomposisi":["memecah","membagi","bagian kecil","bagian yang lebih mudah"],
+    "Algoritma":["prosedur penyelesaian","langkah","urutan","proses terurut","prosedur"],
+    "Pengenalan Pola":["mengenali pola","pola","kesamaan","kemiripan"],
+    "Abstraksi":["informasi yang relevan","data inti","mengabaikan detail","detail yang tidak diperlukan"]
+  };
+  for(const m of MATERI_ORDER){
+    if((correctHints[m]||[]).some(k=>correct.includes(k))) return m;
+  }
+
+  // Pertanyaan yang menyebut materi secara eksplisit.
+  for(const m of MATERI_ORDER){
+    if(text.includes(qkey(m))) return m;
+  }
+
+  // Heuristik terarah untuk soal yang tidak menyebut nama materi.
+  // Pola soal visual/deret → Pengenalan Pola.
+  if(/gambar ke-|muncul .*(lalu|kemudian)|deret\s+[-0-9]/.test(text)) return "Pengenalan Pola";
+  // Input-proses-output, kondisi JIKA-MAKA, perhitungan langkah → Algoritma.
+  if(/input|output|proses|jika .* maka|jika tidak|prosedur|urutan|langkah/.test(text)) return "Algoritma";
+  // Memusatkan perhatian pada data penting → Abstraksi.
+  if(/data inti|informasi yang relevan|detail (yang )?tidak perlu|hanya meminta|tidak mencatat detail/.test(text)) return "Abstraksi";
+  // Membagi masalah menjadi bagian → Dekomposisi.
+  if(/dibagi menjadi|dibagi menjadi bagian|bagian .* lebih mudah|memecah masalah|memecah tugas|sub-tugas|subtugas/.test(text)) return "Dekomposisi";
+
+  let best="Berpikir Komputasional",score=-1;
+  for(const m of MATERI_ORDER.slice(0,4)){
+    let sc=0;
+    for(const k of MATERI_KEYS[m]){
+      if(text.includes(k)) sc += k.length>=8 ? 3 : 1;
+    }
+    if(sc>score){score=sc;best=m}
+  }
+  return score>0?best:"Berpikir Komputasional";
+}
+
+// Pool mempertahankan urutan asli bankSoal. TIDAK di-shuffle.
+const materiPool={};
+MATERI_ORDER.forEach(m=>materiPool[m]=[]);
+Q.forEach(q=>{
+  let m=materiSoal(q);
+  if(m==="Berpikir Komputasional")m="Dasar Berpikir Komputasional";
+  if(materiPool[m]) materiPool[m].push(q);
+});
+
+let materiIndex=0;
+let materiPos=0;
+let materiTerakhir="";
+let soalMateriCount=0;
+
+function materiAktif(){
+  // Cari materi berikutnya yang masih mempunyai soal.
+  for(let n=0;n<MATERI_ORDER.length;n++){
+    const idx=(materiIndex+n)%MATERI_ORDER.length;
+    const m=MATERI_ORDER[idx];
+    const pool=materiPool[m]||[];
+    const masihAda=pool.some(q=>!S.used.has(qkey(q[0])));
+    if(masihAda){
+      materiIndex=idx;
+      return m;
+    }
   }
   return null;
 }
+
+function ask(){
+  let m=materiAktif();
+  if(!m)return null;
+
+  const pool=materiPool[m];
+  let q=null;
+
+  // Ambil soal berikutnya secara berurutan dari materi aktif.
+  while(materiPos<pool.length){
+    const candidate=pool[materiPos++];
+    const key=qkey(candidate[0]);
+    if(S.used.has(key))continue;
+    q=candidate;
+    break;
+  }
+
+  // Jika materi aktif habis, pindah ke materi berikutnya.
+  if(!q){
+    materiIndex=(materiIndex+1)%MATERI_ORDER.length;
+    materiPos=0;
+    soalMateriCount=0;
+    return ask();
+  }
+
+  const idx=q[1].map((_,i)=>i);
+  // Pilihan jawaban tetap diacak seperti fitur sebelumnya.
+  for(let i=idx.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [idx[i],idx[j]]=[idx[j],idx[i]];
+  }
+
+  S.used.add(qkey(q[0]));
+  S.appeared.push(q[0]);
+  materiTerakhir=m;
+  soalMateriCount++;
+
+  // Setelah 4 pemain mendapatkan materi yang sama, pindah materi.
+  if(soalMateriCount>=4){
+    materiIndex=(materiIndex+1)%MATERI_ORDER.length;
+    materiPos=0;
+    soalMateriCount=0;
+  }
+
+  return{
+    q:q[0],
+    o:idx.map(i=>q[1][i]),
+    a:idx.indexOf(q[2]),
+    id:q[3],
+    materi:m
+  };
+}
+
 const FB_OK=["Mantap! Jawabanmu tepat. Terus pertahankan ketelitianmu!","Hebat! Logikamu berhasil menemukan jalan yang benar.","Keren! Satu jawaban benar membuat timmu semakin dekat ke tujuan.","Luar biasa! Fokusmu menghasilkan jawaban yang tepat.","Brilian! Kamu berhasil membaca soal dengan cermat.","Bagus sekali! Cara berpikirmu semakin tajam.","Yes! Strategimu berhasil pada soal ini.","Top! Kamu menunjukkan pemahaman yang kuat.","Fantastis! Tim kamu semakin kompak dan percaya diri.","Jitu! Pilihanmu tepat dan penuh perhitungan.","Hebat! Ketelitian kecil menghasilkan langkah besar.","Mantap! Kamu berhasil menggunakan logika dengan baik.","Keren! Jangan kehilangan fokus sampai garis akhir.","Luar biasa! Satu poin lagi menuju kemenangan.","Bagus! Kepercayaan dirimu terbukti lewat jawaban ini.","Brilian! Kamu mampu menghubungkan petunjuk dengan tepat.","Mantap! Otakmu bekerja cepat dan terarah.","Hebat! Jawaban tepat, strategi juga hebat.","Keren! Pertahankan ritme belajar seperti ini.","Yes! Kamu berhasil melewati tantangan berikutnya.","Fantastis! Ketepatanmu membuat pion melaju.","Bagus sekali! Kamu semakin menguasai berpikir komputasional.","Jago! Kamu tidak terburu-buru dan hasilnya tepat.","Hebat! Analisis yang baik menghasilkan keputusan yang baik.","Mantap! Kerja sama timmu menghasilkan jawaban yang solid.","Keren! Kamu berhasil melihat inti masalahnya.","Luar biasa! Satu tantangan berhasil ditaklukkan.","Brilian! Pilihanmu menunjukkan pemikiran yang sistematis.","Bagus! Terus gunakan logika dan ketelitianmu.","Yes! Jawaban tepat, semangat tetap naik!","Mantap! Kamu membuat langkah yang cerdas.","Hebat! Pemahamanmu terlihat dari pilihan yang tepat.","Keren! Tim kamu sedang berada di jalur yang bagus.","Fantastis! Fokus, analisis, lalu berhasil.","Jitu! Kamu menemukan jawaban yang paling sesuai.","Bagus sekali! Jangan berhenti belajar setelah satu keberhasilan.","Luar biasa! Ketekunanmu mulai membuahkan hasil.","Mantap! Kamu berhasil mengubah tantangan menjadi poin.","Hebat! Cara berpikirmu makin terlatih.","Keren! Jawabanmu menunjukkan perhatian pada detail.","Brilian! Kamu berhasil memecahkan tantangan ini.","Yes! Satu langkah maju sudah kamu dapatkan.","Bagus! Pertahankan konsentrasi untuk soal berikutnya.","Fantastis! Tim kamu makin dekat dengan finish.","Mantap! Keputusan yang tepat membawa hasil yang tepat.","Hebat! Kamu berhasil memanfaatkan petunjuk soal.","Keren! Logika dan ketelitianmu berpadu dengan baik.","Luar biasa! Kamu menunjukkan semangat juara.","Jitu! Tidak hanya cepat, tetapi juga tepat.","Bagus sekali! Kamu semakin percaya diri menghadapi soal.","Brilian! Jawaban ini lahir dari analisis yang baik.","Mantap! Teruskan pola berpikir positif ini.","Hebat! Tim kamu berhasil melewati rintangan.","Keren! Satu jawaban benar menjadi energi untuk tantangan berikutnya.","Fantastis! Kamu semakin dekat dengan tujuan permainan.","Yes! Kerja kerasmu menghasilkan jawaban yang tepat.","Bagus! Kamu berhasil menjaga fokus di tengah permainan.","Luar biasa! Pemikiran sistematismu bekerja dengan baik.","Mantap! Kamu menunjukkan bahwa belajar bisa menyenangkan.","Hebat! Jawaban tepat adalah bukti latihanmu.","Keren! Jangan berhenti mengasah kemampuan berpikirmu.","Brilian! Kamu berhasil membuat keputusan yang cerdas.","Fantastis! Pion maju karena jawabanmu tepat.","Bagus sekali! Kamu semakin siap menghadapi soal sulit.","Mantap! Tetap kompak dan pertahankan strategi tim.","Hebat! Kamu berhasil menaklukkan soal ini dengan tenang.","Keren! Ketelitianmu memberikan hasil yang maksimal.","Yes! Semangatmu sejalan dengan hasil yang hebat.","Luar biasa! Kamu berhasil menemukan solusi yang tepat.","Brilian! Terus jadikan setiap soal sebagai latihan berpikir.","Bagus! Kamu membuktikan bahwa fokus membawa hasil.","Mantap! Satu soal selesai, satu kemampuan bertambah.","Hebat! Strategi yang matang menghasilkan poin.","Keren! Kamu semakin dekat dengan kemenangan tim.","Fantastis! Tetap rendah hati dan lanjutkan perjuangan.","Jitu! Analisis singkatmu menghasilkan keputusan tepat.","Luar biasa! Kamu berhasil menjaga kualitas jawaban.","Mantap! Setiap jawaban benar adalah bukti perkembanganmu.","Hebat! Terus belajar, terus bermain, terus berkembang.","Keren! Pion melaju karena kerja keras timmu."];
 const FB_NO=["Belum tepat. Tidak apa-apa, jadikan soal ini sebagai bahan belajar.","Tetap semangat! Kesalahan ini bisa menjadi petunjuk untuk soal berikutnya.","Jangan menyerah. Coba pahami kembali alasan di balik jawabannya.","Tenang! Satu jawaban salah tidak menentukan hasil akhir permainan.","Ayo bangkit! Evaluasi pilihanmu dan lanjutkan dengan percaya diri.","Belum berhasil kali ini. Kamu masih punya banyak kesempatan untuk belajar.","Tidak masalah! Kesalahan adalah bagian dari proses menjadi lebih pintar.","Tetap fokus. Cari kata kunci pada soal berikutnya.","Semangat! Gunakan pengalaman ini untuk membuat keputusan yang lebih baik.","Jangan berkecil hati. Tim yang hebat juga belajar dari kesalahan.","Tarik napas dan lanjutkan. Tantangan berikutnya masih menunggu.","Belum tepat, tetapi kamu sudah berani mencoba. Itu penting!","Ayo perbaiki strategi. Baca soal lebih teliti pada kesempatan berikutnya.","Kesalahan ini bukan akhir. Jadikan ia guru untuk langkah berikutnya.","Tetap percaya diri! Kamu bisa mengejar poin pada soal selanjutnya.","Tidak apa-apa jika belum tepat. Yang penting terus berpikir dan belajar.","Ayo bangkit! Setiap kesalahan membawa informasi baru.","Fokus kembali. Pelajari kunci jawabannya dan lanjutkan permainan.","Belum tepat kali ini. Jangan biarkan satu soal menurunkan semangatmu.","Semangat terus! Pion mungkin berhenti, tetapi kemampuanmu terus berkembang.","Coba lagi dengan strategi berbeda pada soal berikutnya.","Kesalahan adalah kesempatan untuk memahami konsep lebih dalam.","Tetap kompak! Diskusikan logikanya bersama tim.","Jangan terburu-buru pada soal berikutnya. Baca setiap pilihan dengan teliti.","Belum berhasil. Namun kamu sekarang tahu satu hal yang perlu diperbaiki.","Ayo lanjut! Perjalanan menuju finish masih panjang.","Tetap tenang. Jawaban yang tepat sering ditemukan setelah membaca dengan cermat.","Jangan menyerah! Satu kesalahan tidak menghapus semua usaha tim.","Gunakan kunci jawaban ini untuk belajar, bukan sekadar mengingat.","Belum tepat. Jadikan momen ini latihan untuk berpikir lebih sistematis.","Semangat! Kesempatan mendapatkan jawaban benar masih banyak.","Ayo fokus lagi. Kamu bisa tampil lebih baik di soal berikutnya.","Kesalahan ini bisa menjadi langkah menuju pemahaman yang lebih kuat.","Tetap positif! Yang penting kamu terus berani mencoba.","Belum tepat, tetapi perjalanan belajar tetap berjalan.","Cermati petunjuk soal berikutnya dan jangan takut mencoba lagi.","Ayo susun strategi baru. Tim kamu masih punya peluang besar.","Tidak perlu kecewa. Evaluasi, belajar, lalu lanjutkan permainan.","Semangat! Setiap soal yang kamu hadapi melatih kemampuanmu.","Belum tepat. Gunakan pengalaman ini untuk memperbaiki pola berpikirmu.","Tetap percaya diri. Satu kesalahan tidak menentukan kemampuanmu.","Ayo bangkit! Soal berikutnya bisa menjadi kesempatan untuk membalas poin.","Jangan menyerah. Fokus pada konsep, bukan pada kesalahannya.","Belum tepat kali ini. Tetap kompak dan saling membantu.","Tarik napas, baca ulang, dan siapkan strategi berikutnya.","Kesalahan ini memberi kamu petunjuk penting untuk belajar.","Tetap semangat! Kemenangan masih bisa dikejar.","Ayo lanjutkan perjuangan. Kamu tidak harus sempurna untuk berkembang.","Belum tepat, tetapi keberanianmu mencoba patut diapresiasi.","Jadikan jawaban yang benar sebagai pengetahuan baru.","Fokus kembali dan percaya pada proses belajarmu.","Semangat! Setiap tantangan membuat kemampuanmu semakin kuat.","Jangan berhenti hanya karena satu jawaban keliru.","Ayo perbaiki satu hal dari soal ini untuk soal berikutnya.","Belum tepat. Sekarang kamu punya pengalaman baru untuk digunakan.","Tetap tenang dan jangan kehilangan konsentrasi.","Tim hebat bukan tim yang selalu benar, tetapi tim yang mau belajar.","Ayo coba lebih teliti pada kata-kata penting di soal berikutnya.","Kesalahan hari ini bisa menjadi jawaban benar di kesempatan berikutnya.","Tetap maju! Pion boleh diam, semangatmu jangan.","Belum tepat, tetapi kamu semakin mengenal cara kerja soal.","Gunakan kesempatan berikutnya untuk menerapkan pelajaran ini.","Jangan takut salah. Takutlah jika berhenti belajar.","Ayo bangkit dan tunjukkan kemampuanmu pada soal berikutnya.","Tetap kompak, tetap fokus, dan tetap percaya diri.","Satu kesalahan sudah berlalu. Sekarang waktunya menatap tantangan berikutnya.","Belum tepat. Jadikan ini latihan untuk memperkuat logikamu.","Semangat! Masih banyak jalan untuk mengumpulkan poin.","Ayo lanjut. Pengalaman ini akan membuatmu lebih teliti.","Jangan menyerah. Kamu sedang membangun kemampuan sedikit demi sedikit.","Belum berhasil sekarang, tetapi peluang berikutnya tetap terbuka.","Tetap belajar dari setiap jawaban yang muncul.","Ayo gunakan kesalahan ini sebagai bekal strategi baru.","Tenang dan percaya diri. Soal berikutnya adalah kesempatan baru.","Semangat! Perjalanan menuju finish belum selesai.","Kamu masih bisa mengejar. Tetap fokus bersama tim.","Belum tepat. Terus latih kemampuan membaca dan menganalisis soal.","Ayo bangkit! Setiap langkah tetap membawa pengalaman.","Tetap positif. Belajar dari kesalahan adalah tanda perkembangan.","Jangan menyerah sampai permainan benar-benar selesai."];
 const feedbackBag={ok:[],no:[]};
@@ -518,7 +653,7 @@ function after(){
   next();
 }
 function question(){const i=S.cur,p=S.pos[i][S.activePawn],lv=p<19?0:p<38?1:2,it=ask();if(!it){S.left=0;msg("Seluruh 854 soal unik telah digunakan.");fin2([...S.fin,...[0,1,2,3].filter(j=>!S.fin.includes(j)).sort((a,b)=>S.ok[b]-S.ok[a])]);return}
-show(it,60,`${G[i].n} <span class="lv">Soal berikutnya</span>`,(sel,t)=>{const ok=sel===it.a,st=t<=5?6:t<=10?5:t<=20?4:t<=30?3:t<=45?2:1;S.h[i].push({q:it.q,o:it.o,sel,a:it.a,ok,t,lv:LV[lv]});if(ok)S.ok[i]++;
+show(it,60,`${G[i].n} <span class="lv">Soal berikutnya</span>`,(sel,t)=>{const ok=sel===it.a,st=t<=5?6:t<=10?5:t<=20?4:t<=30?3:t<=45?2:1;S.h[i].push({q:it.q,o:it.o,sel,a:it.a,ok,t,lv:LV[lv],materi:it.materi||""});if(ok)S.ok[i]++;
 document.querySelectorAll(".opt").forEach((b,k)=>{if(ok&&k===it.a)b.classList.add("ok");else if(!ok&&k===sel)b.classList.add("no");});if(ok){sfxCorrect();$("bx").classList.add("boardPulse");setTimeout(()=>$("bx").classList.remove("boardPulse"),700)}else sfxWrong();
 const fb=feedback(ok?"ok":"no");
 $("go").outerHTML=`<div class="answer-feedback ${ok?"ok":"no"}"><span class="feedback-icon">${ok?"🎉":"💪"}</span><div class="mot-label"> </div><div class="feedback-text">${esc(fb)}</div><div class="feedback-sub">${ok?"✅ JAWABAN BENAR! Pion maju.":"❌ "+(sel===null?"WAKTU HABIS":"JAWABAN SALAH")+"! Pion tetap di tempat."}${!ok?`<br>💡 Kunci: <b>${esc(it.o[it.a])}</b>`:""}</div></div><button class="btn nx-btn">${ok?"🚀 LANJUTKAN":"👉 COBA LAGI DI SOAL BERIKUTNYA"}</button>`;
