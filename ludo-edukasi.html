@@ -422,15 +422,14 @@ function fin2(o){
 }
 
 function review(t){modal(`<h2>Mode review</h2><div class="tabs">`+G.map((g,i)=>`<button class="${i==t?"a":""}" onclick="review(${i})">${g.n} (${S.ok[i]} benar · ${S.h[i].filter(x=>!x.ok).length} salah)</button>`).join("")+`</div>`+(S.h[t].map((x,n)=>`<div class="rv ${x.ok?"ok":"no"}"><b>${n+1}. ${esc(x.q)}</b><br>Jawaban kelompok: ${x.sel===null?"(waktu habis)":esc(x.o[x.sel])}<br>Kunci: ${esc(x.o[x.a])} · ${Math.round(x.t)} detik</div>`).join("")||"<p>Belum ada jawaban.</p>")+`<button class="btn" onclick="fin2([...S.fin,...[0,1,2,3].filter(i=>!S.fin.includes(i)).sort((a,b)=>S.ok[b]-S.ok[a])])">⬅ Kembali</button>`)}
-draw();modal(`<h2>📖 PANDUAN BERMAIN</h2><p class="note">
-<b>1. Pilih Pion</b><br>Pilih <b>Pion 1</b> atau <b>Pion 2</b>.<br><br>
-<b>2. Lempar Dadu</b><br>Tekan <b>Dadu</b> untuk mendapatkan <b>1 soal</b>.<br><br>
-<b>3. Jawab Soal</b><br>Pilih jawaban, lalu tekan <b>JAWAB SEKARANG</b>. Waktu menjawab <b>60 detik</b>.<br><br>
-<b>4. Jawab dengan Cepat</b><br>Jawaban benar membuat pion bergerak. Semakin cepat menjawab dengan benar, semakin jauh pion bergerak.<br><br>
-<b>5. Jawaban Salah</b><br>Jawaban salah membuat pion tetap di tempat. Tidak ada soal tambahan dari lemparan yang sama.<br><br>
-<b>6. Tabrak Lawan</b><br>Jika pion berhenti di petak lawan, pion lawan mundur <b>2 langkah</b>, kecuali di petak bintang dan petak mulai.<br><br>
-<b>7. Raih Juara</b><br>Selesaikan <b>kedua pion</b> untuk mendapatkan peringkat. 🏆<br><br>
-<b>8. Soal Tidak Berulang</b><br>Soal diacak dan tidak akan muncul lagi dalam satu permainan.<br><br>
-<b>9. Soal Rebutan</b><br>Soal rebutan muncul secara otomatis jika diperlukan.
+draw();modal(`<h2>📖 PANDUAN BERMAIN</h2><p class="note"><b>1. Tekan Dadu untuk mendapatkan soal.</b><br><br>
+<b>2. Jawab Soal</b><br>Pilih jawaban, lalu tekan <b>JAWAB SEKARANG</b>. Waktu menjawab <b>60 detik</b> dimulai ketika soal sudah dibuka.<br><br>
+<b>3. Jawab dengan Cepat</b><br>Jawaban benar membuat pion bergerak. Semakin cepat menjawab dengan benar, semakin jauh pion bergerak.<br><br>
+<b>4. Jawaban Salah</b><br>Jawaban salah membuat pion tetap di tempat. Tidak ada soal tambahan dari lemparan yang sama.<br><br>
+<b>5. Tabrak Lawan</b><br>Jika pion berhenti di petak yang sudah ditempati oleh pion lawan, pion lawan tersebut akan mundur <b>1 langkah</b>.<br><br>
+<b>6. Soal Rebutan</b><br>Soal rebutan muncul secara otomatis jika diperlukan.
+</p><button class="btn" onclick="modal('');ac()">MENGERTI ðŸ‘</button>`);
+</script></body></html>
+
 </p><button class="btn" onclick="modal('');ac()">MENGERTI 👍</button>`);
 </script></body></html>
