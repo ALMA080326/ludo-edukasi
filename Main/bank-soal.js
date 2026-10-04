@@ -1,6 +1,6 @@
 /*
  * BANK SOAL TERPISAH — LUDO EDUKASI
- * Sumber: Bank_Soal_Informatika_SMA_X_1000_FINAL_FILTERED.xlsx
+ * Sumber: Pembagian_1000_Soal_4_Tim_10_Siswa_Seimbang_Materi.xlsx
  * 1.000 soal: 250 Algoritma, 250 Dekomposisi, 250 Abstraksi, 250 Pengenalan Pola.
  * FORMAT: [pertanyaan, [A,B,C,D], indexKunci(0-3), nomor, materi]
  *
