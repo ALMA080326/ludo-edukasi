@@ -766,3 +766,143 @@ body{padding:clamp(8px,1.2vw,14px)}
   #dice{width:104px!important;height:104px!important}
   .dice-dock-help{display:none}
 }
+
+
+/* ===== V10.4 — STUDENT PHOTO ONLY IN HERO =====
+   Foto siswa menjadi bagian dari hero utama. Kartu foto samping dihapus dari layar permainan.
+*/
+.student-card,.student-side-img,.student-caption{display:none!important}
+.hero{position:relative;overflow:hidden}
+.hero-img{z-index:2;pointer-events:none}
+@media(min-width:901px){
+  .hero-img{width:min(39%,430px);right:2%;bottom:0;max-height:108%;object-fit:contain;object-position:right bottom}
+  .hero-copy{max-width:58%}
+}
+@media(max-width:900px){
+  .hero-img{right:-2%;bottom:-2%;width:56%;max-height:108%;object-fit:contain;object-position:right bottom}
+  .hero-copy{max-width:57%}
+}
+@media(max-width:620px){
+  .hero-img{right:-5%;bottom:-4%;width:64%;max-height:112%}
+  .hero-copy{max-width:58%}
+}
+@media(max-width:380px){
+  .hero-img{right:-8%;bottom:-5%;width:66%;max-height:112%}
+  .hero-copy{max-width:60%}
+}
+
+
+/* ===== V10.5 — CLASS HERO + KELAS KITA ===== */
+.hero{position:relative;overflow:hidden}
+.hero-class-img{
+  width:min(56%,680px)!important;height:100%!important;max-height:none!important;
+  right:0!important;bottom:0!important;object-fit:cover!important;object-position:center center!important;
+  border-radius:0 24px 24px 0;filter:none!important;z-index:1!important;
+}
+.hero:before{z-index:0!important}
+.hero:after{z-index:3!important;right:35%;color:#fff;text-shadow:0 1px 6px #24506b55}
+.hero-copy{z-index:4!important}
+.hero-class-img{
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 15%,#000 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 15%,#000 100%);
+}
+.class-card{padding:12px;overflow:hidden}
+.class-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.class-card-head h3{margin:0!important;font-size:14px!important}
+.class-card-head span{font-size:9px;color:#5b7892;font-weight:800;white-space:nowrap}
+.class-card-body{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;align-items:center}
+.class-card-img{width:92px;height:72px;object-fit:cover;object-position:center;border-radius:13px;border:2px solid #fff;box-shadow:0 7px 16px #2b6b9120}
+.class-card-copy b{display:block;font-size:12px;color:#1f5e8e;line-height:1.25}
+.class-card-copy p{margin:4px 0 0;font-size:10px;line-height:1.35;color:#5a7891}
+.side .score-card{display:none!important}
+@media(max-width:900px){
+  .hero-class-img{width:58%!important;border-radius:0 20px 20px 0}
+}
+@media(max-width:620px){
+  .hero-class-img{width:55%!important;right:-1%!important;object-position:center center!important;border-radius:0 18px 18px 0}
+  .class-card-body{grid-template-columns:78px minmax(0,1fr);gap:9px}
+  .class-card-img{width:78px;height:62px}
+  .class-card-head span{font-size:8px}
+  .class-card-copy b{font-size:11px}
+  .class-card-copy p{font-size:9px}
+}
+@media(max-width:380px){
+  .hero-class-img{width:57%!important}
+  .class-card{padding:10px}
+  .class-card-img{width:72px;height:58px}
+  .class-card-copy p{display:none}
+}
+
+/* ===== V10.6 — THREE PHOTO COMPOSITION =====
+   Foto kelas = Hero utama.
+   Foto 3 siswa + buku = Kelas Kita.
+   Foto 3 siswa + piala = Tantangan Kelas.
+   Tidak membalik foto; komposisi diatur melalui crop/object-position.
+*/
+.hero-class-img{object-position:center center!important}
+.photo-pair{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(8px,1vw,12px);
+  min-width:0;
+}
+.photo-mini-card{
+  min-width:0;
+  padding:10px!important;
+  overflow:hidden;
+}
+.photo-mini-card .class-card-head{
+  display:block;
+  margin-bottom:7px;
+}
+.photo-mini-card .class-card-head h3{
+  font-size:12px!important;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.photo-mini-card .class-card-head span{
+  display:block;
+  margin-top:2px;
+  font-size:8px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.photo-mini-card .class-card-body{
+  display:block;
+}
+.photo-mini-card .class-card-img{
+  width:100%;
+  height:86px;
+  display:block;
+  object-fit:cover;
+  object-position:center 35%;
+  border-radius:12px;
+}
+.photo-mini-card .class-card-copy b{
+  margin-top:7px;
+  font-size:10px;
+}
+.photo-mini-card .class-card-copy p{
+  margin-top:3px;
+  font-size:8px;
+  line-height:1.3;
+}
+.challenge-card .challenge-img{
+  object-position:center 34%;
+}
+.side .class-card{display:block!important}
+.side .score-card{display:none!important}
+@media(max-width:620px){
+  .photo-pair{gap:8px}
+  .photo-mini-card{padding:9px!important}
+  .photo-mini-card .class-card-img{height:82px}
+  .photo-mini-card .class-card-copy b{font-size:9px}
+  .photo-mini-card .class-card-copy p{font-size:8px}
+}
+@media(max-width:380px){
+  .photo-mini-card{padding:8px!important}
+  .photo-mini-card .class-card-img{height:72px}
+  .photo-mini-card .class-card-copy p{display:none}
+}
