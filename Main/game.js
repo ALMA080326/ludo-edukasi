@@ -14,7 +14,10 @@ const HC={red:[[7,1],[7,2],[7,3],[7,4],[7,5]],blue:[[1,7],[2,7],[3,7],[4,7],[5,7
 // Jalur akhir mengikuti warna kelompok dan posisi rumah: BIRU→BIRU, MERAH→MERAH, HIJAU→HIJAU, KUNING→KUNING.
 const G=[{n:"Kelompok 1",c:"#1f6fc5",k:"blue",s:13,y:[0,9]},{n:"Kelompok 2",c:"#e8272b",k:"red",s:0,y:[0,0]},{n:"Kelompok 3",c:"#13a84a",k:"green",s:39,y:[9,0]},{n:"Kelompok 4",c:"#ffd800",k:"yellow",s:26,y:[9,9]}];
 const SAFE=new Set([0,8,13,21,26,34,39,47]),STAR=new Set([8,21,34,47]),LV=["Mudah","Sedang","Sulit"],RUB=[100,90,80,70];
-const S={pos:[[0],[0],[0],[0]],activePawn:0,ok:[0,0,0,0],pts:[0,0,0,0],h:[[],[],[],[]],cur:0,fin:[],used:new Set(),skipQ:[],swapLeft:2,cycle:0,curKey:"",appeared:[],tk:new Set(),quotes:[],left:0,info:"",busy:false,mute:false,over:false,stepFx:false};
+const S={pos:[[0],[0],[0],[0]],activePawn:0,ok:[0,0,0,0],pts:[0,0,0,0],streak:[0,0,0,0],bestStreak:[0,0,0,0],h:[[],[],[],[]],cur:0,fin:[],used:new Set(),skipQ:[],swapLeft:2,cycle:0,curKey:"",appeared:[],tk:new Set(),quotes:[],left:0,info:"",busy:false,mute:false,over:false,stepFx:false};
+const POINT_PER_STEP=100;
+const WRONG_PENALTY=10;
+const REBUTAN_CORRECT_POINTS=100;
 
 // Hapus soal ganda (teks sama persis) di semua level & soal rebutan.
 
@@ -171,6 +174,9 @@ function updateDashboard(){
        <div class="activity-item"><div class="activity-icon">📚</div><div><b>${total} soal sudah dikerjakan.</b><small>${correct} benar dan ${wrong} salah berdasarkan jawaban yang tercatat.</small></div></div>
        <div class="activity-item"><div class="activity-icon">🏁</div><div><b>${S.fin.length} kelompok sudah finish.</b><small>Posisi pion dan status finish mengikuti permainan aktif.</small></div></div>`;
 
+  const rank=[0,1,2,3].sort((a,b)=>S.pts[b]-S.pts[a]);
+  if(!S.over) al.innerHTML += `<div class="activity-item"><div class="activity-icon">🏆</div><div><b>Peringkat sementara</b><small>${rank.map((i,n)=>`${n+1}. ${G[i].n} — ${S.pts[i]} poin`).join(" · ")}</small></div></div>`;
+
   const scores=G.map((g,i)=>({i,total:(S.h[i]||[]).length,ok:S.ok[i]}));
   const byFast=[...scores].filter(x=>x.total).sort((a,b)=>{
     const ta=(S.h[a.i]||[]).reduce((m,x)=>m+x.t,0)/a.total, tb=(S.h[b.i]||[]).reduce((m,x)=>m+x.t,0)/b.total;
@@ -182,14 +188,13 @@ function updateDashboard(){
     ["⚡","Paling Cepat",byFast?G[byFast.i].n:"Belum ada data"],
     ["🧠","Paling Banyak Benar",byCorrect&&byCorrect.ok?G[byCorrect.i].n:"Belum ada data"],
     ["🎯","Paling Konsisten",byCons?G[byCons.i].n:"Belum ada data"],
-    ["🔥","Streak Terpanjang", "Lihat progres jawaban"]
+    ["🔥","Streak Terpanjang", (()=>{const mx=Math.max(...S.bestStreak);if(!mx)return "Belum ada data";const gi=S.bestStreak.indexOf(mx);return `${G[gi].n} · ${mx} benar beruntun`;})()]
   ];
   const ag=$("achievementGrid");if(ag)ag.innerHTML=achievements.map(x=>`<div class="achievement-card"><div class="ach-icon">${x[0]}</div><b>${x[1]}</b><span>${x[2]}</span></div>`).join("");
   const streak=$("streakText");
   if(streak){
-    let best=0;
-    G.forEach((_,i)=>{let n=0;(S.h[i]||[]).forEach(x=>{n=x.ok?n+1:0;best=Math.max(best,n)})});
-    streak.textContent=best?`Streak terbaik saat ini: ${best} jawaban benar berturut-turut.`:"Belum ada jawaban benar beruntun.";
+    const best=Math.max(...S.bestStreak);
+    if(best){const gi=S.bestStreak.indexOf(best);streak.textContent=`${G[gi].n} memimpin dengan ${best} jawaban benar berturut-turut.`;}else streak.textContent="Belum ada jawaban benar beruntun.";
   }
 }
 
@@ -478,7 +483,7 @@ function after(){
   next();
 }
 function question(itIn){const i=S.cur,p=S.pos[i][S.activePawn],lv=p<19?0:p<38?1:2,it=itIn||ask();if(!it){S.left=0;msg("Seluruh "+Q.length+" soal unik telah digunakan.");fin2([...S.fin,...[0,1,2,3].filter(j=>!S.fin.includes(j)).sort((a,b)=>S.ok[b]-S.ok[a])]);return}
-show(it,60,`${G[i].n} <span class="lv">Soal berikutnya</span>`,(sel,t)=>{const ok=sel===it.a,st=t<=5?6:t<=10?5:t<=20?4:t<=30?3:t<=45?2:1;S.h[i].push({q:it.q,o:it.o,sel,a:it.a,ok,t,lv:LV[lv],materi:it.materi||""});if(ok)S.ok[i]++;
+show(it,60,`${G[i].n} <span class="lv">Soal berikutnya</span>`,(sel,t)=>{const ok=sel===it.a,st=t<=5?6:t<=10?5:t<=20?4:t<=30?3:t<=45?2:1;S.h[i].push({q:it.q,o:it.o,sel,a:it.a,ok,t,lv:LV[lv],materi:it.materi||""});if(ok){S.ok[i]++;S.streak[i]++;S.bestStreak[i]=Math.max(S.bestStreak[i],S.streak[i]);}else{S.streak[i]=0;S.pts[i]-=WRONG_PENALTY;}
 document.querySelectorAll(".opt").forEach((b,k)=>{if(ok&&k===it.a)b.classList.add("ok");else if(!ok&&k===sel)b.classList.add("no");});if(ok){sfxCorrect();$("bx").classList.add("boardPulse");setTimeout(()=>$("bx").classList.remove("boardPulse"),700)}else sfxWrong();
 const fb=feedback(ok?"ok":"no");
 $("go").outerHTML=`<div class="answer-feedback ${ok?"ok":"no"}"><span class="feedback-icon">${ok?"🎉":"💪"}</span><div class="mot-label"> </div><div class="feedback-text">${esc(fb)}</div><div class="feedback-sub">${ok?"✅ JAWABAN BENAR! Pion maju.":"❌ "+(sel===null?"WAKTU HABIS":"JAWABAN SALAH")+"! Pion tetap di tempat."}</div></div><button class="btn nx-btn">${ok?"🚀 LANJUTKAN":"👉 COBA LAGI DI SOAL BERIKUTNYA"}</button>`;
@@ -488,7 +493,9 @@ function msg(t){$("msg").textContent=t}
 function move(i,st,cb){
   let k=0;
   const iv=setInterval(()=>{
-    S.pos[i][S.activePawn]=Math.min(56,S.pos[i][S.activePawn]+1);
+    const before=S.pos[i][S.activePawn];
+    S.pos[i][S.activePawn]=Math.min(56,before+1);
+    if(S.pos[i][S.activePawn]>before) S.pts[i]+=POINT_PER_STEP;
     S.stepFx=true;
     sfxPawn();
     draw();
@@ -532,7 +539,7 @@ function land(i){const pawn=0,p=S.pos[i][pawn];if(p===56){if(pawnReady(i)&&!S.fi
 if(p>0&&p<=50){const x=(G[i].s+p)%52;if(!SAFE.has(x))G.forEach((g,j)=>{if(j===i)return;const v=S.pos[j][0];if(v>0&&v<=50&&(g.s+v)%52===x){S.pos[j][0]=Math.max(0,v-1);msg(`💥 ${G[i].n} menabrak pion ${g.n}: mundur 1 langkah!`)}})}draw()}
 function next(){if(S.fin.length>=2)return endGame();let n=S.cur;do n=(n+1)%4;while(S.fin.includes(n));S.cur=n;S.activePawn=0;S.busy=false;draw()}
 function endGame(){S.busy=true;const r=[0,1,2,3].filter(i=>!S.fin.includes(i)).sort((a,b)=>S.ok[b]-S.ok[a]);if(S.ok[r[0]]==S.ok[r[1]])return tie(r);fin2([...S.fin,...r])}
-function tie(r,round=0){const it=ask();if(!it){return fin2([...S.fin,...r])}const res=[];const go=k=>{if(k>1)return judge();const item=k===0?it:ask();if(!item)return fin2([...S.fin,...r]);show(item,30,`🔥 SOAL REBUTAN - PENENTU JUARA<br>${G[r[k]].n} (${k+1}/2)`,(sel,t)=>{const ok=sel===item.a;S.h[r[k]].push({q:item.q,o:item.o,sel,a:item.a,ok,t,lv:"Rebutan"});res.push({ok,t});modal(`<div class="pse">${G[r[k]].n} sudah menjawab.</div><button class="btn nx-btn">${k<1?"Lanjut ke kelompok berikutnya 👉":"Lihat hasil 👉"}</button>`);document.querySelector("#bx .nx-btn").onclick=()=>go(k+1)})};
+function tie(r,round=0){const it=ask();if(!it){return fin2([...S.fin,...r])}const res=[];const go=k=>{if(k>1)return judge();const item=k===0?it:ask();if(!item)return fin2([...S.fin,...r]);show(item,30,`🔥 SOAL REBUTAN - PENENTU JUARA<br>${G[r[k]].n} (${k+1}/2)`,(sel,t)=>{const ok=sel===item.a;S.h[r[k]].push({q:item.q,o:item.o,sel,a:item.a,ok,t,lv:"Rebutan"});if(ok){S.pts[r[k]]+=REBUTAN_CORRECT_POINTS;S.streak[r[k]]++;S.bestStreak[r[k]]=Math.max(S.bestStreak[r[k]],S.streak[r[k]]);}else{S.pts[r[k]]-=WRONG_PENALTY;S.streak[r[k]]=0;}res.push({ok,t});modal(`<div class="pse">${G[r[k]].n} sudah menjawab.</div><button class="btn nx-btn">${k<1?"Lanjut ke kelompok berikutnya 👉":"Lihat hasil 👉"}</button>`);document.querySelector("#bx .nx-btn").onclick=()=>go(k+1)})};
 const judge=()=>{const[a,b]=res;let w=-1;if(a.ok&&!b.ok)w=0;else if(b.ok&&!a.ok)w=1;else if(a.ok&&b.ok)w=a.t<=b.t?0:1;if(w<0){
   modal(`<div class="pse">Keduanya belum menjawab dengan benar.</div><div class="note">Tidak ada soal tambahan. Peringkat ditentukan berdasarkan urutan kelompok pada babak rebutan.</div><button class="btn nx-btn">Lihat hasil 👉</button>`);
   document.querySelector("#bx .nx-btn").onclick=()=>fin2([...S.fin,r[0],r[1]]);
@@ -551,7 +558,7 @@ function reportData(i){const h=S.h[i]||[],m={"Dekomposisi":{ok:0,n:0},"Abstraksi
   const total=h.length,ok=h.filter(x=>x.ok).length,acc=total?Math.round(ok/total*100):0;
   const sorted=[...topics].sort((a,b)=>b.acc-a.acc||b.n-a.n);
   return{total,ok,bad:total-ok,acc,topics,best:sorted[0]||null,weak:sorted[sorted.length-1]||null};}
-function reportCard(i){const d=reportData(i),full=S.fin.includes(i);const best=d.best?`${d.best.name} (${d.best.acc}%)`:"Belum cukup data";const weak=d.weak?`${d.weak.name} (${d.weak.acc}%)`:"Belum cukup data";return `<div class="report-team ${full?"full":""}"><h4><span style="background:${G[i].c};color:#fff">${G[i].n}</span><span>${full?"🏁 FINISH":"🎮 BERMAIN"}</span></h4><div class="report-bars"><i style="width:${d.acc}%"></i></div><div class="report-stats"><div class="report-stat"><b>${d.ok}</b><small>Benar</small></div><div class="report-stat"><b>${d.bad}</b><small>Salah</small></div><div class="report-stat"><b>${d.acc}%</b><small>Akurasi</small></div></div><div class="mastery"><strong>Materi paling dikuasai:</strong><br>${esc(best)}</div><div class="mastery weak"><strong>Materi perlu ditingkatkan:</strong><br>${esc(weak)}</div></div>`}
+function reportCard(i){const d=reportData(i),full=S.fin.includes(i);const best=d.best?`${d.best.name} (${d.best.acc}%)`:"Belum cukup data";const weak=d.weak?`${d.weak.name} (${d.weak.acc}%)`:"Belum cukup data";const steps=S.pos[i][0]||0;return `<div class="report-team ${full?"full":""}"><h4><span style="background:${G[i].c};color:#fff">${G[i].n}</span><span>${full?"🏁 FINISH":"🎮 BERMAIN"}</span></h4><div class="report-bars"><i style="width:${d.acc}%"></i></div><div class="report-stats"><div class="report-stat"><b>${S.pts[i]}</b><small>Poin</small></div><div class="report-stat"><b>${steps}</b><small>Langkah</small></div><div class="report-stat"><b>${d.ok}</b><small>Benar</small></div><div class="report-stat"><b>${d.bad}</b><small>Salah</small></div><div class="report-stat"><b>${d.acc}%</b><small>Akurasi</small></div><div class="report-stat"><b>🔥 ${S.bestStreak[i]}</b><small>Streak</small></div></div><div class="mastery"><strong>Materi paling dikuasai:</strong><br>${esc(best)}</div><div class="mastery weak"><strong>Materi perlu ditingkatkan:</strong><br>${esc(weak)}</div></div>`}
 function selfTest(){
   const checks=[];
   checks.push(["HTML modal",!!$("m")&&!!$("bx")]);
