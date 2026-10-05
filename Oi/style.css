@@ -640,3 +640,68 @@ body.dashboard-open .full-dashboard{display:grid!important}
   .audit-grid{grid-template-columns:repeat(2,1fr)}
 }
 
+
+/* ===== V10.2 DICE IN TURN PANEL =====
+   Dadu menjadi bagian dari kartu giliran. Papan tetap bersih,
+   kontrol tidak mengambil ruang kosong tambahan di bawah papan.
+*/
+.board-controls{display:none!important}
+.turn-card{overflow:hidden;position:relative}
+.turn-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.turn-head h3{margin-bottom:4px}
+.turn-live{flex:none;margin-top:2px;padding:5px 8px;border-radius:999px;background:#e8fff3;border:1px solid #b9efd1;color:#138653;font-size:9px;font-weight:1000;letter-spacing:.5px}
+.turn-note{margin-bottom:9px}
+.dice-dock{
+  position:relative;min-height:184px;padding:24px 12px 10px;border-radius:22px;
+  display:grid;grid-template-columns:1fr;justify-items:center;align-items:center;
+  background:linear-gradient(145deg,#e9f9ff 0%,#ffffff 52%,#eaf4ff 100%);
+  border:2px solid #fff;box-shadow:inset 0 1px 0 #fff,0 10px 24px rgba(38,91,145,.12);
+  overflow:hidden;isolation:isolate
+}
+.dice-dock:before{
+  content:"";position:absolute;left:50%;bottom:-48px;width:190px;height:95px;transform:translateX(-50%);
+  border-radius:50%;background:radial-gradient(ellipse,#7bcfff55 0%,transparent 70%);z-index:-1
+}
+.dice-dock:after{
+  content:"";position:absolute;inset:8px;border-radius:16px;border:1px solid #bfe9fa88;pointer-events:none
+}
+.dice-dock-glow{position:absolute;top:20px;left:50%;width:88px;height:34px;transform:translateX(-50%);border-radius:50%;background:#fff;filter:blur(12px);opacity:.9;pointer-events:none}
+.dice-dock-label{
+  position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:6;white-space:nowrap;
+  padding:4px 9px;border-radius:999px;background:#fff;border:1px solid #d7edf8;color:#23658f;
+  font-size:9px;font-weight:1000;letter-spacing:.45px;box-shadow:0 4px 10px rgba(38,91,145,.08)
+}
+#diceArea{
+  position:relative!important;left:auto!important;top:auto!important;width:136px!important;height:136px!important;
+  min-width:136px!important;min-height:136px!important;transform:none!important;
+  display:grid!important;place-items:center;z-index:10;pointer-events:none;container-type:size;overflow:visible
+}
+#dice{width:126px!important;height:126px!important;pointer-events:auto;position:relative;z-index:11}
+#diceBadge{bottom:-1px!important;z-index:14}
+#diceHint{top:1px!important;z-index:14;background:#ffffffed}
+.dice-dock-help{position:absolute;bottom:7px;z-index:7;font-size:9px;color:#5e7d96;font-weight:700}
+.dice-dock-help b{color:#256694}
+@media(min-width:821px){
+  .turn-card{padding-bottom:13px}
+  .dice-dock{min-height:194px}
+  #diceArea{width:142px!important;height:142px!important;min-width:142px!important;min-height:142px!important}
+  #dice{width:132px!important;height:132px!important}
+}
+@media(max-width:620px){
+  .turn-card{padding:12px}
+  .turn-head h3{font-size:14px}
+  .turn{font-size:21px}
+  .turn-live{font-size:8px;padding:4px 7px}
+  .dice-dock{min-height:166px;padding-top:21px}
+  #diceArea{width:122px!important;height:122px!important;min-width:122px!important;min-height:122px!important}
+  #dice{width:114px!important;height:114px!important}
+  .cube{--s:clamp(62px,19vw,82px)}
+  .dice-dock-label{font-size:8px;top:7px}
+  .dice-dock-help{font-size:8px;bottom:5px}
+}
+@media(max-width:380px){
+  .dice-dock{min-height:154px}
+  #diceArea{width:112px!important;height:112px!important;min-width:112px!important;min-height:112px!important}
+  #dice{width:104px!important;height:104px!important}
+  .dice-dock-help{display:none}
+}

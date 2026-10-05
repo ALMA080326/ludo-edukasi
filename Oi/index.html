@@ -24,24 +24,28 @@
     <div class="bd">
       <svg id="sv" viewBox="0 0 15 15" preserveAspectRatio="none" aria-label="Papan Ludo"></svg>
     </div>
-    <div class="board-controls" aria-label="Kontrol permainan">
-      <div id="diceArea">
-        <div id="diceHint">Klik dadu untuk melempar</div>
-        <button id="dice" onclick="roll()" aria-label="Lempar dadu untuk mendapatkan satu soal"><div class="shadow3d" id="dshadow"></div><div class="throw" id="throw"><div class="cube idle" id="cube"></div></div></button>
-        <div id="diceBadge">KEL. 1</div>
-    </div>
-      <div class="dice-control-copy">
-        <div class="dice-control-title">🎲 Lempar Dadu</div>
-        <div class="dice-control-note">Dadu berada di luar papan agar tidak menutupi jalur atau pion.</div>
-        <div class="dice-key-hint">HP: ketuk dadu · Keyboard: <b>Space</b></div>
-      </div>
-    </div>
+    <!-- Dadu dipindahkan ke panel Giliran agar area papan tetap bersih dan penuh. -->
   </div>
   <div class="side">
-    <div class="card">
-      <h3>🎮 Giliran bermain</h3>
-      <div class="turn" id="turn"></div>
-      <div class="note">Klik dadu, lalu jawab soal dengan tepat.</div>
+    <div class="card turn-card">
+      <div class="turn-head">
+        <div>
+          <h3>🎮 Giliran bermain</h3>
+          <div class="turn" id="turn"></div>
+        </div>
+        <span class="turn-live">● AKTIF</span>
+      </div>
+      <div class="note turn-note">Lempar dadu untuk mendapatkan satu soal.</div>
+      <div class="dice-dock" aria-label="Wadah dadu">
+        <div class="dice-dock-glow" aria-hidden="true"></div>
+        <div class="dice-dock-label">🎲 LEMPAR DADU</div>
+        <div id="diceArea">
+          <div id="diceHint">Ketuk dadu</div>
+          <button id="dice" onclick="roll()" aria-label="Lempar dadu untuk mendapatkan satu soal"><div class="shadow3d" id="dshadow"></div><div class="throw" id="throw"><div class="cube idle" id="cube"></div></div></button>
+          <div id="diceBadge">KEL. 1</div>
+        </div>
+        <div class="dice-dock-help">HP: ketuk dadu · Keyboard: <b>Space</b></div>
+      </div>
       <div id="pawnSelector" class="pawn-selector"></div><div class="note" id="msg"></div>
     </div>
 
