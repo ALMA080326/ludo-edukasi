@@ -811,7 +811,7 @@ body{padding:clamp(8px,1.2vw,14px)}
 .class-card-head h3{margin:0!important;font-size:14px!important}
 .class-card-head span{font-size:9px;color:#5b7892;font-weight:800;white-space:nowrap}
 .class-card-body{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;align-items:center}
-.class-card-img{width:92px;height:72px;object-fit:cover;object-position:center;border-radius:13px;border:2px solid #fff;box-shadow:0 7px 16px #2b6b9120}
+.class-card-img{width:92px;height:72px;object-fit:contain;object-position:center;border-radius:13px;background:transparent;border:2px solid #fff;box-shadow:0 7px 16px #2b6b9120}
 .class-card-copy b{display:block;font-size:12px;color:#1f5e8e;line-height:1.25}
 .class-card-copy p{margin:4px 0 0;font-size:10px;line-height:1.35;color:#5a7891}
 .side .score-card{display:none!important}
@@ -876,8 +876,9 @@ body{padding:clamp(8px,1.2vw,14px)}
   width:100%;
   height:86px;
   display:block;
-  object-fit:cover;
-  object-position:center 35%;
+  object-fit:contain;
+  object-position:center;
+  background:transparent;
   border-radius:12px;
 }
 .photo-mini-card .class-card-copy b{
@@ -912,3 +913,8 @@ body{padding:clamp(8px,1.2vw,14px)}
    Menampilkan kedua foto kartu; tidak mengubah layout permainan lainnya.
 */
 .photo-pair .class-card:nth-child(2){display:block!important}
+
+
+/* FINAL PHOTO FIX — preserve full image, transparent background, never crop */
+.hero-img,.class-card-img{object-fit:contain!important;object-position:center!important;background:transparent!important;}
+.hero-img{max-width:100%;}
