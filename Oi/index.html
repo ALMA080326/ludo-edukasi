@@ -1,4 +1,4 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="ludo-build" content="v9-abcd-swap-bebas-github-safe">
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="ludo-build" content="v10-clean-classroom-save-detail">
 <title>Ludo Edukasi — Berpikir Komputasional</title>
 
 <link rel="stylesheet" href="style.css">
@@ -6,7 +6,7 @@
 <body>
 <div class="top">
   <div><h1>🎲 LUDO <b>EDUKASI</b></h1><div class="sub">Berpikir Komputasional · Permainan Kelompok · <b style="color:#18a8c5">3D Bright Edition</b></div></div>
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><button class="sound-pill" id="teacherReport" type="button">📊 Rekap Guru</button><button class="sound-pill" id="snd" type="button">🔊 Suara aktif</button></div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><button class="sound-pill" id="teacherReport" type="button" aria-hidden="true">📊 Rekap Guru</button><button class="sound-pill menu-pill" id="menuBtn" type="button">☰ Menu</button><button class="sound-pill" id="snd" type="button">🔊 Suara aktif</button></div>
 </div>
 
 <section class="hero">
@@ -20,15 +20,23 @@
 </section>
 
 <div class="wrap">
-  <div class="bd">
-    <svg id="sv" viewBox="0 0 15 15" preserveAspectRatio="none" aria-label="Papan Ludo"></svg>
-    <div id="diceArea">
-      <div id="diceHint">Klik dadu untuk melempar</div>
-      <button id="dice" onclick="roll()" aria-label="Lempar dadu untuk mendapatkan satu soal"><div class="shadow3d" id="dshadow"></div><div class="throw" id="throw"><div class="cube idle" id="cube"></div></div></button>
-      <div id="diceBadge">KEL. 1</div>
+  <div class="board-column">
+    <div class="bd">
+      <svg id="sv" viewBox="0 0 15 15" preserveAspectRatio="none" aria-label="Papan Ludo"></svg>
+    </div>
+    <div class="board-controls" aria-label="Kontrol permainan">
+      <div id="diceArea">
+        <div id="diceHint">Klik dadu untuk melempar</div>
+        <button id="dice" onclick="roll()" aria-label="Lempar dadu untuk mendapatkan satu soal"><div class="shadow3d" id="dshadow"></div><div class="throw" id="throw"><div class="cube idle" id="cube"></div></div></button>
+        <div id="diceBadge">KEL. 1</div>
+    </div>
+      <div class="dice-control-copy">
+        <div class="dice-control-title">🎲 Lempar Dadu</div>
+        <div class="dice-control-note">Dadu berada di luar papan agar tidak menutupi jalur atau pion.</div>
+        <div class="dice-key-hint">HP: ketuk dadu · Keyboard: <b>Space</b></div>
+      </div>
     </div>
   </div>
-
   <div class="side">
     <div class="card">
       <h3>🎮 Giliran bermain</h3>

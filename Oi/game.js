@@ -14,7 +14,12 @@ const HC={red:[[7,1],[7,2],[7,3],[7,4],[7,5]],blue:[[1,7],[2,7],[3,7],[4,7],[5,7
 // Jalur akhir mengikuti warna kelompok dan posisi rumah: BIRU→BIRU, MERAH→MERAH, HIJAU→HIJAU, KUNING→KUNING.
 const G=[{n:"Kelompok 1",c:"#1f6fc5",k:"blue",s:13,y:[0,9]},{n:"Kelompok 2",c:"#e8272b",k:"red",s:0,y:[0,0]},{n:"Kelompok 3",c:"#13a84a",k:"green",s:39,y:[9,0]},{n:"Kelompok 4",c:"#ffd800",k:"yellow",s:26,y:[9,9]}];
 const SAFE=new Set([0,8,13,21,26,34,39,47]),STAR=new Set([8,21,34,47]),LV=["Mudah","Sedang","Sulit"],RUB=[100,90,80,70];
-const S={pos:[[0],[0],[0],[0]],activePawn:0,ok:[0,0,0,0],pts:[0,0,0,0],h:[[],[],[],[]],cur:0,fin:[],used:new Set(),skipQ:[],swapLeft:2,cycle:0,curKey:"",appeared:[],tk:new Set(),quotes:[],left:0,info:"",busy:false,mute:false,over:false,stepFx:false};
+const S={pos:[[0],[0],[0],[0]],activePawn:0,ok:[0,0,0,0],pts:[0,0,0,0],streak:[0,0,0,0],bestStreak:[0,0,0,0],h:[[],[],[],[]],cur:0,fin:[],used:new Set(),skipQ:[],swapLeft:2,cycle:0,curKey:"",appeared:[],tk:new Set(),quotes:[],left:0,info:"",busy:false,mute:false,over:false,stepFx:false,activity:[],startedAt:Date.now(),finishedAt:0,finalOrder:[],matchId:"LUDO-"+new Date().toISOString().replace(/[-:TZ.]/g,"").slice(0,14),_historySaved:false};
+const POINT_PER_STEP=100;
+const WRONG_PENALTY=10;      // salah / waktu habis = -10, poin tidak jatuh di bawah 0
+const COLLISION_PENALTY=100; // pion ditabrak mundur 1 langkah = -100 (setara 1 langkah)
+function penalize(i,n=WRONG_PENALTY){const d=Math.min(S.pts[i],n);S.pts[i]-=d;return d}
+const REBUTAN_CORRECT_POINTS=100;
 
 // Hapus soal ganda (teks sama persis) di semua level & soal rebutan.
 
@@ -22,6 +27,11 @@ const S={pos:[[0],[0],[0],[0]],activePawn:0,ok:[0,0,0,0],pts:[0,0,0,0],h:[[],[],
 const $=i=>document.getElementById(i),esc=t=>String(t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])),pick=a=>a[Math.random()*a.length|0],qkey=q=>String(q).replace(/\s+/g," ").trim().toLowerCase();
 const FIN_PTS=[0,4000,3000,2000,900];
 function bankInfo(){const keys=Q.map(q=>qkey(q[0]));const uniq=new Set(keys);const total=Q.length,unique=uniq.size,dup=total-unique,used=S.used.size,sisa=Math.max(0,unique-used);return{total,unique,dup,used,sisa};}
+function logActivity(icon,title,detail){
+  S.activity.unshift({icon,title,detail,time:new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit"})});
+  if(S.activity.length>8)S.activity.length=8;
+}
+function fmtPts(n){return `${n>=0?"+":""}${n.toLocaleString("id-ID")} poin`}
 
 const PB=["Hebat! Jawabanmu tepat dan langkahmu makin dekat ke juara.","Hebat! Ketelitianmu membuahkan hasil. Teruskan!","Hebat! Kerja sama kelompokmu terlihat semakin kompak.","Hebat! Kepercayaan dirimu membuat permainan semakin seru.","Hebat! Satu jawaban benar menjadi satu langkah menuju kemenangan.","Hebat! Fokus seperti ini akan membawa timmu semakin jauh.","Hebat! Belajarmu hari ini menjadi kekuatan untuk langkah berikutnya.","Hebat! Pertahankan semangat dan strategi yang sudah bagus.","Mantap! Jawabanmu tepat dan langkahmu makin dekat ke juara.","Mantap! Ketelitianmu membuahkan hasil. Teruskan!","Mantap! Kerja sama kelompokmu terlihat semakin kompak.","Mantap! Kepercayaan dirimu membuat permainan semakin seru.","Mantap! Satu jawaban benar menjadi satu langkah menuju kemenangan.","Mantap! Fokus seperti ini akan membawa timmu semakin jauh.","Mantap! Belajarmu hari ini menjadi kekuatan untuk langkah berikutnya.","Mantap! Pertahankan semangat dan strategi yang sudah bagus.","Luar biasa! Jawabanmu tepat dan langkahmu makin dekat ke juara.","Luar biasa! Ketelitianmu membuahkan hasil. Teruskan!","Luar biasa! Kerja sama kelompokmu terlihat semakin kompak.","Luar biasa! Kepercayaan dirimu membuat permainan semakin seru.","Luar biasa! Satu jawaban benar menjadi satu langkah menuju kemenangan.","Luar biasa! Fokus seperti ini akan membawa timmu semakin jauh.","Luar biasa! Belajarmu hari ini menjadi kekuatan untuk langkah berikutnya.","Luar biasa! Pertahankan semangat dan strategi yang sudah bagus.","Keren! Jawabanmu tepat dan langkahmu makin dekat ke juara.","Keren! Ketelitianmu membuahkan hasil. Teruskan!","Keren! Kerja sama kelompokmu terlihat semakin kompak.","Keren! Kepercayaan dirimu membuat permainan semakin seru.","Keren! Satu jawaban benar menjadi satu langkah menuju kemenangan.","Keren! Fokus seperti ini akan membawa timmu semakin jauh.","Keren! Belajarmu hari ini menjadi kekuatan untuk langkah berikutnya.","Keren! Pertahankan semangat dan strategi yang sudah bagus.","Bagus sekali! Jawabanmu tepat dan langkahmu makin dekat ke juara.","Bagus sekali! Ketelitianmu membuahkan hasil. Teruskan!","Bagus sekali! Kerja sama kelompokmu terlihat semakin kompak.","Bagus sekali! Kepercayaan dirimu membuat permainan semakin seru.","Bagus sekali! Satu jawaban benar menjadi satu langkah menuju kemenangan.","Bagus sekali! Fokus seperti ini akan membawa timmu semakin jauh.","Bagus sekali! Belajarmu hari ini menjadi kekuatan untuk langkah berikutnya.","Bagus sekali! Pertahankan semangat dan strategi yang sudah bagus.","Yes! Jawabanmu tepat dan langkahmu makin dekat ke juara.","Yes! Ketelitianmu membuahkan hasil. Teruskan!","Yes! Kerja sama kelompokmu terlihat semakin kompak.","Yes! Kepercayaan dirimu membuat permainan semakin seru.","Yes! Satu jawaban benar menjadi satu langkah menuju kemenangan.","Yes! Fokus seperti ini akan membawa timmu semakin jauh.","Yes! Belajarmu hari ini menjadi kekuatan untuk langkah berikutnya.","Yes! Pertahankan semangat dan strategi yang sudah bagus.","Kerja bagus! Jawabanmu tepat dan langkahmu makin dekat ke juara.","Kerja bagus! Ketelitianmu membuahkan hasil. Teruskan!","Kerja bagus! Kerja sama kelompokmu terlihat semakin kompak.","Kerja bagus! Kepercayaan dirimu membuat permainan semakin seru.","Kerja bagus! Satu jawaban benar menjadi satu langkah menuju kemenangan.","Kerja bagus! Fokus seperti ini akan membawa timmu semakin jauh.","Kerja bagus! Belajarmu hari ini menjadi kekuatan untuk langkah berikutnya.","Kerja bagus! Pertahankan semangat dan strategi yang sudah bagus.","Bravo! Jawabanmu tepat dan langkahmu makin dekat ke juara.","Bravo! Ketelitianmu membuahkan hasil. Teruskan!","Bravo! Kerja sama kelompokmu terlihat semakin kompak.","Bravo! Kepercayaan dirimu membuat permainan semakin seru.","Bravo! Satu jawaban benar menjadi satu langkah menuju kemenangan.","Bravo! Fokus seperti ini akan membawa timmu semakin jauh.","Bravo! Belajarmu hari ini menjadi kekuatan untuk langkah berikutnya.","Bravo! Pertahankan semangat dan strategi yang sudah bagus.","Top! Jawabanmu tepat dan langkahmu makin dekat ke juara.","Top! Ketelitianmu membuahkan hasil. Teruskan!","Top! Kerja sama kelompokmu terlihat semakin kompak.","Top! Kepercayaan dirimu membuat permainan semakin seru.","Top! Satu jawaban benar menjadi satu langkah menuju kemenangan.","Top! Fokus seperti ini akan membawa timmu semakin jauh.","Top! Belajarmu hari ini menjadi kekuatan untuk langkah berikutnya.","Top! Pertahankan semangat dan strategi yang sudah bagus.","Ayo pertahankan! Jawabanmu tepat dan langkahmu makin dekat ke juara.","Ayo pertahankan! Ketelitianmu membuahkan hasil. Teruskan!","Ayo pertahankan! Kerja sama kelompokmu terlihat semakin kompak.","Ayo pertahankan! Kepercayaan dirimu membuat permainan semakin seru.","Ayo pertahankan! Satu jawaban benar menjadi satu langkah menuju kemenangan.","Ayo pertahankan! Fokus seperti ini akan membawa timmu semakin jauh.","Ayo pertahankan! Belajarmu hari ini menjadi kekuatan untuk langkah berikutnya.","Ayo pertahankan! Pertahankan semangat dan strategi yang sudah bagus."],PS=["Belum tepat. Kesalahan ini bisa menjadi bekal untuk jawaban berikutnya.","Belum tepat. Tarik napas, baca soal dengan teliti, lalu coba lagi.","Belum tepat. Yang penting terus belajar dan bekerja sama.","Belum tepat. Satu kesalahan tidak menentukan hasil akhir permainan.","Belum tepat. Gunakan pengalaman ini untuk memperbaiki strategi.","Belum tepat. Masih banyak kesempatan untuk menunjukkan kemampuanmu.","Belum tepat. Belajar dari kesalahan akan membuat timmu semakin kuat.","Belum tepat. Semangatmu tetap penting sampai permainan selesai.","Tidak apa-apa. Kesalahan ini bisa menjadi bekal untuk jawaban berikutnya.","Tidak apa-apa. Tarik napas, baca soal dengan teliti, lalu coba lagi.","Tidak apa-apa. Yang penting terus belajar dan bekerja sama.","Tidak apa-apa. Satu kesalahan tidak menentukan hasil akhir permainan.","Tidak apa-apa. Gunakan pengalaman ini untuk memperbaiki strategi.","Tidak apa-apa. Masih banyak kesempatan untuk menunjukkan kemampuanmu.","Tidak apa-apa. Belajar dari kesalahan akan membuat timmu semakin kuat.","Tidak apa-apa. Semangatmu tetap penting sampai permainan selesai.","Tetap semangat! Kesalahan ini bisa menjadi bekal untuk jawaban berikutnya.","Tetap semangat! Tarik napas, baca soal dengan teliti, lalu coba lagi.","Tetap semangat! Yang penting terus belajar dan bekerja sama.","Tetap semangat! Satu kesalahan tidak menentukan hasil akhir permainan.","Tetap semangat! Gunakan pengalaman ini untuk memperbaiki strategi.","Tetap semangat! Masih banyak kesempatan untuk menunjukkan kemampuanmu.","Tetap semangat! Belajar dari kesalahan akan membuat timmu semakin kuat.","Tetap semangat! Semangatmu tetap penting sampai permainan selesai.","Jangan menyerah! Kesalahan ini bisa menjadi bekal untuk jawaban berikutnya.","Jangan menyerah! Tarik napas, baca soal dengan teliti, lalu coba lagi.","Jangan menyerah! Yang penting terus belajar dan bekerja sama.","Jangan menyerah! Satu kesalahan tidak menentukan hasil akhir permainan.","Jangan menyerah! Gunakan pengalaman ini untuk memperbaiki strategi.","Jangan menyerah! Masih banyak kesempatan untuk menunjukkan kemampuanmu.","Jangan menyerah! Belajar dari kesalahan akan membuat timmu semakin kuat.","Jangan menyerah! Semangatmu tetap penting sampai permainan selesai.","Tenang, masih ada kesempatan. Kesalahan ini bisa menjadi bekal untuk jawaban berikutnya.","Tenang, masih ada kesempatan. Tarik napas, baca soal dengan teliti, lalu coba lagi.","Tenang, masih ada kesempatan. Yang penting terus belajar dan bekerja sama.","Tenang, masih ada kesempatan. Satu kesalahan tidak menentukan hasil akhir permainan.","Tenang, masih ada kesempatan. Gunakan pengalaman ini untuk memperbaiki strategi.","Tenang, masih ada kesempatan. Masih banyak kesempatan untuk menunjukkan kemampuanmu.","Tenang, masih ada kesempatan. Belajar dari kesalahan akan membuat timmu semakin kuat.","Tenang, masih ada kesempatan. Semangatmu tetap penting sampai permainan selesai.","Hampir berhasil! Kesalahan ini bisa menjadi bekal untuk jawaban berikutnya.","Hampir berhasil! Tarik napas, baca soal dengan teliti, lalu coba lagi.","Hampir berhasil! Yang penting terus belajar dan bekerja sama.","Hampir berhasil! Satu kesalahan tidak menentukan hasil akhir permainan.","Hampir berhasil! Gunakan pengalaman ini untuk memperbaiki strategi.","Hampir berhasil! Masih banyak kesempatan untuk menunjukkan kemampuanmu.","Hampir berhasil! Belajar dari kesalahan akan membuat timmu semakin kuat.","Hampir berhasil! Semangatmu tetap penting sampai permainan selesai.","Tetap percaya diri! Kesalahan ini bisa menjadi bekal untuk jawaban berikutnya.","Tetap percaya diri! Tarik napas, baca soal dengan teliti, lalu coba lagi.","Tetap percaya diri! Yang penting terus belajar dan bekerja sama.","Tetap percaya diri! Satu kesalahan tidak menentukan hasil akhir permainan.","Tetap percaya diri! Gunakan pengalaman ini untuk memperbaiki strategi.","Tetap percaya diri! Masih banyak kesempatan untuk menunjukkan kemampuanmu.","Tetap percaya diri! Belajar dari kesalahan akan membuat timmu semakin kuat.","Tetap percaya diri! Semangatmu tetap penting sampai permainan selesai.","Ayo bangkit! Kesalahan ini bisa menjadi bekal untuk jawaban berikutnya.","Ayo bangkit! Tarik napas, baca soal dengan teliti, lalu coba lagi.","Ayo bangkit! Yang penting terus belajar dan bekerja sama.","Ayo bangkit! Satu kesalahan tidak menentukan hasil akhir permainan.","Ayo bangkit! Gunakan pengalaman ini untuk memperbaiki strategi.","Ayo bangkit! Masih banyak kesempatan untuk menunjukkan kemampuanmu.","Ayo bangkit! Belajar dari kesalahan akan membuat timmu semakin kuat.","Ayo bangkit! Semangatmu tetap penting sampai permainan selesai.","Jadikan ini pelajaran! Kesalahan ini bisa menjadi bekal untuk jawaban berikutnya.","Jadikan ini pelajaran! Tarik napas, baca soal dengan teliti, lalu coba lagi.","Jadikan ini pelajaran! Yang penting terus belajar dan bekerja sama.","Jadikan ini pelajaran! Satu kesalahan tidak menentukan hasil akhir permainan.","Jadikan ini pelajaran! Gunakan pengalaman ini untuk memperbaiki strategi.","Jadikan ini pelajaran! Masih banyak kesempatan untuk menunjukkan kemampuanmu.","Jadikan ini pelajaran! Belajar dari kesalahan akan membuat timmu semakin kuat.","Jadikan ini pelajaran! Semangatmu tetap penting sampai permainan selesai.","Terus mencoba! Kesalahan ini bisa menjadi bekal untuk jawaban berikutnya.","Terus mencoba! Tarik napas, baca soal dengan teliti, lalu coba lagi.","Terus mencoba! Yang penting terus belajar dan bekerja sama.","Terus mencoba! Satu kesalahan tidak menentukan hasil akhir permainan.","Terus mencoba! Gunakan pengalaman ini untuk memperbaiki strategi.","Terus mencoba! Masih banyak kesempatan untuk menunjukkan kemampuanmu.","Terus mencoba! Belajar dari kesalahan akan membuat timmu semakin kuat.","Terus mencoba! Semangatmu tetap penting sampai permainan selesai."];
 let AC,MI;
@@ -109,7 +119,7 @@ document.addEventListener("pointerdown",()=>{
   try{Object.values(AUD).forEach(a=>{a.load();});}catch(e){}
 },{once:true,capture:true});
 $("snd").onclick=()=>{unlockAudio();S.mute=!S.mute;$("snd").textContent=S.mute?"🔇 Suara mati":"🔊 Suara aktif";if(S.mute)music(0)};
-$("teacherReport").onclick=teacherReport;
+$("teacherReport").onclick=teacherReport;$("menuBtn").onclick=openMenu;
 function cell(i,pawn=0){const p=S.pos[i][pawn],g=G[i];if(p===56)return[7.15+i*.16,7.10+pawn*.26];if(p===0){const [x,y]=[g.y[1],g.y[0]];return[y+2.25+pawn*1.45,x+2.15+pawn*1.5]}const[r,c]=p<=50?TRACK[(g.s+p)%52]:HC[g.k][p-51];return[r,c]}
 function pawnReady(i){return S.pos[i].every(p=>p===56)}
 function choosePawn(n){if(S.busy||S.over||S.fin.includes(S.cur)||S.pos[S.cur][n]===56)return;S.activePawn=n;draw()}
@@ -145,7 +155,7 @@ function updateDashboard(){
   tg.innerHTML=G.map((g,i)=>{
     const total=(S.h[i]||[]).length, pct=Math.min(100,Math.round((S.pos[i][0]/56)*100));
     const status=S.over?"🏁 Permainan selesai":S.fin.includes(i)?`🏁 Juara ${S.fin.indexOf(i)+1}`:i===S.cur?"🎮 Sedang bermain":"⏳ Menunggu";
-    return `<article class="team-card ${i===S.cur&&!S.over?"active":""}">
+    return `<article class="team-card ${i===S.cur&&!S.over?"active":""}" onclick="teamProfile(${i})" title="Lihat detail ${g.n}">
       <div class="team-top"><div class="team-pawn" style="background:${colors[i]}">${icons[i]}</div>
       <div><div class="team-name">${g.n}</div><div class="team-meta"><span>${S.ok[i]} benar</span><span>${total} soal</span></div></div></div>
       <div class="team-score">${S.pts[i]} <small style="font-size:11px">POIN</small></div>
@@ -165,11 +175,16 @@ function updateDashboard(){
   const cp=$("classProgress");if(cp)cp.style.width=pct+"%";
   set("activityState",S.over?"Permainan selesai":`Giliran ${G[S.cur].n}`);
   const current=G[S.cur];
-  al.innerHTML = S.over
-    ? `<div class="activity-item"><div class="activity-icon">🏆</div><div><b>Pertandingan telah selesai.</b><small>Gunakan Rekap Guru untuk melihat hasil lengkap setiap kelompok.</small></div></div>`
-    : `<div class="activity-item"><div class="activity-icon">🎲</div><div><b>${current.n} sedang mendapat giliran.</b><small>${S.busy?"Soal sedang dikerjakan.":"Lempar dadu untuk memulai tantangan."}</small></div></div>
-       <div class="activity-item"><div class="activity-icon">📚</div><div><b>${total} soal sudah dikerjakan.</b><small>${correct} benar dan ${wrong} salah berdasarkan jawaban yang tercatat.</small></div></div>
-       <div class="activity-item"><div class="activity-icon">🏁</div><div><b>${S.fin.length} kelompok sudah finish.</b><small>Posisi pion dan status finish mengikuti permainan aktif.</small></div></div>`;
+  const rank=[0,1,2,3].sort((a,b)=>S.pts[b]-S.pts[a]);
+  const rankEl=$("liveRanking");
+  if(rankEl){rankEl.innerHTML=rank.map((i,n)=>{
+    const lead=n===0?"🥇":n===1?"🥈":n===2?"🥉":"4️⃣";
+    const h=S.h[i]||[], avg=h.length?(h.reduce((a,x)=>a+x.t,0)/h.length):0;
+    return `<div class="rank-row"><span class="rank-medal">${lead}</span><span class="rank-name"><b>${G[i].n}</b><small>${S.ok[i]} benar · ${S.pos[i][0]}/56 · 🔥 ${S.bestStreak[i]}</small></span><span class="rank-pts">${S.pts[i].toLocaleString("id-ID")}<small>${avg?avg.toFixed(1)+"s rata-rata":"belum bermain"}</small></span></div>`;
+  }).join("")}
+  const recent=S.activity.length?S.activity.map(a=>`<div class="activity-item"><div class="activity-icon">${a.icon}</div><div><b>${esc(a.title)}</b><small>${esc(a.detail)} · ${a.time}</small></div></div>`).join(""):``;
+  al.innerHTML = recent || `<div class="activity-item"><div class="activity-icon">🎲</div><div><b>Belum ada aktivitas.</b><small>Lempar dadu untuk memulai permainan.</small></div></div>`;
+  if(S.over) al.innerHTML = `<div class="activity-item"><div class="activity-icon">🏆</div><div><b>Pertandingan telah selesai.</b><small>Gunakan Rekap Guru untuk melihat hasil lengkap setiap kelompok.</small></div></div>` + al.innerHTML;
 
   const scores=G.map((g,i)=>({i,total:(S.h[i]||[]).length,ok:S.ok[i]}));
   const byFast=[...scores].filter(x=>x.total).sort((a,b)=>{
@@ -182,14 +197,13 @@ function updateDashboard(){
     ["⚡","Paling Cepat",byFast?G[byFast.i].n:"Belum ada data"],
     ["🧠","Paling Banyak Benar",byCorrect&&byCorrect.ok?G[byCorrect.i].n:"Belum ada data"],
     ["🎯","Paling Konsisten",byCons?G[byCons.i].n:"Belum ada data"],
-    ["🔥","Streak Terpanjang", "Lihat progres jawaban"]
+    ["🔥","Streak Terpanjang", (()=>{const mx=Math.max(...S.bestStreak);if(!mx)return "Belum ada data";const gi=S.bestStreak.indexOf(mx);return `${G[gi].n} · ${mx} benar beruntun`;})()]
   ];
   const ag=$("achievementGrid");if(ag)ag.innerHTML=achievements.map(x=>`<div class="achievement-card"><div class="ach-icon">${x[0]}</div><b>${x[1]}</b><span>${x[2]}</span></div>`).join("");
   const streak=$("streakText");
   if(streak){
-    let best=0;
-    G.forEach((_,i)=>{let n=0;(S.h[i]||[]).forEach(x=>{n=x.ok?n+1:0;best=Math.max(best,n)})});
-    streak.textContent=best?`Streak terbaik saat ini: ${best} jawaban benar berturut-turut.`:"Belum ada jawaban benar beruntun.";
+    const best=Math.max(...S.bestStreak);
+    if(best){const gi=S.bestStreak.indexOf(best);streak.textContent=`${G[gi].n} memimpin dengan ${best} jawaban benar berturut-turut.`;}else streak.textContent="Belum ada jawaban benar beruntun.";
   }
 }
 
@@ -465,12 +479,9 @@ const n=1+Math.random()*6|0,cu=$("cube"),th=$("throw"),sh=$("dshadow");
 cu.classList.remove("idle");cu.style.transition="none";cu.style.transform="rotateX(-24deg) rotateY(32deg)";void cu.offsetWidth;
 const[fx,fy]=FACE[n],sx=(2+Math.random()*2|0)*360,sy=(2+Math.random()*2|0)*360;
 cu.style.transition="transform 1.6s cubic-bezier(.2,.75,.25,1)";cu.style.transform=`rotateX(${fx+sx}deg) rotateY(${fy+sy}deg)`;
-const dir=Math.random()<.5?-1:1;
-// Dadu mengitari area rumah kelompok aktif lalu kembali ke tengah papan.
-const hx=(G[S.cur].y[1]+3-7.5)*100/4.2,hy=(G[S.cur].y[0]+3-7.5)*100/4.2;
-const orbit=[[-48,-40],[48,-40],[48,40],[-48,40]];
-th.animate([{transform:"translate(0,0) rotate(0) scale(.9)"},...orbit.map(([x,y],j)=>({transform:`translate(${hx+x}%,${hy+y}%) rotate(${(j+1)*270*dir}deg) scale(${j%2?1.08:1.18})`,offset:(j+1)/5})),{transform:"translate(0,0) rotate(1440deg) scale(1)"}],{duration:1600,easing:"ease-in-out"});
-sh.animate([{transform:"scale(.4)",opacity:.3},{transform:"scale(.7)",opacity:.4,offset:.3},{transform:"scale(1.1)",opacity:1,offset:.55},{transform:"scale(.85)",opacity:.7,offset:.75},{transform:"scale(1)",opacity:1}],{duration:1600});
+// Animasi dadu tetap di area kontrol bawah papan; tidak lagi mengorbit di atas jalur pion.
+th.animate([{transform:"translateY(0) scale(.9) rotate(0deg)"},{transform:"translateY(-9px) scale(1.08) rotate(120deg)",offset:.28},{transform:"translateY(4px) scale(1.02) rotate(300deg)",offset:.62},{transform:"translateY(0) scale(1) rotate(720deg)"}],{duration:1600,easing:"ease-in-out"});
+sh.animate([{transform:"scale(.4)",opacity:.3},{transform:"scale(.75)",opacity:.55,offset:.35},{transform:"scale(1.05)",opacity:1,offset:.65},{transform:"scale(1)",opacity:1}],{duration:1600});
 setTimeout(()=>{S.info=`🎲 Dadu ${n} → 1 soal`;S.left=1;S.total=1;draw();setTimeout(()=>question(),900)},1700)}
 function after(){
   S.left=0;
@@ -478,23 +489,26 @@ function after(){
   next();
 }
 function question(itIn){const i=S.cur,p=S.pos[i][S.activePawn],lv=p<19?0:p<38?1:2,it=itIn||ask();if(!it){S.left=0;msg("Seluruh "+Q.length+" soal unik telah digunakan.");fin2([...S.fin,...[0,1,2,3].filter(j=>!S.fin.includes(j)).sort((a,b)=>S.ok[b]-S.ok[a])]);return}
-show(it,60,`${G[i].n} <span class="lv">Soal berikutnya</span>`,(sel,t)=>{const ok=sel===it.a,st=t<=5?6:t<=10?5:t<=20?4:t<=30?3:t<=45?2:1;S.h[i].push({q:it.q,o:it.o,sel,a:it.a,ok,t,lv:LV[lv],materi:it.materi||""});if(ok)S.ok[i]++;
+show(it,60,`${G[i].n} <span class="lv">Soal berikutnya</span>`,(sel,t)=>{const ok=sel===it.a,st=t<=10?6:t<=20?5:t<=30?4:t<=40?3:t<=50?2:1;let pen=0;S.h[i].push({q:it.q,o:it.o,sel,a:it.a,ok,t,lv:LV[lv],materi:it.materi||"",nomor:it.id});if(ok){S.ok[i]++;S.streak[i]++;S.bestStreak[i]=Math.max(S.bestStreak[i],S.streak[i]);logActivity("✅",`${G[i].n} menjawab benar`,`Pion akan maju ${st} langkah · potensi +${st*POINT_PER_STEP} poin`);}else{S.streak[i]=0;pen=penalize(i);logActivity("❌",`${G[i].n} salah menjawab`,`${fmtPts(-pen)} · pion tetap`);}
 document.querySelectorAll(".opt").forEach((b,k)=>{if(ok&&k===it.a)b.classList.add("ok");else if(!ok&&k===sel)b.classList.add("no");});if(ok){sfxCorrect();$("bx").classList.add("boardPulse");setTimeout(()=>$("bx").classList.remove("boardPulse"),700)}else sfxWrong();
 const fb=feedback(ok?"ok":"no");
-$("go").outerHTML=`<div class="answer-feedback ${ok?"ok":"no"}"><span class="feedback-icon">${ok?"🎉":"💪"}</span><div class="mot-label"> </div><div class="feedback-text">${esc(fb)}</div><div class="feedback-sub">${ok?"✅ JAWABAN BENAR! Pion maju.":"❌ "+(sel===null?"WAKTU HABIS":"JAWABAN SALAH")+"! Pion tetap di tempat."}</div></div><button class="btn nx-btn">${ok?"🚀 LANJUTKAN":"👉 COBA LAGI DI SOAL BERIKUTNYA"}</button>`;
+$("go").outerHTML=`<div class="answer-feedback ${ok?"ok":"no"}"><span class="feedback-icon">${ok?"🎉":"💪"}</span><div class="mot-label"> </div><div class="feedback-text">${esc(fb)}</div><div class="feedback-sub">${ok?`✅ JAWABAN BENAR! Pion maju ${st} langkah · ${fmtPts(st*POINT_PER_STEP)}.`:`❌ ${sel===null?"WAKTU HABIS":"JAWABAN SALAH"}! ${fmtPts(-pen)} · pion tetap.`}</div></div><button class="btn nx-btn">${ok?"🚀 LANJUTKAN":"👉 COBA LAGI DI SOAL BERIKUTNYA"}</button>`;
 draw();
 document.querySelector("#bx .nx-btn").onclick=()=>{modal("");if(ok)move(i,st,after);else after()}},()=>swapSoal(it))}
 function msg(t){$("msg").textContent=t}
 function move(i,st,cb){
-  let k=0;
+  let k=0,moved=0;
   const iv=setInterval(()=>{
-    S.pos[i][S.activePawn]=Math.min(56,S.pos[i][S.activePawn]+1);
+    const before=S.pos[i][S.activePawn];
+    S.pos[i][S.activePawn]=Math.min(56,before+1);
+    if(S.pos[i][S.activePawn]>before){S.pts[i]+=POINT_PER_STEP;moved++;}
     S.stepFx=true;
     sfxPawn();
     draw();
     setTimeout(()=>{S.stepFx=false;draw()},250);
     if(++k>=st||S.pos[i][S.activePawn]===56){
       clearInterval(iv);
+      logActivity("🚀",`${G[i].n} maju ${moved} langkah`,`+${(moved*POINT_PER_STEP).toLocaleString("id-ID")} poin · posisi ${S.pos[i][S.activePawn]}/56`);
       setTimeout(()=>{land(i);cb()},90);
     }
   },330);
@@ -528,16 +542,15 @@ function showFT(i,r){
       d.style.cssText=`position:fixed;left:${cx}vw;top:${cy}vh;width:9px;height:9px;border-radius:50%;z-index:65;pointer-events:none;background:${cols[(n+k)%cols.length]};--fx:${Math.cos(a)*dist}px;--fy:${Math.sin(a)*dist}px;animation:ftFirework 1.1s ease-out forwards`;
       document.body.appendChild(d);setTimeout(()=>d.remove(),1200)}},k*500);
 }
-function land(i){const pawn=0,p=S.pos[i][pawn];if(p===56){if(pawnReady(i)&&!S.fin.includes(i)){S.fin.push(i);const r=S.fin.length;const bp=FIN_PTS[r]||0;if(!S._finPts)S._finPts={};if(!S._finPts[i]){S.pts[i]+=bp;S._finPts[i]=r;}msg(`🏁🎉 ${G[i].n} Juara ${r}! +${bp} poin`);celebrateFinish(i,r);sfxFinish()}draw();return}
-if(p>0&&p<=50){const x=(G[i].s+p)%52;if(!SAFE.has(x))G.forEach((g,j)=>{if(j===i)return;const v=S.pos[j][0];if(v>0&&v<=50&&(g.s+v)%52===x){S.pos[j][0]=Math.max(0,v-1);msg(`💥 ${G[i].n} menabrak pion ${g.n}: mundur 1 langkah!`)}})}draw()}
+function land(i){const pawn=0,p=S.pos[i][pawn];if(p===56){if(pawnReady(i)&&!S.fin.includes(i)){S.fin.push(i);const r=S.fin.length;const bp=FIN_PTS[r]||0;if(!S._finPts)S._finPts={};if(!S._finPts[i]){S.pts[i]+=bp;S._finPts[i]=r;}msg(`🏁🎉 ${G[i].n} Juara ${r}! +${bp} poin`);logActivity("🏆",`${G[i].n} FINISH sebagai Juara ${r}`,`Bonus +${bp.toLocaleString("id-ID")} poin`);celebrateFinish(i,r);sfxFinish()}draw();return}
+if(p>0&&p<=50){const x=(G[i].s+p)%52;if(!SAFE.has(x))G.forEach((g,j)=>{if(j===i)return;const v=S.pos[j][0];if(v>0&&v<=50&&(g.s+v)%52===x){S.pos[j][0]=Math.max(0,v-1);const lost=penalize(j,COLLISION_PENALTY);logActivity("💥",`${g.n} ditabrak ${G[i].n}`,`Mundur 1 langkah · ${fmtPts(-lost)}`);msg(`💥 ${G[i].n} menabrak pion ${g.n}: mundur 1 langkah!`)}})}draw()}
 function next(){if(S.fin.length>=2)return endGame();let n=S.cur;do n=(n+1)%4;while(S.fin.includes(n));S.cur=n;S.activePawn=0;S.busy=false;draw()}
 function endGame(){S.busy=true;const r=[0,1,2,3].filter(i=>!S.fin.includes(i)).sort((a,b)=>S.ok[b]-S.ok[a]);if(S.ok[r[0]]==S.ok[r[1]])return tie(r);fin2([...S.fin,...r])}
-function tie(r,round=0){const it=ask();if(!it){return fin2([...S.fin,...r])}const res=[];const go=k=>{if(k>1)return judge();const item=k===0?it:ask();if(!item)return fin2([...S.fin,...r]);show(item,30,`🔥 SOAL REBUTAN - PENENTU JUARA<br>${G[r[k]].n} (${k+1}/2)`,(sel,t)=>{const ok=sel===item.a;S.h[r[k]].push({q:item.q,o:item.o,sel,a:item.a,ok,t,lv:"Rebutan"});res.push({ok,t});modal(`<div class="pse">${G[r[k]].n} sudah menjawab.</div><button class="btn nx-btn">${k<1?"Lanjut ke kelompok berikutnya 👉":"Lihat hasil 👉"}</button>`);document.querySelector("#bx .nx-btn").onclick=()=>go(k+1)})};
-const judge=()=>{const[a,b]=res;let w=-1;if(a.ok&&!b.ok)w=0;else if(b.ok&&!a.ok)w=1;else if(a.ok&&b.ok)w=a.t<=b.t?0:1;if(w<0){
-  modal(`<div class="pse">Keduanya belum menjawab dengan benar.</div><div class="note">Tidak ada soal tambahan. Peringkat ditentukan berdasarkan urutan kelompok pada babak rebutan.</div><button class="btn nx-btn">Lihat hasil 👉</button>`);
-  document.querySelector("#bx .nx-btn").onclick=()=>fin2([...S.fin,r[0],r[1]]);
-  return;
-}
+function tie(r,round=0){const it=ask();if(!it){return fin2([...S.fin,...r])}const res=[];const go=k=>{if(k>1)return judge();const item=k===0?it:ask();if(!item)return fin2([...S.fin,...r]);show(item,30,`🔥 SOAL REBUTAN - PENENTU JUARA<br>${G[r[k]].n} (${k+1}/2)`,(sel,t)=>{const ok=sel===item.a;S.h[r[k]].push({q:item.q,o:item.o,sel,a:item.a,ok,t,lv:"Rebutan",materi:item.materi||"",nomor:item.id});if(ok){S.pts[r[k]]+=REBUTAN_CORRECT_POINTS;S.streak[r[k]]++;S.bestStreak[r[k]]=Math.max(S.bestStreak[r[k]],S.streak[r[k]]);logActivity("🔥",`${G[r[k]].n} menang soal rebutan`,`+${REBUTAN_CORRECT_POINTS} poin`);}else{penalize(r[k]);S.streak[r[k]]=0;logActivity("❌",`${G[r[k]].n} salah soal rebutan`,`-${WRONG_PENALTY} poin`);}res.push({ok,t});modal(`<div class="pse">${G[r[k]].n} sudah menjawab.</div><button class="btn nx-btn">${k<1?"Lanjut ke kelompok berikutnya 👉":"Lihat hasil 👉"}</button>`);document.querySelector("#bx .nx-btn").onclick=()=>go(k+1)})};
+const judge=()=>{const[a,b]=res;let w=-1;if(a.ok&&!b.ok)w=0;else if(b.ok&&!a.ok)w=1;else if(a.ok&&b.ok)w=a.t<b.t?0:b.t<a.t?1:(Math.random()<.5?0:1);if(w<0){
+  if(round<2){modal(`<div class="pse">Kedua kelompok belum menjawab dengan benar.</div><div class="note">Soal rebutan diulang dengan soal baru (${round+2}/3).</div><button class="btn nx-btn">Soal rebutan berikutnya 👉</button>`);document.querySelector("#bx .nx-btn").onclick=()=>tie(r,round+1);return}
+  const f=Math.random()<.5;modal(`<div class="pse">Masih seri setelah 3 soal rebutan.</div><div class="note">Juara 3 ditentukan dengan undian acak agar adil untuk semua kelompok.</div><button class="btn nx-btn">Lihat hasil 👉</button>`);document.querySelector("#bx .nx-btn").onclick=()=>fin2([...S.fin,...(f?[r[0],r[1]]:[r[1],r[0]])]);return}
+
 modal(`<div class="pse">${G[r[w]].n} unggul dan menjadi Juara 3! 🏆</div><button class="btn nx-btn">Lihat pemenang 👉</button>`);document.querySelector("#bx .nx-btn").onclick=()=>fin2([...S.fin,r[w],r[1-w]])};go(0)}
 function topicOf(x){const q=qkey(x.q),a=qkey((x.o||[])[x.a]||""),all=q+" "+a;
   if(/muncul .*gambar ke-\d|urutan .*gambar|kesamaan|berulang|pola yang sama|hasil sama|pengenalan pola|mengenali pola|situasi serupa/.test(q))return"Pengenalan Pola";
@@ -551,7 +564,7 @@ function reportData(i){const h=S.h[i]||[],m={"Dekomposisi":{ok:0,n:0},"Abstraksi
   const total=h.length,ok=h.filter(x=>x.ok).length,acc=total?Math.round(ok/total*100):0;
   const sorted=[...topics].sort((a,b)=>b.acc-a.acc||b.n-a.n);
   return{total,ok,bad:total-ok,acc,topics,best:sorted[0]||null,weak:sorted[sorted.length-1]||null};}
-function reportCard(i){const d=reportData(i),full=S.fin.includes(i);const best=d.best?`${d.best.name} (${d.best.acc}%)`:"Belum cukup data";const weak=d.weak?`${d.weak.name} (${d.weak.acc}%)`:"Belum cukup data";return `<div class="report-team ${full?"full":""}"><h4><span style="background:${G[i].c};color:#fff">${G[i].n}</span><span>${full?"🏁 FINISH":"🎮 BERMAIN"}</span></h4><div class="report-bars"><i style="width:${d.acc}%"></i></div><div class="report-stats"><div class="report-stat"><b>${d.ok}</b><small>Benar</small></div><div class="report-stat"><b>${d.bad}</b><small>Salah</small></div><div class="report-stat"><b>${d.acc}%</b><small>Akurasi</small></div></div><div class="mastery"><strong>Materi paling dikuasai:</strong><br>${esc(best)}</div><div class="mastery weak"><strong>Materi perlu ditingkatkan:</strong><br>${esc(weak)}</div></div>`}
+function reportCard(i){const d=reportData(i),full=S.fin.includes(i);const best=d.best?`${d.best.name} (${d.best.acc}%)`:"Belum cukup data";const weak=d.weak?`${d.weak.name} (${d.weak.acc}%)`:"Belum cukup data";const steps=S.pos[i][0]||0;return `<div class="report-team ${full?"full":""}"><h4><span style="background:${G[i].c};color:#fff">${G[i].n}</span><span>${full?"🏁 FINISH":"🎮 BERMAIN"}</span></h4><div class="report-bars"><i style="width:${d.acc}%"></i></div><div class="report-stats"><div class="report-stat"><b>${S.pts[i]}</b><small>Poin</small></div><div class="report-stat"><b>${steps}</b><small>Langkah</small></div><div class="report-stat"><b>${d.ok}</b><small>Benar</small></div><div class="report-stat"><b>${d.bad}</b><small>Salah</small></div><div class="report-stat"><b>${d.acc}%</b><small>Akurasi</small></div><div class="report-stat"><b>🔥 ${S.bestStreak[i]}</b><small>Streak</small></div></div><div class="mastery"><strong>Materi paling dikuasai:</strong><br>${esc(best)}</div><div class="mastery weak"><strong>Materi perlu ditingkatkan:</strong><br>${esc(weak)}</div></div>`}
 function selfTest(){
   const checks=[];
   checks.push(["HTML modal",!!$("m")&&!!$("bx")]);
@@ -563,9 +576,157 @@ function selfTest(){
   checks.push(["Pion Base64",typeof PION_IMG==="object"&&["blue","yellow","green","red"].every(k=>/^data:image\/png;base64,/.test(PION_IMG[k]||""))]);
   return checks;
 }
-function teacherReport(){modal(`<div class="teacher-report"><div class="report-head"><div><div class="report-title">📊 HASIL & PROGRESS KELOMPOK</div><div class="report-sub">Rekap live untuk guru · data diperbarui setiap jawaban</div></div></div><div class="report-grid">${G.map((_,i)=>reportCard(i)).join("")}</div><div class="note" style="margin-top:10px">Tekan <b>Tutup</b> untuk kembali ke permainan. Akurasi dihitung dari jawaban yang sudah dikerjakan. Materi teratas/terendah ditampilkan dari kategori soal yang sudah muncul pada kelompok.</div></div><button class="btn" onclick="closeModal()">Tutup</button>`)}
+function teamProfile(i){
+ const d=reportData(i),h=S.h[i]||[],avg=h.length?(h.reduce((a,x)=>a+x.t,0)/h.length):0;
+ const rank=[0,1,2,3].sort((a,b)=>S.pts[b]-S.pts[a]).indexOf(i)+1;
+ const rows=d.topics.map(t=>`<div class="topic-mini"><span>${esc(t.name)}</span><b>${t.acc}%</b><small>${t.ok}/${t.n} benar</small></div>`).join("")||`<div class="note">Belum ada data materi.</div>`;
+ modal(`<div class="profile-card"><div class="profile-title"><span style="background:${G[i].c}">${G[i].n}</span><b>${rank===1?"🥇":rank===2?"🥈":rank===3?"🥉":"4️⃣"} Peringkat ${rank}</b></div><div class="profile-stats"><div><b>${S.pts[i].toLocaleString("id-ID")}</b><small>POIN</small></div><div><b>${S.pos[i][0]}</b><small>LANGKAH</small></div><div><b>${d.ok}</b><small>BENAR</small></div><div><b>${d.bad}</b><small>SALAH</small></div><div><b>${d.acc}%</b><small>AKURASI</small></div><div><b>${avg?avg.toFixed(1)+"s":"—"}</b><small>RATA-RATA</small></div></div><div class="profile-streak">🔥 Streak terbaik <b>${S.bestStreak[i]}</b></div><h3 style="margin-top:12px">🧠 Penguasaan Materi</h3><div class="topic-list">${rows}</div><button class="btn" onclick="teacherReport()">📊 Kembali ke Rekap Guru</button></div>`);
+}
+function resultOrder(order){
+  return order && order.length ? [...order] : (S.finalOrder&&S.finalOrder.length?[...S.finalOrder]:[0,1,2,3].sort((a,b)=>S.pts[b]-S.pts[a]));
+}
+function resultSnapshot(order){
+  const ranking=resultOrder(order);
+  const now=S.finishedAt||Date.now();
+  const durationSec=Math.max(0,Math.round((now-S.startedAt)/1000));
+  const teams=G.map((g,i)=>{
+    const h=S.h[i]||[],ok=h.filter(x=>x.ok).length,bad=h.length-ok,timeout=h.filter(x=>x.sel===null).length;
+    const avg=h.length?h.reduce((a,x)=>a+x.t,0)/h.length:0;
+    const rd=reportData(i);
+    return {
+      team:g.n,color:g.c,rank:ranking.indexOf(i)+1,finish:S.fin.indexOf(i)>=0?S.fin.indexOf(i)+1:null,
+      points:S.pts[i],steps:S.pos[i][0]||0,correct:ok,wrong:bad,timeout,
+      totalQuestions:h.length,accuracy:h.length?Math.round(ok/h.length*100):0,
+      averageAnswerSeconds:avg?Number(avg.toFixed(2)):0,bestStreak:S.bestStreak[i],
+      materials:rd.topics,
+      questions:h.map((x,n)=>({
+        order:n+1,number:x.nomor??null,question:x.q,material:x.materi||"",
+        selected:x.sel===null?null:(x.o[x.sel]??""),correctAnswer:x.o[x.a]??"",
+        correct:!!x.ok,timeout:x.sel===null,timeSeconds:Number(Number(x.t||0).toFixed(2)),level:x.lv||""
+      }))
+    };
+  });
+  return {
+    app:"Ludo Edukasi",version:"V2 Clean Classroom",matchId:S.matchId,
+    status:S.over?"SELESAI":"BERJALAN",
+    startedAt:new Date(S.startedAt).toISOString(),
+    finishedAt:S.finishedAt?new Date(S.finishedAt).toISOString():null,
+    durationSeconds:durationSec,
+    bank:bankInfo(),
+    ranking:ranking.map((i,n)=>({rank:n+1,team:G[i].n,points:S.pts[i],steps:S.pos[i][0]||0})),
+    teams,usedQuestionTexts:[...S.appeared],activity:[...S.activity]
+  };
+}
+function saveResultJSON(){
+  try{
+    const snap=resultSnapshot();
+    const blob=new Blob([JSON.stringify(snap,null,2)],{type:"application/json;charset=utf-8"});
+    const url=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=url;a.download=`ludo-edukasi-${S.matchId}.json`;a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    persistHistory();
+    msg("💾 Hasil permainan disimpan.");
+  }catch(e){console.error(e);msg("Gagal menyimpan hasil.");}
+}
+function persistHistory(){
+  if(!S.over||S._historySaved)return;
+  try{
+    const snap=resultSnapshot();
+    const old=JSON.parse(localStorage.getItem("ludoEdukasiHistory")||"[]");
+    const item={
+      matchId:snap.matchId,finishedAt:snap.finishedAt,durationSeconds:snap.durationSeconds,
+      ranking:snap.ranking,bank:snap.bank
+    };
+    old.unshift(item);
+    localStorage.setItem("ludoEdukasiHistory",JSON.stringify(old.slice(0,20)));
+    S._historySaved=true;
+  }catch(e){console.warn("Riwayat lokal tidak dapat disimpan",e);}
+}
+function showHistory(){
+  let rows=[];
+  try{rows=JSON.parse(localStorage.getItem("ludoEdukasiHistory")||"[]")}catch(e){rows=[]}
+  if(!rows.length){modal(`<h2>📜 Riwayat Pertandingan</h2><p class="note">Belum ada hasil permainan tersimpan di perangkat ini.</p><button class="btn" onclick="openMenu()">⬅ Kembali</button>`);return}
+  const list=rows.map((x,i)=>{
+    const d=x.finishedAt?new Date(x.finishedAt).toLocaleString("id-ID"):"—";
+    const rank=(x.ranking||[]).map(r=>`${r.rank}. ${esc(r.team)} (${Number(r.points||0).toLocaleString("id-ID")})`).join(" · ");
+    return `<div class="history-item"><b>${esc(x.matchId||("Pertandingan "+(i+1)))}</b><small>${d} · Durasi ${Math.round((x.durationSeconds||0)/60)} menit</small><div style="margin-top:5px;font-size:11px">${rank}</div></div>`;
+  }).join("");
+  modal(`<h2>📜 Riwayat Pertandingan</h2><p class="note">Riwayat ini hanya tersimpan di perangkat/browser ini, bukan untuk sinkronisasi permainan.</p>${list}<button class="btn" onclick="openMenu()">⬅ Kembali</button><button class="btn" onclick="clearHistory()">🗑️ Hapus Riwayat</button>`);
+}
+function clearHistory(){
+  try{localStorage.removeItem("ludoEdukasiHistory")}catch(e){}
+  openMenu();
+}
+function auditBank(){
+  const bi=bankInfo();
+  const appearedUnique=new Set(S.appeared.map(q=>qkey(q))).size;
+  const repeated=Math.max(0,S.appeared.length-appearedUnique);
+  modal(`<h2>🔎 Audit Bank Soal</h2>
+    <div class="audit-grid">
+      <div class="audit-box"><b>${bi.total}</b><small>Total bank</small></div>
+      <div class="audit-box"><b>${bi.unique}</b><small>Soal unik</small></div>
+      <div class="audit-box"><b>${bi.dup}</b><small>Duplikat bank</small></div>
+      <div class="audit-box"><b>${bi.used}</b><small>Terpakai</small></div>
+      <div class="audit-box"><b>${bi.sisa}</b><small>Belum digunakan</small></div>
+      <div class="audit-box"><b>${repeated}</b><small>Terulang di layar</small></div>
+    </div>
+    <p class="note">Audit pengulangan dihitung dari daftar soal yang benar-benar diberikan selama pertandingan/siklus saat ini.</p>
+    <button class="btn" onclick="openMenu()">⬅ Kembali</button>`);
+}
+function detailedResults(){
+  const snap=resultSnapshot();
+  const rankRows=snap.ranking.map(r=>`<tr><td>${r.rank}</td><td>${esc(r.team)}</td><td>${Number(r.points).toLocaleString("id-ID")}</td><td>${r.steps}</td></tr>`).join("");
+  const teamHtml=snap.teams.map(t=>{
+    const qhtml=t.questions.map(q=>`<div class="result-question ${q.correct?"ok":"no"}">
+      <b>${q.order}. ${esc(q.question)}</b><br>
+      <span>Materi: ${esc(q.material||"—")} · ${q.number==null?"":("No. "+q.number+" · ")}
+      Hasil: ${q.timeout?"⏱️ Timeout":q.correct?"✅ Benar":"❌ Salah"} · ${q.timeSeconds}s</span><br>
+      <span>Jawaban: ${esc(q.selected??"(tidak menjawab)")} · Kunci: ${esc(q.correctAnswer)}</span>
+    </div>`).join("")||`<div class="note">Belum ada soal.</div>`;
+    const mats=t.materials.map(m=>`${esc(m.name)}: <b>${m.acc}%</b> (${m.ok}/${m.n})`).join(" · ")||"Belum ada data materi";
+    return `<details class="result-team-detail" ${t.rank===1?"open":""}><summary>${t.rank===1?"🥇":t.rank===2?"🥈":t.rank===3?"🥉":"4️⃣"} ${esc(t.team)} · ${Number(t.points).toLocaleString("id-ID")} poin · ${t.accuracy}%</summary>
+      <div class="result-team-body">
+        <div class="result-kpi-grid">
+          <div class="result-kpi"><b>${t.correct}</b><small>Benar</small></div>
+          <div class="result-kpi"><b>${t.wrong}</b><small>Salah</small></div>
+          <div class="result-kpi"><b>${t.timeout}</b><small>Timeout</small></div>
+          <div class="result-kpi"><b>${t.bestStreak}</b><small>Streak terbaik</small></div>
+        </div>
+        <div class="note"><b>Penguasaan materi:</b> ${mats}</div>
+        ${qhtml}
+      </div>
+    </details>`;
+  }).join("");
+  modal(`<h2>📊 Hasil Permainan ${snap.status==="SELESAI"?"Lengkap":"Sementara"}</h2>
+    <p class="note">ID: <b>${esc(snap.matchId)}</b> · Durasi: ${Math.floor(snap.durationSeconds/60)} menit ${snap.durationSeconds%60} detik · Soal diberikan: ${snap.bank.used}</p>
+    <table><tr><th>Rank</th><th>Kelompok</th><th>Poin</th><th>Langkah</th></tr>${rankRows}</table>
+    ${teamHtml}
+    <button class="btn" onclick="saveResultJSON()">💾 Simpan JSON</button>
+    <button class="btn" onclick="downloadCSV()">📊 Download CSV Detail</button>
+    <button class="btn" onclick="openMenu()">⬅ Kembali</button>`);
+}
+function downloadCSV(){
+  const snap=resultSnapshot();
+  const rows=[
+    ["RINGKASAN PER KELOMPOK"],[],
+    ["Peringkat","Kelompok","Poin","Langkah","Benar","Salah","Timeout","Akurasi","Streak","Rata-rata waktu"],
+    ...snap.teams.slice().sort((a,b)=>a.rank-b.rank).map(t=>[t.rank,t.team,t.points,t.steps,t.correct,t.wrong,t.timeout,t.accuracy,t.bestStreak,t.averageAnswerSeconds]),
+    [],
+    ["DETAIL SOAL"],[],
+    ["Kelompok","Urutan","No Soal","Materi","Hasil","Waktu (detik)","Jawaban","Kunci"],
+  ];
+  snap.teams.forEach(t=>t.questions.forEach(q=>rows.push([
+    t.team,q.order,q.number,q.material,q.timeout?"TIMEOUT":q.correct?"BENAR":"SALAH",q.timeSeconds,q.selected??"",q.correctAnswer
+  ])));
+  const csv=rows.map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download=`ludo-edukasi-hasil-${S.matchId}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function teacherReport(){modal(`<div class="teacher-report"><div class="report-head"><div><div class="report-title">📊 HASIL & PROGRESS KELOMPOK</div><div class="report-sub">Rekap live untuk guru · data diperbarui setiap jawaban</div></div></div><div class="report-grid">${G.map((_,i)=>reportCard(i)).join("")}</div><div class="note" style="margin-top:10px">Tekan <b>Tutup</b> untuk kembali ke permainan. Akurasi dihitung dari jawaban yang sudah dikerjakan. Materi teratas/terendah ditampilkan dari kategori soal yang sudah muncul pada kelompok.</div></div><button class="btn" onclick="detailedResults()">📋 HASIL DETAIL</button><button class="btn" onclick="auditBank()">🔎 AUDIT SOAL</button><button class="btn" onclick="saveResultJSON()">💾 SIMPAN JSON</button><button class="btn" onclick="downloadCSV()">📊 DOWNLOAD CSV</button><button class="btn" onclick="closeModal()">Tutup</button>`)}
 function fin2(o){
   S.over=true;
+  S.finishedAt=S.finishedAt||Date.now();
+  S.finalOrder=[...o];
   // Bonus finish sesuai peringkat akhir (sekali saja; yang sudah finish via pion tidak digandakan)
   if(!S._ptsAwarded){
     S._ptsAwarded=1;
@@ -587,19 +748,84 @@ function fin2(o){
   <div class="note" style="text-align:center;margin:4px 0 10px">Hasil lengkap setiap kelompok</div>
   <table><tr><th>Peringkat</th><th>Kelompok</th><th>Benar</th><th>Salah</th><th>Akurasi</th><th>Total soal</th><th>Poin</th></tr>${rows}</table>
   <div class="note" style="margin-top:8px">Bonus finish: Juara 1 = 4000 · Juara 2 = 3000 · Juara 3 = 2000 · Juara 4 = 900</div>
-    <div class="note">Belajar adalah perjalanan, setiap jawaban adalah langkah maju. Jika kelompok yang belum finish seri pada jumlah jawaban benar, soal rebutan menentukan Juara 3.</div>
+    <div class="note">Belajar adalah perjalanan, setiap jawaban adalah langkah maju. Jika kelompok yang belum finish seri pada jumlah jawaban benar, soal rebutan (sampai 3 putaran, lalu undian) menentukan Juara 3.</div>
   <button class="btn" onclick="teacherReport()">📊 REKAP / PROGRESS GURU</button>
+  <button class="btn" onclick="detailedResults()">📋 HASIL DETAIL</button>
+  <button class="btn" onclick="saveResultJSON()">💾 SIMPAN HASIL</button>
   <button class="btn" onclick="review(0)">📖 Tinjau jawaban</button>
   <button class="btn" onclick="location.reload()">MAIN LAGI</button>`);
+  persistHistory();
 }
 
 function review(t){modal(`<h2>Mode review</h2><div class="tabs">`+G.map((g,i)=>`<button class="${i==t?"a":""}" onclick="review(${i})">${g.n} (${S.ok[i]} benar · ${S.h[i].filter(x=>!x.ok).length} salah)</button>`).join("")+`</div>`+(S.h[t].map((x,n)=>`<div class="rv ${x.ok?"ok":"no"}"><b>${n+1}. ${esc(x.q)}</b><br>Jawaban kelompok: ${x.sel===null?"(waktu habis)":esc(x.o[x.sel])}<br>Kunci: ${esc(x.o[x.a])} · ${Math.round(x.t)} detik</div>`).join("")||"<p>Belum ada jawaban.</p>")+`<button class="btn" onclick="fin2([...S.fin,...[0,1,2,3].filter(i=>!S.fin.includes(i)).sort((a,b)=>S.ok[b]-S.ok[a])])">⬅ Kembali</button>`)}
+
+function openDashboard(){
+  document.body.classList.add("dashboard-open");
+  closeModal();
+  setTimeout(()=>$("fullDashboard")?.scrollIntoView({behavior:"smooth",block:"start"}),40);
+}
+function hideDashboard(){
+  document.body.classList.remove("dashboard-open");
+}
+function openMenu(){
+  const dash=document.body.classList.contains("dashboard-open");
+  modal(`<div class="menu-panel">
+    <h2>☰ MENU GURU</h2>
+    <p class="note">Fitur tambahan disimpan di sini agar layar permainan tetap bersih.</p>
+    <button class="menu-item" onclick="teacherReport()">📊 Rekap Guru</button>
+    <button class="menu-item" onclick="detailedResults()">📋 Hasil Permainan Detail</button>
+    <button class="menu-item" onclick="showHistory()">📜 Riwayat Pertandingan</button>
+    <button class="menu-item" onclick="auditBank()">🔎 Audit Soal & Anti-Repeat</button>
+    <button class="menu-item" onclick="downloadCSV()">📊 Export CSV Detail</button>
+    <button class="menu-item" onclick="saveResultJSON()">💾 Simpan/Backup JSON</button>
+    <button class="menu-item" onclick="openDashboard()">📈 ${dash?"Buka/Refresh":"Buka"} Pusat Pertandingan</button>
+    <button class="menu-item" onclick="hideDashboard();openMenu()">🙈 Sembunyikan Pusat Pertandingan</button>
+    <button class="btn" onclick="closeModal()">Tutup</button>
+  </div>`);
+}
+
+
+/* ===== KEYBOARD CONTROLS =====
+   Space = dadu; 1-4 = pilih jawaban; Enter = jawab jika sudah memilih.
+   Space dinonaktifkan saat soal terbuka agar tidak terjadi lemparan ganda.
+*/
+window.addEventListener("keydown",e=>{
+  if(e.repeat)return;
+  const modalOpen=$("m")&&$("m").style.display==="flex";
+  if(modalOpen){
+    const opts=[...document.querySelectorAll(".opt:not(:disabled)")];
+    if(e.key===" "){e.preventDefault();return;}
+    if(/^[1-4]$/.test(e.key)&&opts.length){
+      e.preventDefault();
+      const b=opts[Number(e.key)-1];
+      if(b)b.click();
+      return;
+    }
+    if(e.key==="Enter"){
+      const go=$("go");
+      if(go&&!go.disabled){e.preventDefault();go.click();}
+      return;
+    }
+    if(e.key==="Escape"){
+      /* Escape hanya menutup panel informasi/menu.
+         Saat soal aktif, timer tetap berjalan agar tidak bisa dieksploitasi. */
+      if(!document.querySelector(".opt"))closeModal();
+      return;
+    }
+    return;
+  }
+  if(e.key===" "&&!S.busy&&!S.over){
+    e.preventDefault();
+    roll();
+  }
+});
+
 draw();modal(`<h2>📖 PANDUAN BERMAIN</h2><p class="note">
 <b>🎲 Lempar Dadu</b><br><br>
 <b>1. Tekan Dadu untuk mendapatkan soal.</b><br><br>
 <b>2. Jawab Soal</b><br>Pilih jawaban, lalu tekan <b>JAWAB SEKARANG</b>. Waktu menjawab <b>60 detik</b> dimulai ketika soal sudah dibuka.<br><br>
 <b>3. Jawaban Benar</b><br>Jawaban benar membuat pion bergerak maju.<br><br>
-<b>4. Jawaban Salah</b><br>Jawaban salah membuat pion tetap di tempat. Tidak ada soal tambahan dari lemparan yang sama.<br><br>
-<b>5. Tabrak Lawan</b><br>Jika pion berhenti di petak yang sudah ditempati oleh pion lawan, pion lawan tersebut akan mundur <b>1 langkah</b>.<br><br>
+<b>4. Jawaban Salah</b><br>Jawaban salah membuat pion tetap di tempat dan poin berkurang <b>10</b>. Tidak ada soal tambahan dari lemparan yang sama.<br><br>
+<b>5. Tabrak Lawan</b><br>Jika pion berhenti di petak yang sudah ditempati oleh pion lawan, pion lawan tersebut akan mundur <b>1 langkah</b> dan kehilangan <b>100 poin</b>.<br><br>
 <b>6. Soal Rebutan</b><br>Soal rebutan muncul secara otomatis jika terdapat nilai seri bagi kelompok yang belum sampai finish.
 </p><button class="btn" onclick="modal('');ac()">MENGERTI 👍</button>`);
