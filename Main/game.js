@@ -16,7 +16,9 @@ const G=[{n:"Kelompok 1",c:"#1f6fc5",k:"blue",s:13,y:[0,9]},{n:"Kelompok 2",c:"#
 const SAFE=new Set([0,8,13,21,26,34,39,47]),STAR=new Set([8,21,34,47]),LV=["Mudah","Sedang","Sulit"],RUB=[100,90,80,70];
 const S={pos:[[0],[0],[0],[0]],activePawn:0,ok:[0,0,0,0],pts:[0,0,0,0],streak:[0,0,0,0],bestStreak:[0,0,0,0],h:[[],[],[],[]],cur:0,fin:[],used:new Set(),skipQ:[],swapLeft:2,cycle:0,curKey:"",appeared:[],tk:new Set(),quotes:[],left:0,info:"",busy:false,mute:false,over:false,stepFx:false,activity:[]};
 const POINT_PER_STEP=100;
-const WRONG_PENALTY=10;
+const WRONG_PENALTY=50;      // salah / waktu habis = -50 (setengah langkah), poin tidak jatuh di bawah 0
+const COLLISION_PENALTY=100; // pion ditabrak mundur 1 langkah = -100 (setara 1 langkah)
+function penalize(i,n=WRONG_PENALTY){const d=Math.min(S.pts[i],n);S.pts[i]-=d;return d}
 const REBUTAN_CORRECT_POINTS=100;
 
 // Hapus soal ganda (teks sama persis) di semua level & soal rebutan.
@@ -490,10 +492,10 @@ function after(){
   next();
 }
 function question(itIn){const i=S.cur,p=S.pos[i][S.activePawn],lv=p<19?0:p<38?1:2,it=itIn||ask();if(!it){S.left=0;msg("Seluruh "+Q.length+" soal unik telah digunakan.");fin2([...S.fin,...[0,1,2,3].filter(j=>!S.fin.includes(j)).sort((a,b)=>S.ok[b]-S.ok[a])]);return}
-show(it,60,`${G[i].n} <span class="lv">Soal berikutnya</span>`,(sel,t)=>{const ok=sel===it.a,st=t<=5?6:t<=10?5:t<=20?4:t<=30?3:t<=45?2:1;S.h[i].push({q:it.q,o:it.o,sel,a:it.a,ok,t,lv:LV[lv],materi:it.materi||""});if(ok){S.ok[i]++;S.streak[i]++;S.bestStreak[i]=Math.max(S.bestStreak[i],S.streak[i]);logActivity("✅",`${G[i].n} menjawab benar`,`Pion akan maju ${st} langkah · potensi +${st*POINT_PER_STEP} poin`);}else{S.streak[i]=0;S.pts[i]-=WRONG_PENALTY;logActivity("❌",`${G[i].n} salah menjawab`,`${fmtPts(-WRONG_PENALTY)} · pion tetap`);}
+show(it,60,`${G[i].n} <span class="lv">Soal berikutnya</span>`,(sel,t)=>{const ok=sel===it.a,st=t<=10?6:t<=20?5:t<=30?4:t<=40?3:t<=50?2:1;let pen=0;S.h[i].push({q:it.q,o:it.o,sel,a:it.a,ok,t,lv:LV[lv],materi:it.materi||""});if(ok){S.ok[i]++;S.streak[i]++;S.bestStreak[i]=Math.max(S.bestStreak[i],S.streak[i]);logActivity("✅",`${G[i].n} menjawab benar`,`Pion akan maju ${st} langkah · potensi +${st*POINT_PER_STEP} poin`);}else{S.streak[i]=0;pen=penalize(i);logActivity("❌",`${G[i].n} salah menjawab`,`${fmtPts(-pen)} · pion tetap`);}
 document.querySelectorAll(".opt").forEach((b,k)=>{if(ok&&k===it.a)b.classList.add("ok");else if(!ok&&k===sel)b.classList.add("no");});if(ok){sfxCorrect();$("bx").classList.add("boardPulse");setTimeout(()=>$("bx").classList.remove("boardPulse"),700)}else sfxWrong();
 const fb=feedback(ok?"ok":"no");
-$("go").outerHTML=`<div class="answer-feedback ${ok?"ok":"no"}"><span class="feedback-icon">${ok?"🎉":"💪"}</span><div class="mot-label"> </div><div class="feedback-text">${esc(fb)}</div><div class="feedback-sub">${ok?`✅ JAWABAN BENAR! Pion maju ${st} langkah · ${fmtPts(st*POINT_PER_STEP)}.`:`❌ ${sel===null?"WAKTU HABIS":"JAWABAN SALAH"}! ${fmtPts(-WRONG_PENALTY)} · pion tetap.`}</div></div><button class="btn nx-btn">${ok?"🚀 LANJUTKAN":"👉 COBA LAGI DI SOAL BERIKUTNYA"}</button>`;
+$("go").outerHTML=`<div class="answer-feedback ${ok?"ok":"no"}"><span class="feedback-icon">${ok?"🎉":"💪"}</span><div class="mot-label"> </div><div class="feedback-text">${esc(fb)}</div><div class="feedback-sub">${ok?`✅ JAWABAN BENAR! Pion maju ${st} langkah · ${fmtPts(st*POINT_PER_STEP)}.`:`❌ ${sel===null?"WAKTU HABIS":"JAWABAN SALAH"}! ${fmtPts(-pen)} · pion tetap.`}</div></div><button class="btn nx-btn">${ok?"🚀 LANJUTKAN":"👉 COBA LAGI DI SOAL BERIKUTNYA"}</button>`;
 draw();
 document.querySelector("#bx .nx-btn").onclick=()=>{modal("");if(ok)move(i,st,after);else after()}},()=>swapSoal(it))}
 function msg(t){$("msg").textContent=t}
@@ -544,15 +546,14 @@ function showFT(i,r){
       document.body.appendChild(d);setTimeout(()=>d.remove(),1200)}},k*500);
 }
 function land(i){const pawn=0,p=S.pos[i][pawn];if(p===56){if(pawnReady(i)&&!S.fin.includes(i)){S.fin.push(i);const r=S.fin.length;const bp=FIN_PTS[r]||0;if(!S._finPts)S._finPts={};if(!S._finPts[i]){S.pts[i]+=bp;S._finPts[i]=r;}msg(`🏁🎉 ${G[i].n} Juara ${r}! +${bp} poin`);logActivity("🏆",`${G[i].n} FINISH sebagai Juara ${r}`,`Bonus +${bp.toLocaleString("id-ID")} poin`);celebrateFinish(i,r);sfxFinish()}draw();return}
-if(p>0&&p<=50){const x=(G[i].s+p)%52;if(!SAFE.has(x))G.forEach((g,j)=>{if(j===i)return;const v=S.pos[j][0];if(v>0&&v<=50&&(g.s+v)%52===x){S.pos[j][0]=Math.max(0,v-1);msg(`💥 ${G[i].n} menabrak pion ${g.n}: mundur 1 langkah!`)}})}draw()}
+if(p>0&&p<=50){const x=(G[i].s+p)%52;if(!SAFE.has(x))G.forEach((g,j)=>{if(j===i)return;const v=S.pos[j][0];if(v>0&&v<=50&&(g.s+v)%52===x){S.pos[j][0]=Math.max(0,v-1);const lost=penalize(j,COLLISION_PENALTY);logActivity("💥",`${g.n} ditabrak ${G[i].n}`,`Mundur 1 langkah · ${fmtPts(-lost)}`);msg(`💥 ${G[i].n} menabrak pion ${g.n}: mundur 1 langkah!`)}})}draw()}
 function next(){if(S.fin.length>=2)return endGame();let n=S.cur;do n=(n+1)%4;while(S.fin.includes(n));S.cur=n;S.activePawn=0;S.busy=false;draw()}
 function endGame(){S.busy=true;const r=[0,1,2,3].filter(i=>!S.fin.includes(i)).sort((a,b)=>S.ok[b]-S.ok[a]);if(S.ok[r[0]]==S.ok[r[1]])return tie(r);fin2([...S.fin,...r])}
-function tie(r,round=0){const it=ask();if(!it){return fin2([...S.fin,...r])}const res=[];const go=k=>{if(k>1)return judge();const item=k===0?it:ask();if(!item)return fin2([...S.fin,...r]);show(item,30,`🔥 SOAL REBUTAN - PENENTU JUARA<br>${G[r[k]].n} (${k+1}/2)`,(sel,t)=>{const ok=sel===item.a;S.h[r[k]].push({q:item.q,o:item.o,sel,a:item.a,ok,t,lv:"Rebutan"});if(ok){S.pts[r[k]]+=REBUTAN_CORRECT_POINTS;S.streak[r[k]]++;S.bestStreak[r[k]]=Math.max(S.bestStreak[r[k]],S.streak[r[k]]);logActivity("🔥",`${G[r[k]].n} menang soal rebutan`,`+${REBUTAN_CORRECT_POINTS} poin`);}else{S.pts[r[k]]-=WRONG_PENALTY;S.streak[r[k]]=0;logActivity("❌",`${G[r[k]].n} salah soal rebutan`,`-${WRONG_PENALTY} poin`);}res.push({ok,t});modal(`<div class="pse">${G[r[k]].n} sudah menjawab.</div><button class="btn nx-btn">${k<1?"Lanjut ke kelompok berikutnya 👉":"Lihat hasil 👉"}</button>`);document.querySelector("#bx .nx-btn").onclick=()=>go(k+1)})};
-const judge=()=>{const[a,b]=res;let w=-1;if(a.ok&&!b.ok)w=0;else if(b.ok&&!a.ok)w=1;else if(a.ok&&b.ok)w=a.t<=b.t?0:1;if(w<0){
-  modal(`<div class="pse">Keduanya belum menjawab dengan benar.</div><div class="note">Tidak ada soal tambahan. Peringkat ditentukan berdasarkan urutan kelompok pada babak rebutan.</div><button class="btn nx-btn">Lihat hasil 👉</button>`);
-  document.querySelector("#bx .nx-btn").onclick=()=>fin2([...S.fin,r[0],r[1]]);
-  return;
-}
+function tie(r,round=0){const it=ask();if(!it){return fin2([...S.fin,...r])}const res=[];const go=k=>{if(k>1)return judge();const item=k===0?it:ask();if(!item)return fin2([...S.fin,...r]);show(item,30,`🔥 SOAL REBUTAN - PENENTU JUARA<br>${G[r[k]].n} (${k+1}/2)`,(sel,t)=>{const ok=sel===item.a;S.h[r[k]].push({q:item.q,o:item.o,sel,a:item.a,ok,t,lv:"Rebutan"});if(ok){S.pts[r[k]]+=REBUTAN_CORRECT_POINTS;S.streak[r[k]]++;S.bestStreak[r[k]]=Math.max(S.bestStreak[r[k]],S.streak[r[k]]);logActivity("🔥",`${G[r[k]].n} menang soal rebutan`,`+${REBUTAN_CORRECT_POINTS} poin`);}else{penalize(r[k]);S.streak[r[k]]=0;logActivity("❌",`${G[r[k]].n} salah soal rebutan`,`-${WRONG_PENALTY} poin`);}res.push({ok,t});modal(`<div class="pse">${G[r[k]].n} sudah menjawab.</div><button class="btn nx-btn">${k<1?"Lanjut ke kelompok berikutnya 👉":"Lihat hasil 👉"}</button>`);document.querySelector("#bx .nx-btn").onclick=()=>go(k+1)})};
+const judge=()=>{const[a,b]=res;let w=-1;if(a.ok&&!b.ok)w=0;else if(b.ok&&!a.ok)w=1;else if(a.ok&&b.ok)w=a.t<b.t?0:b.t<a.t?1:(Math.random()<.5?0:1);if(w<0){
+  if(round<2){modal(`<div class="pse">Kedua kelompok belum menjawab dengan benar.</div><div class="note">Soal rebutan diulang dengan soal baru (${round+2}/3).</div><button class="btn nx-btn">Soal rebutan berikutnya 👉</button>`);document.querySelector("#bx .nx-btn").onclick=()=>tie(r,round+1);return}
+  const f=Math.random()<.5;modal(`<div class="pse">Masih seri setelah 3 soal rebutan.</div><div class="note">Juara 3 ditentukan dengan undian acak agar adil untuk semua kelompok.</div><button class="btn nx-btn">Lihat hasil 👉</button>`);document.querySelector("#bx .nx-btn").onclick=()=>fin2([...S.fin,...(f?[r[0],r[1]]:[r[1],r[0]])]);return}
+
 modal(`<div class="pse">${G[r[w]].n} unggul dan menjadi Juara 3! 🏆</div><button class="btn nx-btn">Lihat pemenang 👉</button>`);document.querySelector("#bx .nx-btn").onclick=()=>fin2([...S.fin,r[w],r[1-w]])};go(0)}
 function topicOf(x){const q=qkey(x.q),a=qkey((x.o||[])[x.a]||""),all=q+" "+a;
   if(/muncul .*gambar ke-\d|urutan .*gambar|kesamaan|berulang|pola yang sama|hasil sama|pengenalan pola|mengenali pola|situasi serupa/.test(q))return"Pengenalan Pola";
@@ -614,7 +615,7 @@ function fin2(o){
   <div class="note" style="text-align:center;margin:4px 0 10px">Hasil lengkap setiap kelompok</div>
   <table><tr><th>Peringkat</th><th>Kelompok</th><th>Benar</th><th>Salah</th><th>Akurasi</th><th>Total soal</th><th>Poin</th></tr>${rows}</table>
   <div class="note" style="margin-top:8px">Bonus finish: Juara 1 = 4000 · Juara 2 = 3000 · Juara 3 = 2000 · Juara 4 = 900</div>
-    <div class="note">Belajar adalah perjalanan, setiap jawaban adalah langkah maju. Jika kelompok yang belum finish seri pada jumlah jawaban benar, soal rebutan menentukan Juara 3.</div>
+    <div class="note">Belajar adalah perjalanan, setiap jawaban adalah langkah maju. Jika kelompok yang belum finish seri pada jumlah jawaban benar, soal rebutan (sampai 3 putaran, lalu undian) menentukan Juara 3.</div>
   <button class="btn" onclick="teacherReport()">📊 REKAP / PROGRESS GURU</button>
   <button class="btn" onclick="review(0)">📖 Tinjau jawaban</button>
   <button class="btn" onclick="location.reload()">MAIN LAGI</button>`);
@@ -626,7 +627,7 @@ draw();modal(`<h2>📖 PANDUAN BERMAIN</h2><p class="note">
 <b>1. Tekan Dadu untuk mendapatkan soal.</b><br><br>
 <b>2. Jawab Soal</b><br>Pilih jawaban, lalu tekan <b>JAWAB SEKARANG</b>. Waktu menjawab <b>60 detik</b> dimulai ketika soal sudah dibuka.<br><br>
 <b>3. Jawaban Benar</b><br>Jawaban benar membuat pion bergerak maju.<br><br>
-<b>4. Jawaban Salah</b><br>Jawaban salah membuat pion tetap di tempat. Tidak ada soal tambahan dari lemparan yang sama.<br><br>
-<b>5. Tabrak Lawan</b><br>Jika pion berhenti di petak yang sudah ditempati oleh pion lawan, pion lawan tersebut akan mundur <b>1 langkah</b>.<br><br>
+<b>4. Jawaban Salah</b><br>Jawaban salah membuat pion tetap di tempat dan poin berkurang <b>50</b>. Tidak ada soal tambahan dari lemparan yang sama.<br><br>
+<b>5. Tabrak Lawan</b><br>Jika pion berhenti di petak yang sudah ditempati oleh pion lawan, pion lawan tersebut akan mundur <b>1 langkah</b> dan kehilangan <b>100 poin</b>.<br><br>
 <b>6. Soal Rebutan</b><br>Soal rebutan muncul secara otomatis jika terdapat nilai seri bagi kelompok yang belum sampai finish.
 </p><button class="btn" onclick="modal('');ac()">MENGERTI 👍</button>`);
