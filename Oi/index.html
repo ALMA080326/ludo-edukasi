@@ -1,4 +1,4 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="ludo-build" content="v10.6-three-photo-layout">
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="ludo-build" content="v10.8-three-photo-base64">
 <title>Ludo Edukasi — Berpikir Komputasional</title>
 
 <link rel="stylesheet" href="style.css">
@@ -16,7 +16,7 @@
   <span>🎮 GAME EDUKASI</span><span>👥 4 KELOMPOK</span><span>🧠 BERPIKIR KOMPUTASIONAL</span>
 </div>
   </div>
-  <img class="hero-img" alt="Foto kelas siswa" src="foto-kelas.jpg">
+  <img class="hero-img" alt="Foto kelas siswa" src="" data-base64-image="kelas">
 </section>
 
 <div class="wrap">
@@ -53,7 +53,7 @@
       <div class="card class-card photo-mini-card">
         <div class="class-card-head"><h3>🏫 Kelas Kita</h3><span>40 siswa · 4 kelompok</span></div>
         <div class="class-card-body">
-          <img src="foto-3-siswa.webp" alt="Tiga siswa membawa buku" class="class-card-img">
+          <img src="" alt="Tiga siswa belajar" class="class-card-img" data-base64-image="piala">
           <div class="class-card-copy"><b>Belajar bersama.</b><p>Berpikir, bekerja sama, dan menyelesaikan tantangan.</p></div>
         </div>
       </div>
@@ -61,7 +61,7 @@
       <div class="card class-card challenge-card photo-mini-card">
         <div class="class-card-head"><h3>🏆 Tantangan Kelas</h3><span>Berani mencoba</span></div>
         <div class="class-card-body">
-          <img src="foto-piala.png" alt="Tiga siswa merayakan kemenangan" class="class-card-img challenge-img">
+          <img src="" alt="Tiga siswa merayakan kemenangan" class="class-card-img challenge-img" data-base64-image="buku">
           <div class="class-card-copy"><b>Raih prestasi bersama.</b><p>Setiap soal adalah kesempatan untuk maju.</p></div>
         </div>
       </div>
@@ -145,5 +145,12 @@
 <div class="finish-toast" id="finishToast"></div>
 <div id="soundFx" class="sound-fx"></div>
 <div id="m"><div class="box" id="bx"></div></div>
+<script src="foto-base64.js"></script>
+<script>
+(function(){
+  const map={kelas:IMG_FOTO_KELAS,piala:IMG_FOTO_PIALA,buku:IMG_FOTO_BUKU};
+  document.querySelectorAll("[data-base64-image]").forEach(function(img){img.src=map[img.dataset.base64Image]||"";});
+})();
+</script>
 <script src="bank-soal.js"></script>
 <script src="game.js"></script></body></html>

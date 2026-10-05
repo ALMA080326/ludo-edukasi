@@ -906,3 +906,9 @@ body{padding:clamp(8px,1.2vw,14px)}
   .photo-mini-card .class-card-img{height:72px}
   .photo-mini-card .class-card-copy p{display:none}
 }
+
+
+/* ===== V10.7 — SHOW BOTH SUPPORTING PHOTOS =====
+   Menampilkan kedua foto kartu; tidak mengubah layout permainan lainnya.
+*/
+.photo-pair .class-card:nth-child(2){display:block!important}
