@@ -705,3 +705,64 @@ body.dashboard-open .full-dashboard{display:grid!important}
   #dice{width:104px!important;height:104px!important}
   .dice-dock-help{display:none}
 }
+
+/* ===== V10.3 FULL-SPACE RESPONSIVE =====
+   Menutup ruang kosong tanpa mengubah logika permainan.
+   Semua ukuran mengikuti isi + viewport; tidak ada panel kontrol kosong yang dipaksa tinggi.
+*/
+body{padding:clamp(8px,1.2vw,14px)}
+.top,.hero,.wrap{max-width:1180px}
+.hero{
+  min-height:0;
+  height:clamp(112px,13.5vw,148px);
+  margin-bottom:clamp(9px,1.2vw,14px);
+  padding:clamp(14px,2vw,22px) clamp(15px,3.2vw,42%);
+}
+.hero-img{max-height:100%;}
+.wrap{
+  grid-template-columns:minmax(0,1fr) minmax(285px,390px);
+  gap:clamp(10px,1.4vw,18px);
+  align-items:start;
+}
+.board-column{display:flex;justify-content:center;min-width:0}
+.bd{
+  width:min(100%,720px);
+  max-height:calc(100dvh - 220px);
+}
+.side{gap:clamp(8px,1vw,12px)}
+.turn-card{padding:clamp(11px,1.3vw,15px)}
+.dice-dock{
+  min-height:0!important;
+  height:auto;
+  padding:18px 10px 8px;
+  grid-template-rows:auto 1fr auto;
+}
+#diceArea{
+  min-height:0!important;
+  min-width:0!important;
+}
+.dice-dock-help{position:static;margin-top:2px;line-height:1.2}
+@media(min-width:821px){
+  .dice-dock{min-height:0!important;padding:17px 10px 7px}
+  #diceArea{width:142px!important;height:142px!important;min-width:0!important;min-height:0!important}
+  #dice{width:132px!important;height:132px!important}
+}
+@media(max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr) minmax(270px,350px)}
+  .bd{max-height:none}
+}
+@media(max-width:620px){
+  .hero{height:auto;min-height:0;padding:13px 38% 13px 13px}
+  .wrap{grid-template-columns:1fr;gap:9px}
+  .bd{width:100%;max-width:none}
+  .dice-dock{padding:17px 8px 7px;}
+  #diceArea{width:122px!important;height:122px!important;min-width:0!important;min-height:0!important}
+  #dice{width:114px!important;height:114px!important}
+  .dice-dock-help{font-size:8px}
+}
+@media(max-width:380px){
+  .dice-dock{padding:15px 7px 6px}
+  #diceArea{width:112px!important;height:112px!important;min-width:0!important;min-height:0!important}
+  #dice{width:104px!important;height:104px!important}
+  .dice-dock-help{display:none}
+}
