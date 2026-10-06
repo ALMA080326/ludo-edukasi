@@ -1614,3 +1614,19 @@ body.focus-mode .full-dashboard,body.focus-mode .smart-hud,body.focus-mode .quic
 .guide-panel{max-width:720px}.guide-hero{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#e7faff,#fff5c9);border:1px solid #ccebf3;border-radius:20px;padding:16px;margin-bottom:12px}.guide-hero>span,.guide-hero>div>span{font-size:11px;font-weight:900;color:#28708f;letter-spacing:.1em}.guide-hero>div h2{margin:2px 0 0;font-size:24px;color:#174b80}.guide-steps{display:grid;gap:8px}.guide-steps>div{display:grid;grid-template-columns:34px 34px 1fr;align-items:center;gap:8px;background:#fff;border:1px solid #dceef5;border-radius:15px;padding:9px}.guide-steps>div>b{color:#83a2b3;font-size:11px}.guide-steps>div>span{font-size:23px;text-align:center}.guide-steps p{margin:0}.guide-steps strong,.guide-steps small{display:block}.guide-steps strong{color:#214f70}.guide-steps small{color:#6b8494;margin-top:2px}.guide-tip{margin:12px 0;padding:11px 13px;border-radius:14px;background:#fff8d9;color:#735400;border:1px solid #f4df8a}
 @media(max-width:900px){.smart-hud{grid-template-columns:repeat(2,minmax(0,1fr));padding:0 10px}.hud-next{grid-column:1/-1}.quick-tools{padding:0 10px}.quick-tools button{flex:1;min-width:140px}.guide-hero>div h2{font-size:20px}}
 @media(max-width:520px){.smart-hud{gap:8px;margin:10px auto;padding:0 8px}.hud-card{min-height:64px;padding:9px 10px;border-radius:16px}.hud-icon{width:32px;height:32px;font-size:17px}.hud-card b{font-size:15px}.hud-card small{font-size:8px}.quick-tools{margin-bottom:12px}.quick-tools button{padding:9px 10px;font-size:11px}.guide-steps>div{grid-template-columns:27px 30px 1fr}.guide-hero{padding:12px}.guide-hero>div h2{font-size:18px}}
+
+/* V16 SUNNY DICE CLEAN — dice is an unobstructed primary control. */
+.dice-console{background:linear-gradient(145deg,#fff7b8 0%,#e7fbff 48%,#eaffdc 100%)!important;color:#174d7d!important;}
+.dice-zone{position:relative!important;overflow:visible!important;isolation:isolate!important;}
+#diceArea{position:relative!important;z-index:100!important;display:flex!important;align-items:center!important;justify-content:center!important;min-height:150px!important;overflow:visible!important;}
+#dice{position:relative!important;z-index:101!important;display:grid!important;place-items:center!important;background:transparent!important;border:0!important;box-shadow:none!important;outline:none!important;padding:0!important;cursor:pointer!important;overflow:visible!important;}
+#dice:focus-visible{outline:4px solid #20b9e8!important;outline-offset:8px!important;border-radius:28px!important;}
+#dice .throw,#dice .cube{pointer-events:none!important;}
+.dice-zone:before,.dice-zone:after{pointer-events:none!important;z-index:1!important;}
+#diceBadge{position:relative!important;z-index:105!important;}
+/* No instruction text may occupy the dice zone. */
+#diceHint,.console-help{display:none!important;}
+/* Sunny-only page surfaces: no black/dark backdrop. */
+html,body{background:linear-gradient(135deg,#fffdf1 0%,#e9fbff 48%,#f0ffe7 100%)!important;color:#173b62!important;}
+body:before{background:radial-gradient(circle,#ffe88999,transparent 68%)!important;}
+body:after{background:radial-gradient(circle,#9deeff88,transparent 68%)!important;}
