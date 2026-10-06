@@ -1630,3 +1630,102 @@ body.focus-mode .full-dashboard,body.focus-mode .smart-hud,body.focus-mode .quic
 html,body{background:linear-gradient(135deg,#fffdf1 0%,#e9fbff 48%,#f0ffe7 100%)!important;color:#173b62!important;}
 body:before{background:radial-gradient(circle,#ffe88999,transparent 68%)!important;}
 body:after{background:radial-gradient(circle,#9deeff88,transparent 68%)!important;}
+
+/* =========================================================
+   V17 — SUNNY 3D TOTAL EXPERIENCE
+   Everything is bright, layered, dimensional and touch-safe.
+   The dice is a dedicated unobstructed 3D hero control.
+   ========================================================= */
+:root{
+  --v17-sky:#dff8ff;
+  --v17-blue:#1678d4;
+  --v17-cyan:#31d7ef;
+  --v17-yellow:#ffd34d;
+  --v17-orange:#ff9b2f;
+  --v17-green:#28c879;
+  --v17-pink:#ff7da8;
+  --v17-ink:#16476d;
+  --v17-shadow:0 18px 35px rgba(28,105,155,.18),0 5px 0 rgba(28,105,155,.08),inset 0 1px 0 #fff;
+}
+html,body{background:linear-gradient(135deg,#fffdf0 0%,#dff8ff 42%,#efffe7 72%,#fff1d4 100%)!important;color:var(--v17-ink)!important;min-height:100%;}
+body{perspective:1800px;overflow-x:hidden;}
+body:before{background:radial-gradient(circle at 18% 18%,rgba(255,222,83,.42),transparent 30%)!important;}
+body:after{background:radial-gradient(circle at 85% 24%,rgba(74,222,255,.30),transparent 28%)!important;}
+/* No dark command/nav surface. */
+.top.command-top{background:linear-gradient(145deg,#ffffffee,#e8faffdd 55%,#fff5cde8)!important;border:2px solid #fff!important;color:var(--v17-ink)!important;box-shadow:0 18px 38px rgba(35,111,155,.15),inset 0 1px 0 #fff!important;transform:translateZ(18px);}
+.top.command-top:before{background:linear-gradient(90deg,#24d6ee,#ffd34d,#67df9a)!important;opacity:.8!important;}
+.sound-pill{background:linear-gradient(145deg,#fff,#e8f8ff)!important;color:#215a7c!important;border:2px solid #fff!important;box-shadow:0 8px 0 rgba(36,125,174,.10),0 12px 22px rgba(36,125,174,.12),inset 0 1px 0 #fff!important;transform:translateZ(8px);}
+.sound-pill:active{transform:translateY(3px) translateZ(3px)!important;box-shadow:0 4px 0 rgba(36,125,174,.10)!important;}
+.mission-hero,.arena-board-shell,.arena-rail,.smart-hud,.quick-tools,.full-dashboard,.command-strip{transform-style:preserve-3d;}
+.mission-hero{transform:translateZ(20px);}
+.mission-copy,.crew-window,.arena-rail,.arena-board-shell,.hud-card,.quick-tools button,.live-ranking-card,.team-card,.activity-card,.learning-lab,.edu-card,.photo-panel,.footer-card{box-shadow:var(--v17-shadow)!important;border:2px solid rgba(255,255,255,.96)!important;}
+.mission-copy,.crew-window,.arena-rail,.hud-card,.quick-tools button,.live-ranking-card,.team-card,.activity-card,.learning-lab,.edu-card,.photo-panel,.footer-card{transform:translateZ(8px);}
+.mission-copy:hover,.crew-window:hover,.hud-card:hover,.team-card:hover,.edu-card:hover,.photo-panel:hover{transform:translateY(-4px) translateZ(18px) rotateX(1deg) rotateY(-1deg)!important;}
+.crew-window img{transform:translateZ(14px);filter:drop-shadow(0 15px 14px rgba(30,91,125,.18));}
+/* Make the board feel like a physical 3D game table. */
+.arena-board-shell{perspective:1300px;}
+.bd{transform-style:preserve-3d!important;transform:rotateX(2deg) rotateY(-1deg) translateZ(12px)!important;background:linear-gradient(145deg,#fff,#dff8ff 45%,#fff5c9)!important;box-shadow:0 32px 60px rgba(32,110,155,.23),0 8px 0 rgba(30,102,153,.10),inset 0 2px 0 #fff!important;}
+.bd svg{transform:translateZ(12px) rotateX(1deg)!important;filter:drop-shadow(0 18px 20px rgba(28,87,125,.18))!important;}
+/* Dedicated dice stage: absolutely no instructional text inside it. */
+.dice-console{background:linear-gradient(145deg,#fff4a9,#e4fbff 48%,#eaffd9)!important;box-shadow:0 25px 50px rgba(36,124,165,.18),inset 0 2px 0 #fff!important;transform-style:preserve-3d;transform:translateZ(20px);}
+.console-label,#diceBadge,#diceHint,.dice-dock-help,.dice-control-copy{display:none!important;}
+.dice-zone{height:230px!important;min-height:230px!important;display:grid!important;place-items:center!important;overflow:visible!important;position:relative!important;isolation:isolate!important;perspective:1100px!important;}
+.dice-zone:before{width:190px!important;height:190px!important;border:3px dashed rgba(42,190,225,.35)!important;box-shadow:0 0 0 16px rgba(255,211,77,.10),0 0 55px rgba(53,211,238,.18)!important;animation:diceHalo 2.4s linear infinite!important;}
+.dice-zone:after{width:160px!important;height:160px!important;border:2px solid rgba(255,174,36,.24)!important;animation:diceHalo 3s linear reverse infinite!important;}
+@keyframes diceHalo{to{transform:translate(-50%,-50%) rotate(360deg)}}
+#diceArea{width:190px!important;height:190px!important;min-width:190px!important;min-height:190px!important;display:grid!important;place-items:center!important;position:relative!important;z-index:100!important;overflow:visible!important;pointer-events:none!important;perspective:1100px!important;transform-style:preserve-3d!important;}
+#dice{width:184px!important;height:184px!important;position:relative!important;z-index:101!important;display:grid!important;place-items:center!important;pointer-events:auto!important;perspective:1100px!important;transform-style:preserve-3d!important;background:transparent!important;}
+#dice .throw{position:absolute!important;inset:0!important;display:grid!important;place-items:center!important;transform-style:preserve-3d!important;perspective:1100px!important;}
+#dice .cube{--s:clamp(96px,18vw,150px)!important;transform-style:preserve-3d!important;perspective:1100px!important;will-change:transform,filter!important;}
+#dice .face{backface-visibility:hidden!important;transform-style:preserve-3d!important;border-radius:22%!important;border-width:4px!important;box-shadow:inset 7px 7px 13px rgba(255,255,255,.42),inset -10px -12px 20px rgba(9,70,150,.30),0 10px 0 rgba(20,93,160,.16),0 20px 28px rgba(21,95,145,.20)!important;}
+#dice .face:after{content:"";position:absolute;inset:6%;border-radius:18%;background:linear-gradient(135deg,rgba(255,255,255,.34),transparent 42%);pointer-events:none;transform:translateZ(2px);}
+#dice .face i{transform:translateZ(4px);width:78%!important;height:78%!important;background:radial-gradient(circle at 28% 22%,#fff 0 6%,#16456f 9% 58%,#062a4f 100%)!important;box-shadow:inset 3px 4px 5px rgba(255,255,255,.65),inset 0 -4px 7px rgba(0,25,65,.55),0 3px 4px rgba(0,45,90,.32)!important;}
+#dice .shadow3d{width:115px!important;height:22px!important;bottom:13px!important;filter:blur(2px)!important;background:radial-gradient(ellipse,rgba(20,92,139,.38),transparent 70%)!important;transform:translateZ(-35px)!important;}
+#dice:active .cube{filter:brightness(1.08) saturate(1.12)!important;}
+/* A true 3D press/lift treatment across every interactive card. */
+button,.btn,.menu-item,.opt,.team-card{transform-style:preserve-3d;}
+button:not(:disabled):hover,.btn:hover,.menu-item:hover,.opt:hover{transform:translateY(-3px) translateZ(10px);}
+/* 3D dashboard surfaces */
+.smart-hud,.full-dashboard{perspective:1200px;}
+.hud-card,.rank-row,.profile-card,.activity-item,.edu-card,.photo-panel{transform-style:preserve-3d!important;}
+.hud-card:before,.edu-card:before,.profile-card:before,.rank-row:before{content:"";position:absolute;inset:1px;border-radius:inherit;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.55),transparent 36%);transform:translateZ(3px);}
+/* Never allow a dark/black surface to reappear through legacy rules. */
+[style*="background:#000"],[style*="background: #000"],[style*="background:black"],[style*="background: black"]{background:#fff!important;}
+@media(max-width:780px){
+  .dice-zone{height:205px!important;min-height:205px!important;}
+  #diceArea{width:176px!important;height:176px!important;min-width:176px!important;min-height:176px!important;}
+  #dice{width:172px!important;height:172px!important;}
+  #dice .cube{--s:108px!important;}
+  .bd{transform:rotateX(1deg) translateZ(8px)!important;}
+}
+@media(max-width:420px){
+  .dice-zone{height:190px!important;min-height:190px!important;}
+  #diceArea{width:160px!important;height:160px!important;min-width:160px!important;min-height:160px!important;}
+  #dice{width:156px!important;height:156px!important;}
+  #dice .cube{--s:94px!important;}
+}
+
+/* V17 bright surface enforcement: every visible panel remains sunny, never black. */
+.arena-rail,.arena-board-shell,.rail-tip,.score-mini,.score-mini .row,.dashboard-titlebar,.live-ranking-card,.team-card,.activity-card,.learning-lab,.edu-card,.photo-panel,.footer-card,.rank-row,.profile-card,.activity-item{
+  background:linear-gradient(145deg,#ffffff 0%,#eefaff 58%,#fff7d6 100%)!important;
+  color:var(--v17-ink)!important;
+  border-color:rgba(255,255,255,.98)!important;
+  box-shadow:0 18px 36px rgba(38,111,153,.15),0 4px 0 rgba(38,111,153,.07),inset 0 1px 0 #fff!important;
+}
+.dashboard-titlebar{background:linear-gradient(135deg,#e6fbff,#ffffff 48%,#fff0b8)!important;}
+.rail-kicker,.section-head p,.command-strip .strip-note{color:#5f8198!important}
+.turn-orb{background:linear-gradient(145deg,#fff7c9,#e7fbff)!important;border-color:#fff!important;box-shadow:inset 0 1px 0 #fff,0 10px 22px rgba(36,120,158,.12)!important;}
+.rail-stat{border-color:#d7edf6!important}.rail-stat span{color:#7190a2!important}.rail-stat b{color:#164d76!important}
+.score-mini{border-top-color:#d7edf6!important}.score-mini .row.on{background:linear-gradient(145deg,#fff7c8,#e6fbff)!important;color:#164d76!important;border-color:#ffd85c!important}
+.score-mini .sc{color:#174b80!important}
+.footer-brand,.dashboard-title h2,.edu-card h3{color:#174d7d!important}.edu-card p,.footer-sub{color:#648399!important}
+
+/* V17 true 3D dice fallback: keep depth even when a browser has weak 3D compositing. */
+#dice .throw{isolation:isolate;}
+#dice .cube{will-change:transform;}
+#dice .face:nth-child(1){background:linear-gradient(145deg,#72efff,#2aabf1 45%,#2368d4)!important}
+#dice .face:nth-child(2){background:linear-gradient(145deg,#b2fff0,#31d4b4 45%,#139b8e)!important}
+#dice .face:nth-child(3){background:linear-gradient(145deg,#fff29b,#ffc044 45%,#f17c19)!important}
+#dice .face:nth-child(4){background:linear-gradient(145deg,#ffd0df,#ff7ea4 45%,#df416f)!important}
+#dice .face:nth-child(5){background:linear-gradient(145deg,#ded5ff,#927df3 45%,#5d4dc4)!important}
+#dice .face:nth-child(6){background:linear-gradient(145deg,#b9dcff,#5ca9f0 45%,#2874c7)!important}
