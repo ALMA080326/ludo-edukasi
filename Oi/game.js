@@ -768,22 +768,102 @@ function openDashboard(){
 function hideDashboard(){
   document.body.classList.remove("dashboard-open");
 }
+function toggleAdvancedMenu(){
+  const body=$("menuAdvancedBody");
+  const btn=$("menuAdvancedToggle");
+  if(!body||!btn)return;
+  const open=body.classList.toggle("open");
+  btn.setAttribute("aria-expanded",open?"true":"false");
+  btn.querySelector(".advanced-chevron").textContent=open?"⌃":"⌄";
+}
+function toggleDashboardFromMenu(){
+  const visible=document.body.classList.contains("dashboard-open");
+  if(visible){
+    hideDashboard();
+    openMenu();
+    return;
+  }
+  openDashboard();
+}
 function openMenu(){
   const dash=document.body.classList.contains("dashboard-open");
-  modal(`<div class="menu-panel">
-    <h2>☰ MENU GURU</h2>
-    <p class="note">Fitur tambahan disimpan di sini agar layar permainan tetap bersih.</p>
-    <button class="menu-item" onclick="teacherReport()">📊 Rekap Guru</button>
-    <button class="menu-item" onclick="detailedResults()">📋 Hasil Permainan Detail</button>
-    <button class="menu-item" onclick="showHistory()">📜 Riwayat Pertandingan</button>
-    <button class="menu-item" onclick="auditBank()">🔎 Audit Soal & Anti-Repeat</button>
-    <button class="menu-item" onclick="downloadCSV()">📊 Export CSV Detail</button>
-    <button class="menu-item" onclick="saveResultJSON()">💾 Simpan/Backup JSON</button>
-    <button class="menu-item" onclick="openDashboard()">📈 ${dash?"Buka/Refresh":"Buka"} Pusat Pertandingan</button>
-    <button class="menu-item" onclick="hideDashboard();openMenu()">🙈 Sembunyikan Pusat Pertandingan</button>
-    <button class="btn" onclick="closeModal()">Tutup</button>
+  const dashLabel=dash?"Sembunyikan Pusat Pertandingan":"Tampilkan Pusat Pertandingan";
+  const dashDesc=dash?"Sembunyikan tampilan dashboard tanpa menghapus data.":"Tampilkan kembali dashboard pertandingan.";
+  modal(`<div class="menu-guru-modern">
+    <div class="menu-guru-head">
+      <div class="menu-guru-icon">👩‍🏫</div>
+      <div class="menu-guru-title-wrap">
+        <h2>MENU <span>GURU</span> ✨</h2>
+        <p>Fitur tambahan untuk mengelola permainan dan data pembelajaran.</p>
+      </div>
+      <button class="menu-close-x" onclick="closeModal()" aria-label="Tutup">×</button>
+    </div>
+
+    <section class="menu-section menu-section-blue">
+      <div class="menu-section-title"><span>📊</span> DATA PERMAINAN</div>
+      <button class="menu-item-modern" onclick="teacherReport()">
+        <span class="menu-item-icon blue">📊</span>
+        <span><b>Rekap Guru</b><small>Lihat ringkasan hasil permainan.</small></span>
+        <i>›</i>
+      </button>
+      <button class="menu-item-modern" onclick="detailedResults()">
+        <span class="menu-item-icon green">📋</span>
+        <span><b>Hasil Permainan Detail</b><small>Lihat detail setiap permainan.</small></span>
+        <i>›</i>
+      </button>
+      <button class="menu-item-modern" onclick="showHistory()">
+        <span class="menu-item-icon purple">🏆</span>
+        <span><b>Riwayat Pertandingan</b><small>Lihat catatan pertandingan yang sudah berlangsung.</small></span>
+        <i>›</i>
+      </button>
+    </section>
+
+    <section class="menu-section menu-section-yellow">
+      <div class="menu-section-title"><span>🔎</span> SOAL</div>
+      <button class="menu-item-modern" onclick="auditBank()">
+        <span class="menu-item-icon pink">📝</span>
+        <span><b>Cek Soal & Anti-Pengulangan</b><small>Pastikan soal tidak berulang dan tetap bervariasi.</small></span>
+        <i>›</i>
+      </button>
+    </section>
+
+    <section class="menu-section menu-section-teal">
+      <div class="menu-section-title"><span>🗄️</span> DATA & PERTANDINGAN</div>
+      <button class="menu-item-modern" onclick="downloadCSV()">
+        <span class="menu-item-icon cyan">↗️</span>
+        <span><b>Export Data</b><small>Unduh data dalam format CSV.</small></span>
+        <i>›</i>
+      </button>
+      <button class="menu-item-modern" onclick="saveResultJSON()">
+        <span class="menu-item-icon purple">☁️</span>
+        <span><b>Backup Data</b><small>Simpan cadangan data (JSON).</small></span>
+        <i>›</i>
+      </button>
+      <button class="menu-item-modern" onclick="openDashboard()">
+        <span class="menu-item-icon orange">🏆</span>
+        <span><b>Pusat Pertandingan</b><small>Kelola dan atur pusat pertandingan.</small></span>
+        <i>›</i>
+      </button>
+    </section>
+
+    <section class="menu-advanced">
+      <button id="menuAdvancedToggle" class="menu-advanced-toggle" onclick="toggleAdvancedMenu()" aria-expanded="false" type="button">
+        <span class="advanced-left"><span class="advanced-icon">⚙️</span><span><b>Fitur Lanjutan</b><small>Fitur tambahan yang jarang digunakan.</small></span></span>
+        <span class="advanced-chevron">⌄</span>
+      </button>
+      <div id="menuAdvancedBody" class="menu-advanced-body" aria-hidden="true">
+        <button class="menu-item-modern advanced-item" onclick="toggleDashboardFromMenu()">
+          <span class="menu-item-icon gray">${dash?"🙈":"👁️"}</span>
+          <span><b>${dashLabel}</b><small>${dashDesc}</small></span>
+          <i>›</i>
+        </button>
+      </div>
+    </section>
+
+    <button class="menu-close-bottom" onclick="closeModal()"><span>×</span> Tutup</button>
   </div>`);
 }
+
 
 
 /* ===== KEYBOARD CONTROLS =====
