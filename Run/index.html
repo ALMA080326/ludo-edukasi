@@ -1,4 +1,4 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="ludo-build" content="v10.8-three-photo-base64">
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="ludo-build" content="v10.11-photo-showcase-fixed">
 <title>Ludo Edukasi — Berpikir Komputasional</title>
 
 <link rel="stylesheet" href="style.css">
@@ -96,6 +96,17 @@
       <div class="material"><div class="mi">🧠</div><b>Berpikir Komputasional</b><p>Cara berpikir sistematis untuk memahami dan menyelesaikan masalah.</p><small><strong>Manfaat:</strong> membantu menyusun solusi yang logis, terstruktur, dan efisien.</small></div>
     </div>
   </div>
+  <section class="photo-showcase" aria-label="Galeri kegiatan kelas">
+    <div class="photo-panel photo-panel-wide">
+      <div class="photo-panel-kicker">👥 KEBERSAMAAN KELAS</div>
+      <img data-base64-image="galeriKelas" alt="Ilustrasi kebersamaan guru dan siswa" loading="lazy">
+    </div>
+    <div class="photo-panel photo-panel-trophy">
+      <div class="photo-panel-kicker">🏆 SEMANGAT BERPRESTASI</div>
+      <img data-base64-image="tigaSiswa" alt="Tiga siswa dengan piala" loading="lazy">
+    </div>
+  </section>
+
   <div class="footer-card">
     <div class="footer-brand">🎲 LUDO EDUKASI</div>
     <div class="footer-sub">Belajar • Bermain • Berpikir • Berkembang</div>
@@ -109,7 +120,7 @@
 <script src="foto-base64.js"></script>
 <script>
 (function(){
-  const map={kelas:IMG_FOTO_KELAS,piala:IMG_FOTO_PIALA,buku:IMG_FOTO_BUKU};
+  const map={kelas:IMG_FOTO_KELAS,piala:IMG_FOTO_PIALA,buku:IMG_FOTO_BUKU,galeriKelas:IMG_FOTO_GALERI_KELAS,tigaSiswa:IMG_FOTO_TIGA_SISWA};
   document.querySelectorAll("[data-base64-image]").forEach(function(img){img.src=map[img.dataset.base64Image]||"";});
 })();
 </script>
