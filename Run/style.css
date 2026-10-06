@@ -1037,3 +1037,11 @@ body{padding:clamp(8px,1.2vw,14px)}
   .photo-panel{min-height:165px;}
   .photo-panel img{height:calc(100% - 22px);}
 }
+
+/* v10.12 — three new decorative photos, outside playable controls. */
+.photo-showcase-three{grid-template-columns:repeat(3,minmax(0,1fr));}
+.photo-showcase-three .photo-panel{min-height:190px;}
+.photo-showcase-three .photo-panel img{height:calc(100% - 22px);object-fit:contain;object-position:center bottom;}
+.photo-showcase-three .photo-panel-wide img,.photo-showcase-three .photo-panel-trophy img,.photo-showcase-three .photo-panel-group img{transform:none;}
+@media (max-width:900px){.photo-showcase-three{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (max-width:560px){.photo-showcase-three{grid-template-columns:1fr;}.photo-showcase-three .photo-panel{min-height:170px;}}
