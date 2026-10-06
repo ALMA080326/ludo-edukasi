@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="ludo-build" content="v17-sunny-total-3d">
+<meta name="ludo-build" content="v14-sunny-3d-orbit">
 <meta name="theme-color" content="#dff8ff">
 <title>Ludo Edukasi — Command Arena</title>
 <link rel="stylesheet" href="style.css">
@@ -58,7 +58,7 @@
     <aside class="arena-rail rail-right">
       <div class="rail-kicker">ACTION DECK</div>
       <div class="dice-console">
-        
+        <div class="console-label"></div>
         <div class="dice-zone">
           <div id="diceArea">
             <button id="dice" onclick="roll()" aria-label="Lempar dadu untuk mendapatkan satu soal"><div class="shadow3d" id="dshadow"></div><div class="throw" id="throw"><div class="cube idle" id="cube"></div></div></button>
@@ -133,7 +133,7 @@
 <div class="finish-toast" id="finishToast"></div>
 <div id="soundFx" class="sound-fx"></div><div id="diceFlight" aria-hidden="true"></div>
 <div id="m"><div class="box" id="bx"></div></div>
-<script src="foto-base64.js?v=17"></script>
+<script src="foto-base64.js?v=14"></script>
 <script>
 (function(){function g(n){try{return(0,eval)("typeof "+n+"!=='undefined'?"+n+":''")||"";}catch(e){return "";}}
 const map={kelas:g("IMG_FOTO_KELAS"),piala:g("IMG_FOTO_PIALA"),buku:g("IMG_FOTO_BUKU"),galeriKelas:g("IMG_FOTO_GALERI_KELAS"),tigaSiswa:g("IMG_FOTO_TIGA_SISWA"),galeriKelasBaru:g("IMG_FOTO_GALERI_KELAS_BARU"),tigaSiswaBaru:g("IMG_FOTO_TIGA_SISWA_BARU"),kebersamaanKelasBaru:g("IMG_FOTO_KEBERSAMAAN_KELAS_BARU")};
@@ -165,5 +165,6 @@ document.querySelectorAll("[data-base64-image]").forEach(function(img){img.src=m
   q("quickTop")?.addEventListener("click",()=>q("arenaTop")?.scrollIntoView({behavior:"smooth",block:"start"}));
 })();
 </script>
+<script src="v18-3d-motion.js"></script>
 </body>
 </html>
