@@ -1,4 +1,4 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="ludo-build" content="v10.11-photo-showcase-fixed">
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="ludo-build" content="v10.12-photo-fix">
 <title>Ludo Edukasi — Berpikir Komputasional</title>
 
 <link rel="stylesheet" href="style.css">
@@ -124,7 +124,8 @@
 <script src="foto-base64.js?v=12"></script>
 <script>
 (function(){
-  const map={kelas:window.IMG_FOTO_KELAS||"",piala:window.IMG_FOTO_PIALA||"",buku:window.IMG_FOTO_BUKU||"",galeriKelas:window.IMG_FOTO_GALERI_KELAS||"",tigaSiswa:window.IMG_FOTO_TIGA_SISWA||"",galeriKelasBaru:window.IMG_FOTO_GALERI_KELAS_BARU||"",tigaSiswaBaru:window.IMG_FOTO_TIGA_SISWA_BARU||"",kebersamaanKelasBaru:window.IMG_FOTO_KEBERSAMAAN_KELAS_BARU||""};
+  function g(n){try{return(0,eval)("typeof "+n+"!=='undefined'?"+n+":''")||"";}catch(e){return "";}}
+  const map={kelas:g("IMG_FOTO_KELAS"),piala:g("IMG_FOTO_PIALA"),buku:g("IMG_FOTO_BUKU"),galeriKelas:g("IMG_FOTO_GALERI_KELAS"),tigaSiswa:g("IMG_FOTO_TIGA_SISWA"),galeriKelasBaru:g("IMG_FOTO_GALERI_KELAS_BARU"),tigaSiswaBaru:g("IMG_FOTO_TIGA_SISWA_BARU"),kebersamaanKelasBaru:g("IMG_FOTO_KEBERSAMAAN_KELAS_BARU")};
   document.querySelectorAll("[data-base64-image]").forEach(function(img){img.src=map[img.dataset.base64Image]||"";});
 })();
 </script>
