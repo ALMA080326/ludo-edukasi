@@ -1762,3 +1762,103 @@ body:after{animation-delay:-4s!important}
   #dice .cube{--s:108px!important}
   .smart-hud{grid-template-columns:1fr 1fr!important}
 }
+
+/* V19 — TOTAL BRIGHT COLOR OVERRIDE
+   No dark/black UI surfaces. Keep shadows chromatic and soft. */
+:root{
+  --v19-sky:#dff8ff;--v19-mint:#e8fff3;--v19-yellow:#fff6bf;--v19-pink:#ffe8f5;
+  --v19-blue:#2f8cff;--v19-cyan:#22cfe3;--v19-green:#35cf78;--v19-orange:#ffad3d;
+  --v19-purple:#9d7aff;--v19-ink:#24527a;
+}
+html,body{background:linear-gradient(120deg,#e7fbff 0%,#fff9cf 24%,#effff2 48%,#e9f4ff 70%,#fff0fa 100%)!important;color:var(--v19-ink)!important}
+body:before{background:radial-gradient(circle at 15% 20%,rgba(62,205,255,.30),transparent 34%)!important}
+body:after{background:radial-gradient(circle at 85% 70%,rgba(255,190,72,.28),transparent 36%)!important}
+
+/* Bright command/navigation area — never dark. */
+.top.command-top,.top,.command-strip{
+  background:linear-gradient(135deg,#ffffff 0%,#e9faff 45%,#fff6c9 100%)!important;
+  color:var(--v19-ink)!important;
+  border:2px solid #ffffff!important;
+  box-shadow:0 14px 32px rgba(44,145,196,.18),0 5px 0 rgba(72,169,205,.10),inset 0 2px 0 #fff!important;
+  backdrop-filter:none!important;
+}
+.top h1,.top .sub,.command-strip,.command-strip *{color:var(--v19-ink)!important}
+.top h1 b{color:#ff8b28!important}
+.sound-pill,.menu-pill,.quick-tools button{
+  background:linear-gradient(145deg,#ffffff,#dff8ff 48%,#fff0a8)!important;
+  color:#23638a!important;border:2px solid #fff!important;
+  box-shadow:0 7px 0 rgba(61,151,193,.16),0 14px 22px rgba(62,153,201,.15)!important;
+}
+
+/* Every major surface is bright and colorful. */
+.arena-rail,.arena-board-shell,.full-dashboard,.dashboard-titlebar,.live-ranking-card,
+.activity-card,.learning-lab,.material-card,.photo-panel,.footer-card,.team-card,
+.rail-tip,.score-mini .row,.dice-console,.turn-orb,.rail-stat,.menu-section,
+.menu-advanced,.menu-item-modern,.menu-advanced-toggle,.hud-card,.guide-hero,
+.card,.activity-item,.edu-card,.profile-card,.result-kpi,.audit-box,.history-item,
+.report-team,.report-stat,.result-team-detail,.result-question,.rv,.opt,.tabs button{
+  color:var(--v19-ink)!important;
+  background:linear-gradient(145deg,#ffffff 0%,#e9faff 52%,#fff5c8 100%)!important;
+  border-color:#d5f0fb!important;
+  box-shadow:0 16px 34px rgba(44,132,180,.16),inset 0 2px 0 #fff!important;
+}
+
+/* Modal / popup surfaces are bright too. */
+#m,.modal,.modal-backdrop,.overlay{background:rgba(221,247,255,.72)!important;backdrop-filter:blur(8px)!important}
+.box,.teacher-report,.menu-guru-modern,.finish-toast,.ft-card{
+  background:linear-gradient(145deg,#ffffff,#e8fbff 55%,#fff1bb)!important;
+  color:var(--v19-ink)!important;border:3px solid #fff!important;
+  box-shadow:0 24px 65px rgba(44,126,178,.22),inset 0 2px 0 #fff!important;
+}
+.box h1,.box h2,.q,.teacher-report *,.menu-guru-modern *{color:var(--v19-ink)!important}
+.btn{background:linear-gradient(135deg,#ffd84d,#ff9c45)!important;color:#24527a!important;border:2px solid #fff!important;box-shadow:0 7px 0 #e6a32f,0 13px 24px rgba(240,156,49,.20)!important}
+.opt{background:linear-gradient(145deg,#fff,#e9fbff)!important;color:#24527a!important;border:2px solid #cfeaf5!important}
+.opt:hover,.opt.s{background:linear-gradient(145deg,#fff6aa,#bff6ff)!important;border-color:#4ed4df!important}
+
+/* Remove dark backgrounds from special states. */
+.score-mini .row.on,.turn-live,.status-pill,.badge,.chip,.tag{
+  background:linear-gradient(135deg,#e2fff1,#e5f8ff,#fff2bd)!important;color:#25704f!important;border-color:#bcefd8!important
+}
+
+/* Bright 3D board/table. */
+.arena-board-shell{background:linear-gradient(145deg,#ffffff,#dff8ff 48%,#fff0b0)!important}
+.bd{background:linear-gradient(145deg,#ffffff,#c9f4ff 44%,#fff1ae)!important}
+
+/* Dedicated dice stage: nothing dark, nothing covering the die. */
+.dice-console{background:linear-gradient(145deg,#fff4a8,#d9fbff 48%,#dfffe9)!important;min-height:270px!important;overflow:visible!important}
+.dice-zone{overflow:visible!important}
+#diceArea,#dice,#dice .throw{overflow:visible!important;z-index:1000!important}
+#dice .shadow3d{background:radial-gradient(ellipse,rgba(39,166,210,.28),transparent 70%)!important}
+#dice .face{background:linear-gradient(145deg,#fff3a8,#ffb83f,#ff7b52)!important;border-color:#fff!important;box-shadow:inset 5px 5px 15px rgba(255,255,255,.72),inset -10px -12px 20px rgba(255,116,54,.20),0 0 0 2px rgba(255,255,255,.65)!important}
+#dice .face i{background:radial-gradient(circle at 30% 25%,#ffffff 0 10%,#43d7ff 28%,#248cff 68%,#1670cf 100%)!important;box-shadow:inset 3px 3px 5px rgba(255,255,255,.65),0 3px 7px rgba(28,123,204,.24)!important}
+#dice .face:nth-child(1){background:linear-gradient(145deg,#fff3a8,#ffd54d,#ff9645)!important}
+#dice .face:nth-child(2){background:linear-gradient(145deg,#dfffff,#62e3f2,#2f9cff)!important}
+#dice .face:nth-child(3){background:linear-gradient(145deg,#efffdc,#6be59b,#26be70)!important}
+#dice .face:nth-child(4){background:linear-gradient(145deg,#ffe9f4,#ff9bc7,#ef65a4)!important}
+#dice .face:nth-child(5){background:linear-gradient(145deg,#f1eaff,#b99bff,#8566e8)!important}
+#dice .face:nth-child(6){background:linear-gradient(145deg,#fff0dc,#ffc16a,#ff853e)!important}
+
+/* Bright colorful 3D accents. */
+.team-pawn,.hud-icon,.edu-icon,.ach-icon,.activity-icon,.rank-medal,.brand-mark{box-shadow:inset 0 2px 0 #fff,0 10px 20px rgba(46,135,183,.20)!important}
+.progress i,.class-progress i{background:linear-gradient(90deg,#ffcc3d,#ff7e55,#b477ff,#35d67f,#28cfe4)!important}
+.v18-particles i{filter:drop-shadow(0 3px 6px rgba(43,135,186,.24))!important}
+
+/* Never let inherited dark legacy text/surfaces survive. */
+[class*="dark"],[class*="dark"] *{background:linear-gradient(145deg,#ffffff,#e9faff,#fff4c8)!important;color:var(--v19-ink)!important}
+
+/* Mobile: one large, unobstructed colorful 3D dice stage. */
+@media(max-width:780px){
+  .top.command-top{background:linear-gradient(135deg,#fff,#e7faff,#fff4bf)!important}
+  .dice-console{width:100%!important;min-height:280px!important;margin:0!important}
+  .dice-zone{height:235px!important;width:100%!important}
+  #diceArea{width:220px!important;height:220px!important}
+  #dice{width:205px!important;height:205px!important}
+  #dice .cube{--s:136px!important}
+}
+@media(max-width:480px){
+  .dice-console{min-height:270px!important;border-radius:26px!important}
+  .dice-zone{height:225px!important}
+  #diceArea{width:210px!important;height:210px!important}
+  #dice{width:195px!important;height:195px!important}
+  #dice .cube{--s:128px!important}
+}
