@@ -1074,3 +1074,368 @@ body{padding:clamp(8px,1.2vw,14px)}
   .photo-showcase-three{grid-template-columns:1fr;gap:12px}
   .photo-showcase-three .photo-panel,.photo-showcase-three .photo-panel-group{height:clamp(210px,62vw,280px)}
 }
+
+
+/* ============================================================
+   LUDO EDUKASI — VISUAL OVERHAUL V11
+   Visual-only layer. Tidak mengubah game logic / bank soal.
+   ============================================================ */
+:root{
+  --ui-bg:#f4f8fc;
+  --ui-card:rgba(255,255,255,.92);
+  --ui-line:rgba(24,67,105,.10);
+  --ui-ink:#16324f;
+  --ui-muted:#6c8095;
+  --ui-blue:#1677ff;
+  --ui-blue2:#4f9cff;
+  --ui-shadow:0 18px 55px rgba(22,55,88,.13);
+  --ui-shadow-soft:0 8px 26px rgba(22,55,88,.10);
+  --ui-radius:24px;
+}
+
+/* ---------- page shell ---------- */
+html,body{min-height:100%;background:#f4f8fc}
+body{
+  padding:12px clamp(10px,2vw,24px) 28px;
+  color:var(--ui-ink);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body:before,body:after{opacity:.32;filter:blur(18px)}
+
+.top{
+  max-width:1240px;
+  margin:0 auto 10px;
+  padding:4px 2px;
+}
+.top h1{
+  font-size:clamp(23px,3.1vw,34px);
+  line-height:1;
+  letter-spacing:-.7px;
+  text-shadow:none;
+  color:#123c68;
+}
+.top .sub{margin-top:6px;font-size:12px;color:#7890a7}
+.sound-pill{
+  min-height:38px;
+  padding:8px 13px;
+  border:1px solid rgba(255,255,255,.9);
+  background:rgba(255,255,255,.86);
+  color:#24445f;
+  box-shadow:0 7px 20px rgba(20,62,96,.08);
+  backdrop-filter:blur(14px);
+}
+.sound-pill:hover{transform:translateY(-1px)}
+
+/* ---------- hero ---------- */
+.hero{
+  max-width:1240px;
+  min-height:142px;
+  margin:0 auto 14px;
+  padding:22px clamp(18px,3vw,34px);
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:28px;
+  background:
+    radial-gradient(circle at 88% 20%,rgba(86,165,255,.18),transparent 30%),
+    linear-gradient(120deg,#fff 0%,#f3f9ff 56%,#e8f4ff 100%);
+  box-shadow:var(--ui-shadow);
+}
+.hero-copy{max-width:570px}
+.hero-title{font-size:clamp(21px,3vw,31px);letter-spacing:-.7px}
+.hero-copy p{max-width:500px;color:#627b92}
+.hero-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.hero-badges span{
+  display:inline-flex;align-items:center;
+  padding:6px 9px;border-radius:999px;
+  background:#fff;border:1px solid rgba(26,101,169,.09);
+  box-shadow:0 4px 14px rgba(25,72,112,.06);
+  font-size:10px;font-weight:800;color:#55708a;
+}
+.hero-img{
+  right:12px;bottom:-12px;
+  width:min(48%,540px);max-height:165px;
+  filter:drop-shadow(0 16px 20px rgba(24,67,101,.16));
+}
+
+/* ---------- main game area ---------- */
+.wrap{
+  max-width:1240px;
+  grid-template-columns:minmax(0,1fr) minmax(300px,350px);
+  gap:16px;
+}
+.board-column{min-width:0}
+.bd{
+  padding:8px;
+  border-radius:30px;
+  border:1px solid rgba(255,255,255,.98);
+  background:linear-gradient(145deg,#ffffff,#edf6fc);
+  box-shadow:0 22px 60px rgba(22,65,101,.16);
+}
+.bd:before{inset:5px;border-radius:24px;box-shadow:inset 0 0 0 1px rgba(62,146,207,.13)}
+.bd:hover{transform:none;box-shadow:0 22px 60px rgba(22,65,101,.18),inset 0 2px 0 #fff}
+.bd svg{border-radius:23px;filter:drop-shadow(0 10px 13px rgba(34,90,130,.11))}
+
+/* ---------- right control rail ---------- */
+.side{display:flex;flex-direction:column;gap:12px}
+.card{
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:var(--ui-radius);
+  background:var(--ui-card);
+  box-shadow:var(--ui-shadow-soft);
+  backdrop-filter:blur(16px);
+}
+.turn-card{padding:16px}
+.turn-head{align-items:center}
+.turn-head h3,.score-card h3{
+  font-size:13px;letter-spacing:.1px;color:#234764;
+}
+.turn{
+  margin-top:3px;
+  font-size:20px;font-weight:950;letter-spacing:-.5px;color:#123c68;
+}
+.turn-live{
+  padding:5px 8px;border-radius:999px;
+  background:#eafbf2;color:#16945a;
+  font-size:9px;font-weight:900;
+}
+.note{color:#7890a3;font-size:11px}
+.turn-note{margin-top:10px}
+
+/* ---------- dice dock: focal interaction ---------- */
+.dice-dock{
+  min-height:230px;
+  margin-top:12px;
+  position:relative;
+  overflow:hidden;
+  border-radius:22px;
+  border:1px solid rgba(43,119,188,.10);
+  background:
+    radial-gradient(circle at 50% 45%,rgba(255,255,255,.98) 0 20%,rgba(220,239,255,.8) 47%,rgba(202,228,250,.55) 100%),
+    #eaf5ff;
+  box-shadow:inset 0 1px 0 #fff,0 8px 22px rgba(31,91,139,.07);
+}
+.dice-dock:after{
+  content:"";
+  position:absolute;left:12%;right:12%;bottom:-30px;height:90px;
+  border-radius:50%;background:rgba(80,155,221,.12);filter:blur(18px);
+  pointer-events:none;
+}
+.dice-dock-label{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  z-index:8;white-space:nowrap;
+  padding:6px 11px;border-radius:999px;
+  background:rgba(255,255,255,.82);
+  border:1px solid rgba(255,255,255,.95);
+  box-shadow:0 5px 14px rgba(27,75,113,.08);
+  color:#42637d;font-size:10px;font-weight:900;letter-spacing:.5px;
+}
+#diceArea{
+  width:64%;height:64%;
+}
+#diceHint{
+  position:absolute;bottom:1%;left:50%;transform:translateX(-50%);
+  color:#7690a6;font-size:10px;font-weight:800;white-space:nowrap;
+}
+#diceBadge{
+  position:absolute;right:2%;top:5%;z-index:8;
+  padding:6px 8px;border-radius:10px;
+  background:#fff;color:#3e6280;
+  box-shadow:0 5px 14px rgba(26,71,108,.09);
+  font-size:9px;font-weight:900;
+}
+.dice-dock-help{
+  position:absolute;bottom:9px;left:50%;transform:translateX(-50%);
+  z-index:9;white-space:nowrap;color:#7690a6;font-size:9px;
+}
+.cube{--s:clamp(76px,15vw,128px)}
+.face{box-shadow:inset 0 0 0 1px rgba(255,255,255,.25),0 10px 20px rgba(41,78,108,.14)}
+#dice:not(:disabled):hover .cube{transform:rotateX(-24deg) rotateY(38deg) scale(1.03)}
+
+.pawn-selector{margin-top:10px}
+.pawn-selector button{
+  border-radius:12px!important;
+  border:1px solid rgba(31,102,161,.10)!important;
+  box-shadow:0 5px 12px rgba(20,66,103,.07)!important;
+}
+
+/* ---------- scoreboard: compact, scannable ---------- */
+.score-card{padding:15px}
+.score-card .note{margin-top:4px}
+#sb{margin-top:10px}
+#sb>*,#sb .row{
+  border-radius:12px;
+}
+#sb .row{padding:8px 10px!important;margin-bottom:6px}
+#sb .row:last-child{margin-bottom:0}
+
+/* ---------- dashboard ---------- */
+.full-dashboard{
+  max-width:1240px;
+  margin:16px auto 0;
+}
+.section-head{
+  margin-bottom:9px;
+}
+.dashboard-title h2{
+  color:#183d5e;
+  font-size:16px;
+  letter-spacing:-.25px;
+}
+.section-head p{color:#8295a6;font-size:10px}
+.full-dashboard>*,.live-ranking-card{
+  border-radius:var(--ui-radius);
+}
+.live-ranking-card,.activity-card,.material-card,.footer-card,.edu-card{
+  border:1px solid rgba(255,255,255,.95);
+  box-shadow:var(--ui-shadow-soft);
+}
+.live-ranking-card{
+  padding:15px;
+  background:rgba(255,255,255,.9);
+}
+.team-grid{
+  gap:10px;
+}
+.team-grid>*{
+  border-radius:18px!important;
+  border:1px solid rgba(26,77,115,.08)!important;
+  box-shadow:0 8px 20px rgba(21,65,101,.07)!important;
+}
+.info-grid{margin-top:10px}
+.activity-card{padding:15px;background:rgba(255,255,255,.9)}
+.activity-list{gap:7px}
+.activity-list>*{
+  border-radius:13px!important;
+  border:1px solid rgba(25,77,114,.07)!important;
+}
+.edu-grid,.material-grid{gap:10px}
+.edu-card{
+  padding:15px;
+  background:rgba(255,255,255,.88);
+}
+.edu-card h3{font-size:13px;color:#244762}
+.edu-card p,.material p,.material small{color:#71879a}
+.material-card{
+  margin-top:12px;
+  padding:15px;
+  background:rgba(255,255,255,.9);
+}
+.material{
+  border-radius:17px!important;
+  border:1px solid rgba(28,82,119,.07)!important;
+  background:#fbfdff!important;
+  box-shadow:none!important;
+  padding:14px!important;
+}
+.material b{color:#244762}
+.photo-showcase{
+  gap:12px!important;
+  margin-top:12px!important;
+}
+.photo-panel{
+  overflow:hidden;
+  border-radius:20px!important;
+  border:1px solid rgba(255,255,255,.95)!important;
+  box-shadow:0 12px 30px rgba(23,67,102,.11)!important;
+  background:#fff!important;
+}
+.photo-panel img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain!important;
+  object-position:center!important;
+  background:#eef5fa;
+}
+.photo-panel-kicker{
+  background:rgba(255,255,255,.92)!important;
+  color:#365d79!important;
+  backdrop-filter:blur(10px);
+}
+.footer-card{
+  margin-top:12px!important;
+  padding:18px!important;
+  background:linear-gradient(135deg,#123f69,#1d5e91)!important;
+  color:#fff!important;
+}
+.footer-sub{opacity:.78}
+
+/* ---------- popups / overlays ---------- */
+#notice,.modal,.popup,.question-modal{
+  backdrop-filter:blur(8px);
+}
+#m .box{
+  border-radius:24px!important;
+  border:1px solid rgba(255,255,255,.95)!important;
+  box-shadow:0 25px 70px rgba(11,37,61,.25)!important;
+}
+
+/* ---------- mobile: board first, controls second ---------- */
+@media(max-width:860px){
+  body{padding:8px 8px 20px}
+  .top{padding:2px 3px}
+  .top>div:first-child .sub{max-width:230px}
+  .top .sound-pill{font-size:11px;padding:7px 9px;min-height:34px}
+  .hero{
+    min-height:132px;margin-bottom:10px;padding:18px 16px;
+  }
+  .hero-copy{max-width:65%}
+  .hero-title{font-size:20px}
+  .hero-copy p{font-size:11px;line-height:1.35}
+  .hero-badges span{font-size:8px;padding:5px 7px}
+  .hero-img{width:49%;right:-4px;bottom:-8px;max-height:125px}
+  .wrap{
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .board-column{width:100%}
+  .side{width:100%}
+  .bd{border-radius:22px;padding:5px}
+  .bd svg{inset:7px;width:calc(100% - 14px);height:calc(100% - 14px);border-radius:18px}
+  .turn-card{padding:12px;border-radius:19px}
+  .turn{font-size:18px}
+  .dice-dock{min-height:205px}
+  #diceArea{width:62%;height:68%}
+  .cube{--s:clamp(74px,23vw,112px)}
+  .score-card{padding:12px}
+  .full-dashboard{margin-top:10px}
+  .live-ranking-card,.activity-card,.material-card{padding:12px;border-radius:19px}
+  .edu-grid,.material-grid{grid-template-columns:1fr 1fr}
+  .photo-showcase{grid-template-columns:1fr 1fr!important}
+  .photo-panel-wide{grid-column:1/-1}
+}
+@media(max-width:520px){
+  .top{align-items:flex-start}
+  .top>div:first-child{min-width:0}
+  .top h1{font-size:21px}
+  .top .sub{font-size:9px}
+  .top>div:last-child{gap:5px!important}
+  #teacherReport{display:none}
+  .menu-pill{font-size:0!important;width:38px;padding:0!important}
+  .menu-pill:after{content:"☰";font-size:17px}
+  #snd{font-size:0!important;width:38px;padding:0!important}
+  #snd:before{content:"🔊";font-size:15px}
+  .hero{min-height:124px;border-radius:19px}
+  .hero-copy{max-width:72%}
+  .hero-title{font-size:18px}
+  .hero-copy p{font-size:10px;max-width:245px}
+  .hero-badges{display:none}
+  .hero-img{width:43%;max-height:105px;right:0;bottom:-5px}
+  .bd{border-radius:18px}
+  .bd svg{border-radius:15px}
+  .dice-dock{min-height:190px;border-radius:17px}
+  .dice-dock-label{top:9px;font-size:9px}
+  .dice-dock-help{font-size:8px}
+  #diceHint{font-size:9px}
+  .edu-grid,.material-grid{grid-template-columns:1fr}
+  .photo-showcase{grid-template-columns:1fr!important}
+  .photo-panel-wide{grid-column:auto}
+}
+
+/* Respect reduced motion for accessibility */
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+    transition-duration:.001ms!important;
+  }
+}
