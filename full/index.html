@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="ludo-build" content="v13-sunny-motion">
-<meta name="theme-color" content="#fff8e8">
-<title>Ludo Edukasi — Sunny Motion Arena</title>
+<meta name="ludo-build" content="v13-papan-nusantara">
+<meta name="theme-color" content="#07111f">
+<title>Ludo Edukasi — Papan Nusantara</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="v13-skin.css?v=13">
 </head>
 <body>
 <header class="top command-top">
@@ -25,7 +26,7 @@
   <section class="mission-hero">
     <div class="mission-copy">
       <div class="eyebrow"><span class="signal"></span> CLASSROOM GAME SYSTEM</div>
-      <h2>Berpikir. Jawab. <em>Menjelajah!</em></h2>
+      <h2>Berpikir. Jawab. <em>Bergerak.</em></h2>
       <p>Satu lemparan membuka satu tantangan. Jawaban tepat mengubah pengetahuan menjadi langkah di papan.</p>
       <div class="mission-chips"><span>4 KELOMPOK</span><span>60 DETIK / SOAL</span><span>BERPIKIR KOMPUTASIONAL</span></div>
     </div>
@@ -48,15 +49,7 @@
 
     <section class="arena-board-shell">
       <div class="arena-topline"><span>◉ LIVE BOARD</span><span>4 × 56 PETAK</span></div>
-      <div class="bd" id="boardStage">
-        <div class="board-glow-ring"></div>
-        <div class="orbit-trail orbit-trail-a"></div>
-        <div class="orbit-trail orbit-trail-b"></div>
-        <div id="orbitDice" class="orbit-dice" aria-hidden="true">
-          <div class="orbit-dice-core"><div class="cube orbit-cube"></div></div>
-        </div>
-        <svg id="sv" viewBox="0 0 15 15" preserveAspectRatio="none" aria-label="Papan Ludo"></svg>
-      </div>
+      <div class="bd"><svg id="sv" viewBox="0 0 15 15" preserveAspectRatio="none" aria-label="Papan Ludo"></svg></div>
       <div class="board-caption"><span><i class="legend-dot red"></i> Kel. 2</span><span><i class="legend-dot blue"></i> Kel. 1</span><span><i class="legend-dot green"></i> Kel. 3</span><span><i class="legend-dot yellow"></i> Kel. 4</span></div>
     </section>
 
@@ -134,56 +127,6 @@ document.querySelectorAll("[data-base64-image]").forEach(function(img){img.src=m
 </script>
 <script src="bank-soal.js"></script>
 <script src="game.js"></script>
-<script>
-/* V13 motion layer: visual-only orbit animation around the board.
-   The existing roll() remains responsible for game state and scoring. */
-(function(){
-  const originalRoll = window.roll;
-  let orbitFrame = 0, orbitStart = 0;
-  const duration = 1850;
-
-  function syncOrbitCube(){
-    const src=document.getElementById("cube"), dst=document.querySelector(".orbit-cube");
-    if(src && dst) dst.innerHTML=src.innerHTML;
-  }
-
-  function orbitDice(){
-    const stage=document.getElementById("boardStage"), orb=document.getElementById("orbitDice");
-    if(!stage||!orb)return;
-    syncOrbitCube();
-    document.body.classList.add("board-dice-flight");
-    const w=stage.clientWidth, h=stage.clientHeight;
-    const size=orb.getBoundingClientRect().width||78;
-    const rx=w/2+26, ry=h/2+26, cx=w/2, cy=h/2;
-
-    cancelAnimationFrame(orbitFrame);
-    orbitStart=performance.now();
-
-    function tick(now){
-      const t=Math.min(1,(now-orbitStart)/duration);
-      const eased=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
-      const angle=-Math.PI/2 + eased*Math.PI*2;
-      const x=cx+rx*Math.cos(angle)-size/2;
-      const y=cy+ry*Math.sin(angle)-size/2;
-      const scale=1+0.10*Math.sin(eased*Math.PI*4);
-      const tilt=Math.sin(angle)*8;
-      orb.style.transform=`translate3d(${x}px,${y}px,0) scale(${scale}) rotate(${tilt}deg)`;
-      if(t<1){orbitFrame=requestAnimationFrame(tick);}
-      else{
-        orb.style.opacity="0";
-        orb.style.transform=`translate3d(${cx-size/2}px,${cy-size/2}px,0) scale(.75)`;
-        setTimeout(()=>document.body.classList.remove("board-dice-flight"),260);
-      }
-    }
-    orb.style.opacity="1";
-    requestAnimationFrame(tick);
-  }
-
-  window.roll=function(){
-    orbitDice();
-    return originalRoll.apply(this,arguments);
-  };
-})();
-</script>
+<script src="fx.js?v=13"></script>
 </body>
 </html>
