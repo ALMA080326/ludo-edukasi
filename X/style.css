@@ -1045,3 +1045,32 @@ body{padding:clamp(8px,1.2vw,14px)}
 .photo-showcase-three .photo-panel-wide img,.photo-showcase-three .photo-panel-trophy img,.photo-showcase-three .photo-panel-group img{transform:none;}
 @media (max-width:900px){.photo-showcase-three{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media (max-width:560px){.photo-showcase-three{grid-template-columns:1fr;}.photo-showcase-three .photo-panel{min-height:170px;}}
+
+/* v10.13 — galeri foto baru: tinggi seragam, foto utuh (tanpa crop), rata bawah, kartu premium. */
+.photo-showcase-three{
+  display:grid;grid-template-columns:1.1fr 1fr 1.45fr;gap:14px;margin-top:18px;align-items:stretch;
+}
+.photo-showcase-three .photo-panel{
+  min-height:0;height:clamp(230px,26vw,320px);border-radius:24px;padding:0;
+  background:linear-gradient(160deg,#ffffff 0%,#e6f8ff 55%,#cfeeff 100%);
+  border:2px solid #fff;box-shadow:0 16px 38px rgba(45,113,169,.18),inset 0 -40px 60px -30px rgba(126,216,255,.35);
+  transition:transform .25s ease,box-shadow .25s ease;
+}
+.photo-showcase-three .photo-panel:hover{transform:translateY(-4px);box-shadow:0 22px 46px rgba(45,113,169,.26)}
+.photo-showcase-three .photo-panel-trophy{background:linear-gradient(160deg,#fffdf0 0%,#fff0bf 60%,#ffe08a 100%)}
+.photo-showcase-three .photo-panel-group{background:linear-gradient(160deg,#fff 0%,#f1ecff 60%,#dcd0ff 100%)}
+.photo-showcase-three .photo-panel img{
+  position:absolute;left:50%;bottom:0;transform:translateX(-50%)!important;
+  width:auto;max-width:94%;height:calc(100% - 46px);object-fit:contain;object-position:center bottom;
+  filter:drop-shadow(0 10px 12px rgba(38,78,110,.22));
+}
+.photo-showcase-three .photo-panel-kicker{margin:12px 0 0 12px;font-size:11px;box-shadow:0 5px 13px rgba(58,112,146,.14)}
+@media (max-width:900px){
+  .photo-showcase-three{grid-template-columns:1fr 1fr}
+  .photo-showcase-three .photo-panel-group{grid-column:1/-1}
+  .photo-showcase-three .photo-panel{height:clamp(220px,46vw,300px)}
+}
+@media (max-width:560px){
+  .photo-showcase-three{grid-template-columns:1fr;gap:12px}
+  .photo-showcase-three .photo-panel,.photo-showcase-three .photo-panel-group{height:clamp(210px,62vw,280px)}
+}
