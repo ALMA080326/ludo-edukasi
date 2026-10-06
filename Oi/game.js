@@ -787,8 +787,10 @@ function openMenu(){
 
 
 /* ===== KEYBOARD CONTROLS =====
-   Space = dadu; 1-4 = pilih jawaban; Enter = jawab jika sudah memilih.
-   Space dinonaktifkan saat soal terbuka agar tidak terjadi lemparan ganda.
+   Space = lempar dadu.
+   1-4 = langsung pilih dan kirim jawaban (tanpa klik tombol JAWAB).
+   Enter = lanjut ke tahap/soal berikutnya setelah jawaban diproses.
+   Kontrol sentuh/tap tetap tersedia untuk pengguna HP.
 */
 window.addEventListener("keydown",e=>{
   if(e.repeat)return;
@@ -796,17 +798,28 @@ window.addEventListener("keydown",e=>{
   if(modalOpen){
     const opts=[...document.querySelectorAll(".opt:not(:disabled)")];
     if(e.key===" "){e.preventDefault();return;}
+
+    // 1-4: pilih jawaban sekaligus langsung submit.
     if(/^[1-4]$/.test(e.key)&&opts.length){
       e.preventDefault();
       const b=opts[Number(e.key)-1];
-      if(b)b.click();
+      if(b){
+        b.click();
+        const go=$("go");
+        if(go&&!go.disabled)go.click();
+      }
       return;
     }
+
+    // Enter: setelah jawaban diproses, lanjutkan ke soal/tahap berikutnya.
     if(e.key==="Enter"){
+      const nextBtn=document.querySelector("#bx .nx-btn");
+      if(nextBtn){e.preventDefault();nextBtn.click();return;}
       const go=$("go");
       if(go&&!go.disabled){e.preventDefault();go.click();}
       return;
     }
+
     if(e.key==="Escape"){
       /* Escape hanya menutup panel informasi/menu.
          Saat soal aktif, timer tetap berjalan agar tidak bisa dieksploitasi. */
