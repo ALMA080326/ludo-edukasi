@@ -787,6 +787,14 @@ function toggleDashboardFromMenu(){
   }
   openDashboard();
 }
+function showMateri(){
+  const M=[["🔷","Algoritma","Langkah-langkah terurut untuk menyelesaikan masalah.","membuat solusi lebih jelas, sistematis, dan mudah diikuti."],
+  ["🧩","Dekomposisi","Memecah masalah besar menjadi bagian-bagian yang lebih kecil.","membuat masalah kompleks lebih mudah dikelola."],
+  ["🔍","Pengenalan Pola","Mencari kesamaan, kecenderungan, atau pola dari berbagai informasi.","membantu menemukan hubungan dan memperkirakan kejadian."],
+  ["💡","Abstraksi","Memilih informasi penting dan mengabaikan detail yang tidak diperlukan.","membuat masalah lebih sederhana dan fokus pada inti."],
+  ["🧠","Berpikir Komputasional","Cara berpikir sistematis untuk memahami dan menyelesaikan masalah.","membantu menyusun solusi yang logis, terstruktur, dan efisien."]];
+  modal(`<h2>📚 Materi Berpikir Komputasional</h2><div style="text-align:left;display:grid;gap:10px;margin:10px 0 14px">${M.map(m=>`<div style="background:#f2f9ff;border:1px solid #cfe6f7;border-radius:14px;padding:10px 13px;color:#2b4a63;font-size:14px;line-height:1.5"><div style="font-size:16px;font-weight:900;color:#17609a">${m[0]} ${m[1]}</div>${m[2]}<br><small style="color:#4a6c86"><b>Manfaat:</b> ${m[3]}</small></div>`).join("")}</div><button class="btn" onclick="openMenu()">‹ KEMBALI KE MENU</button>`);
+}
 function openMenu(){
   const dash=document.body.classList.contains("dashboard-open");
   const dashLabel=dash?"Sembunyikan Pusat Pertandingan":"Tampilkan Pusat Pertandingan";
@@ -816,6 +824,15 @@ function openMenu(){
       <button class="menu-item-modern" onclick="showHistory()">
         <span class="menu-item-icon purple">🏆</span>
         <span><b>Riwayat Pertandingan</b><small>Lihat catatan pertandingan yang sudah berlangsung.</small></span>
+        <i>›</i>
+      </button>
+    </section>
+
+    <section class="menu-section menu-section-blue">
+      <div class="menu-section-title"><span>📚</span> BELAJAR</div>
+      <button class="menu-item-modern" onclick="showMateri()">
+        <span class="menu-item-icon orange">📚</span>
+        <span><b>Materi Berpikir Komputasional</b><small>Pelajari 5 konsep dasar sebelum atau sesudah bermain.</small></span>
         <i>›</i>
       </button>
     </section>

@@ -1443,3 +1443,6 @@ body:before,body:after{opacity:.32;filter:blur(18px)}
 /* Hanya dadu yang tampil: sembunyikan semua teks di wadah dadu */
 #diceHint,#diceBadge,.dice-dock-label,.dice-dock-help{display:none!important}
 .dice-dock{padding-top:10px!important;padding-bottom:10px!important}
+
+/* Materi dipindah ke Menu (☰ Menu > Belajar) */
+.material-card{display:none!important}
