@@ -888,12 +888,21 @@ window.addEventListener("keydown",e=>{
   }
 });
 
-draw();modal(`<h2>📖 PANDUAN BERMAIN</h2><p class="note">
-<b>🎲 Lempar Dadu</b><br><br>
-<b>1. Tekan Dadu untuk mendapatkan soal.</b><br><br>
-<b>2. Jawab Soal</b><br>Pilih jawaban, lalu tekan <b>JAWAB SEKARANG</b>. Waktu menjawab <b>60 detik</b> dimulai ketika soal sudah dibuka.<br><br>
-<b>3. Jawaban Benar</b><br>Jawaban benar membuat pion bergerak maju.<br><br>
-<b>4. Jawaban Salah</b><br>Jawaban salah membuat pion tetap di tempat dan mendapat <b>0 poin</b>. Tidak ada soal tambahan dari lemparan yang sama.<br><br>
-<b>5. Tabrak Lawan</b><br>Jika pion berhenti di petak yang sudah ditempati oleh pion lawan, pion lawan tersebut akan mundur <b>1 langkah</b> dan kehilangan <b>2 poin</b>.<br><br>
-<b>6. Soal Rebutan</b><br>Soal rebutan muncul secara otomatis jika terdapat nilai seri bagi kelompok yang belum sampai finish.
+draw();modal(`<h2>🎮 Panduan Bermain Ludo Edukas</h2><p class="note">
+<b>1. 🎲 Lempar Dadu</b><br>
+Tekan <b>Dadu 🎲</b> untuk mendapatkan soal 📚.<br><br>
+<b>2. 📝 Jawab Soal</b><br>
+Pilih jawaban ✅, lalu tekan <b>JAWAB SEKARANG 🚀</b>. Waktu menjawab <b>60 detik ⏱️</b> dimulai setelah soal dibuka.<br><br>
+<b>3. ✅ Jawaban Benar</b><br>
+Jawaban benar membuat pion <b>bergerak maju 🚶‍♂️➡️</b> dan mendapatkan poin ⭐.<br><br>
+<b>4. ❌ Jawaban Salah</b><br>
+Jawaban salah membuat pion <b>tetap di tempat 🛑</b> dan mendapat <b>0 poin</b>. Tidak ada soal tambahan dari lemparan yang sama 🔒.<br><br>
+<b>5. ⏰ Waktu Habis</b><br>
+Jika waktu <b>60 detik ⏱️</b> habis sebelum menjawab, jawaban dianggap <b>gagal ❌</b> dan pion tetap di tempat 🛑.<br><br>
+<b>6. 💥 Tabrak Lawan</b><br>
+Jika pion berhenti di petak yang ditempati pion lawan 🎯, pion lawan akan <b>mundur 1 langkah ⬅️</b> dan kehilangan <b>2 poin 💔</b>.<br><br>
+<b>7. ⚔️ Soal Rebutan</b><br>
+Soal rebutan muncul secara otomatis jika terdapat <b>nilai seri 🤝</b> bagi kelompok yang belum sampai <b>finish 🏁</b>.<br><br>
+<b>8. 🏆 Menjadi Juara</b><br>
+Kelompok dengan hasil terbaik dan mencapai <b>finish 🏁</b> akan menjadi <b>pemenang 🥇🎉</b>.
 </p><button class="btn" onclick="modal('');ac()">MENGERTI 👍</button>`);
