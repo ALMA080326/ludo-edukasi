@@ -1,170 +1,133 @@
-<!doctype html>
-<html lang="id">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="ludo-build" content="v21-true-orange-3d-dice">
-<meta name="theme-color" content="#dff8ff">
-<title>Ludo Edukasi — Command Arena</title>
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="ludo-build" content="v11-visual-overhaul"><meta name="theme-color" content="#f4f8fc">
+<title>Ludo Edukasi — Berpikir Komputasional</title>
+
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="top command-top">
-  <div class="brand-lockup">
-    <div class="brand-mark">L</div>
-    <div><h1>LUDO <b>EDUKASI</b></h1><div class="sub">COMMAND ARENA · BERPIKIR KOMPUTASIONAL</div></div>
+<div class="top">
+  <div><h1>🎲 LUDO <b>EDUKASI</b></h1><div class="sub">Berpikir Komputasional · Permainan Kelompok · <b style="color:#18a8c5">3D Bright Edition</b></div></div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><button class="sound-pill" id="teacherReport" type="button" aria-hidden="true">📊 Rekap Guru</button><button class="sound-pill menu-pill" id="menuBtn" type="button">☰ Menu</button><button class="sound-pill" id="snd" type="button">🔊 Suara aktif</button></div>
+</div>
+
+<section class="hero">
+  <div class="hero-copy">
+    <div class="hero-title">Belajar, bermain, <span>jadi juara!</span> 🏆</div>
+    <p>Kerjakan soal berpikir komputasional bersama kelompok. Satu lemparan dadu menghasilkan satu soal.</p><div class="hero-badges">
+  <span>🎮 GAME EDUKASI</span><span>👥 4 KELOMPOK</span><span>🧠 BERPIKIR KOMPUTASIONAL</span>
+</div>
   </div>
-  <div class="top-actions">
-    <button class="sound-pill" id="teacherReport" type="button">▦ REKAP GURU</button>
-    <button class="sound-pill menu-pill" id="menuBtn" type="button">☰ MENU</button>
-    <button class="sound-pill" id="focusBtn" type="button">🎯 FOKUS</button>
-    <button class="sound-pill" id="guideBtn" type="button">❔ PANDUAN</button>
-    <button class="sound-pill" id="motionBtn" type="button">✨ ANIMASI AKTIF</button>
-    <button class="sound-pill" id="snd" type="button">🔊 SUARA AKTIF</button>
+  <img class="hero-img" alt="Foto kelas siswa" src="" data-base64-image="kelas">
+</section>
+
+<div class="wrap">
+  <div class="board-column">
+    <div class="bd">
+      <svg id="sv" viewBox="0 0 15 15" preserveAspectRatio="none" aria-label="Papan Ludo"></svg>
+    </div>
+    <!-- Dadu dipindahkan ke panel Giliran agar area papan tetap bersih dan penuh. -->
   </div>
-</header>
-
-<main>
-  <section class="mission-hero">
-    <div class="mission-copy">
-      <div class="eyebrow"><span class="signal"></span> CLASSROOM GAME SYSTEM</div>
-      <h2>Berpikir. Jawab. <em>Bergerak.</em></h2>
-      <p>Satu lemparan membuka satu tantangan. Jawaban tepat mengubah pengetahuan menjadi langkah di papan.</p>
-      <div class="mission-chips"><span>4 KELOMPOK</span><span>60 DETIK / SOAL</span><span>BERPIKIR KOMPUTASIONAL</span></div>
-    </div>
-    <div class="crew-window">
-      <div class="crew-label">CLASS CREW <b>LIVE</b></div>
-      <img data-base64-image="kelas" alt="Foto kelas siswa">
-      <div class="crew-scan"></div>
-    </div>
-  </section>
-
-  <section class="arena-grid" id="arenaTop">
-    <aside class="arena-rail rail-left">
-      <div class="rail-kicker">MATCH STATUS</div>
-      <div class="turn-orb"><span></span><small>GILIRAN</small><strong id="turn"></strong></div>
-      <div class="micro-rule"></div>
-      <div class="rail-stat"><span>Posisi pion</span><b id="pawnSelector">—</b></div>
-      <div class="rail-stat"><span>Status</span><b id="msg">Siap bermain</b></div>
-      <div class="rail-tip"><b>STRATEGI</b><br>Jawab cepat dan tepat. Waktu ikut menentukan performa.</div>
-    </aside>
-
-    <section class="arena-board-shell">
-      <div class="arena-topline"><span>◉ LIVE BOARD</span><span>4 × 56 PETAK</span></div>
-      <div class="bd"><svg id="sv" viewBox="0 0 15 15" preserveAspectRatio="none" aria-label="Papan Ludo"></svg></div>
-      <div class="board-caption"><span><i class="legend-dot red"></i> Kel. 2</span><span><i class="legend-dot blue"></i> Kel. 1</span><span><i class="legend-dot green"></i> Kel. 3</span><span><i class="legend-dot yellow"></i> Kel. 4</span></div>
-    </section>
-
-    <aside class="arena-rail rail-right">
-      <div class="rail-kicker">ACTION DECK</div>
-      <div class="dice-console">
-        <div class="console-label"></div>
-        <div class="dice-zone">
-          <div id="diceArea">
-            <button id="dice" onclick="roll()" aria-label="Lempar dadu untuk mendapatkan satu soal"><div class="shadow3d" id="dshadow"></div><div class="throw" id="throw"><div class="cube idle" id="cube"></div></div></button>
-            <div id="diceBadge">KEL. 1</div>
-          </div>
+  <div class="side">
+    <div class="card turn-card">
+      <div class="turn-head">
+        <div>
+          <h3>🎮 Giliran bermain</h3>
+          <div class="turn" id="turn"></div>
         </div>
+        <span class="turn-live">● AKTIF</span>
       </div>
-      <div class="score-mini">
-        <div class="rail-kicker">LIVE SCORE</div>
-        <div id="sb"></div>
-        <div id="bankStats" style="display:none!important"></div>
+      <div class="note turn-note">Lempar dadu untuk mendapatkan satu soal.</div>
+      <div class="dice-dock" aria-label="Wadah dadu">
+        <div class="dice-dock-glow" aria-hidden="true"></div>
+        <div class="dice-dock-label">🎲 LEMPAR DADU</div>
+        <div id="diceArea">
+          <div id="diceHint">Ketuk dadu</div>
+          <button id="dice" onclick="roll()" aria-label="Lempar dadu untuk mendapatkan satu soal"><div class="shadow3d" id="dshadow"></div><div class="throw" id="throw"><div class="cube idle" id="cube"></div></div></button>
+          <div id="diceBadge">KEL. 1</div>
+        </div>
+        <div class="dice-dock-help">HP: ketuk dadu · Keyboard: <b>Space</b></div>
       </div>
-    </aside>
-  </section>
-
-  <section class="command-strip">
-    <div><span class="signal"></span><b>PUSAT PERTANDINGAN</b><small>Data bergerak bersama permainan</small></div>
-    <div class="strip-note">Jangan hafalkan posisi. Fokus pada keputusan.</div>
-  </section>
-
-  <section class="smart-hud" aria-label="Status permainan langsung">
-    <div class="hud-card hud-clock"><span class="hud-icon">⏱️</span><div><small>WAKTU MATCH</small><b id="matchClock">00:00</b></div></div>
-    <div class="hud-card"><span class="hud-icon">📚</span><div><small>SOAL TERPAKAI</small><b id="hudUsed">0 / 0</b></div></div>
-    <div class="hud-card"><span class="hud-icon">🎯</span><div><small>AKURASI KELAS</small><b id="hudAccuracy">0%</b></div></div>
-    <div class="hud-card"><span class="hud-icon">🔥</span><div><small>STREAK AKTIF</small><b id="hudStreak">0</b></div></div>
-    <div class="hud-card hud-next"><span class="hud-live-dot"></span><div><small>STATUS</small><b id="hudStatus">Siap bermain</b></div></div>
-  </section>
-
-  <section class="quick-tools" aria-label="Kontrol cepat">
-    <button type="button" id="quickFocus">🎯 Mode Fokus Papan</button>
-    <button type="button" id="quickGuide">🧠 Cara Bermain</button>
-    <button type="button" id="quickTop">⬆️ Kembali ke Papan</button>
-  </section>
-
-  <section class="full-dashboard" id="fullDashboard">
-    <div class="dashboard-titlebar"><div><span class="eyebrow">COMMAND CENTER</span><h2>Performa kelas dalam satu layar</h2></div><p>Ringkas untuk guru, jelas untuk siswa.</p></div>
-
-    <div class="live-ranking-card">
-      <div class="section-head"><div class="dashboard-title"><h2>01 / LIVE RANKING</h2></div><p>Skor performa dari jawaban siswa</p></div>
-      <div class="live-ranking" id="liveRanking"></div>
+      <div id="pawnSelector" class="pawn-selector"></div><div class="note" id="msg"></div>
+    </div>
+    <div class="card score-card">
+      <h3>🏆 PAPAN SKOR · LIVE</h3><div class="note">Ilmu yang dipelajari hari ini adalah bekal kejayaan esok hari.</div>
+      <div id="sb"></div>
+      <div id="bankStats" style="display:none!important;margin-top:10px"></div>
     </div>
 
-    <div class="team-grid" id="teamGrid"></div>
+  </div>
+</div>
 
-    <div class="info-grid">
-      <div class="activity-card">
-        <div class="section-head"><div class="dashboard-title"><h2>02 / ACTIVITY FEED</h2></div><p id="activityState">Menunggu permainan</p></div>
-        <div class="activity-list" id="activityList"></div>
-      </div>
+
+<section class="full-dashboard" id="fullDashboard">
+  <div class="section-head">
+    <div class="dashboard-title"><span class="live-dot"></span><h2>🔥 Pusat Pertandingan</h2></div>
+    <p>Semua informasi permainan dalam satu layar</p>
+  </div>
+
+  <div class="live-ranking-card">
+    <div class="section-head"><div class="dashboard-title"><h2>📊 Skor Performa Live</h2></div><p>Skor performa dari jawaban siswa</p></div>
+    <div class="live-ranking" id="liveRanking"></div>
+  </div>
+
+  <div class="team-grid" id="teamGrid"></div>
+
+  <div class="info-grid">
+    <div class="activity-card">
+      <div class="section-head"><div class="dashboard-title"><h2>🎯 Aktivitas Pertandingan</h2></div><p id="activityState">Menunggu permainan</p></div>
+      <div class="activity-list" id="activityList"></div>
     </div>
-
-    <div class="learning-lab">
-      <div class="section-head"><div class="dashboard-title"><h2>03 / LEARNING LAB</h2></div><p>Empat cara berpikir yang dilatih</p></div>
-      <div class="edu-grid">
-        <article class="edu-card"><div class="edu-icon">01</div><h3>Algoritma</h3><p>Menyusun langkah yang runtut untuk mencapai tujuan.</p></article>
-        <article class="edu-card"><div class="edu-icon">02</div><h3>Dekomposisi</h3><p>Memecah masalah besar menjadi bagian yang bisa ditangani.</p></article>
-        <article class="edu-card"><div class="edu-icon">03</div><h3>Pengenalan Pola</h3><p>Menemukan kesamaan dan kecenderungan dari informasi.</p></article>
-        <article class="edu-card"><div class="edu-icon">04</div><h3>Abstraksi</h3><p>Memusatkan perhatian pada informasi yang paling penting.</p></article>
-      </div>
+  </div>
+  <div>
+    <div class="section-head"><div class="dashboard-title"><h2>🧠 Zona Edukasi</h2></div><p>Ringkas, informatif, dan tetap relevan</p></div>
+    <div class="edu-grid">
+      <article class="edu-card"><div class="edu-icon">🎯</div><h3>Tantangan Hari Ini</h3><p>Gunakan logika, pola, abstraksi, dekomposisi, dan algoritma saat menjawab.</p></article>
+      <article class="edu-card"><div class="edu-icon">💡</div><h3>Tahukah Kamu?</h3><p>Berpikir komputasional membantu memecah masalah kompleks menjadi langkah yang lebih mudah dikelola.</p></article>
+      <article class="edu-card"><div class="edu-icon">🚀</div><h3>Target Kelas</h3><p>Jawab dengan teliti dan gunakan setiap lemparan sebagai kesempatan belajar.</p></article>
     </div>
+  </div>
 
-    <section class="photo-showcase photo-showcase-three" aria-label="Galeri kegiatan kelas">
-      <div class="photo-panel photo-panel-wide"><div class="photo-panel-kicker">CLASSROOM / 01</div><img data-base64-image="galeriKelasBaru" alt="Kebersamaan guru dan siswa" loading="lazy"></div>
-      <div class="photo-panel photo-panel-trophy"><div class="photo-panel-kicker">CLASSROOM / 02</div><img data-base64-image="tigaSiswaBaru" alt="Siswa berprestasi dengan piala" loading="lazy"></div>
-      <div class="photo-panel photo-panel-group"><div class="photo-panel-kicker">CLASSROOM / 03</div><img data-base64-image="kebersamaanKelasBaru" alt="Kebersamaan siswa dan guru" loading="lazy"></div>
-    </section>
-
-    <footer class="footer-card"><div class="footer-brand">LUDO EDUKASI / COMMAND ARENA</div><div class="footer-sub">BELAJAR • BERMAIN • BERPIKIR • BERKEMBANG</div></footer>
+  <div class="material-card">
+    <div class="section-head"><div class="dashboard-title"><h2>📚 Materi Berpikir Komputasional</h2></div><p>Area pendukung permainan</p></div>
+    <div class="material-grid">
+      <div class="material"><div class="mi">🔷</div><b>Algoritma</b><p>Langkah-langkah terurut untuk menyelesaikan masalah.</p><small><strong>Manfaat:</strong> membuat solusi lebih jelas, sistematis, dan mudah diikuti.</small></div>
+      <div class="material"><div class="mi">🧩</div><b>Dekomposisi</b><p>Memecah masalah besar menjadi bagian-bagian yang lebih kecil.</p><small><strong>Manfaat:</strong> membuat masalah kompleks lebih mudah dikelola.</small></div>
+      <div class="material"><div class="mi">🔍</div><b>Pengenalan Pola</b><p>Mencari kesamaan, kecenderungan, atau pola dari berbagai informasi.</p><small><strong>Manfaat:</strong> membantu menemukan hubungan dan memperkirakan kejadian.</small></div>
+      <div class="material"><div class="mi">💡</div><b>Abstraksi</b><p>Memilih informasi penting dan mengabaikan detail yang tidak diperlukan.</p><small><strong>Manfaat:</strong> membuat masalah lebih sederhana dan fokus pada inti.</small></div>
+      <div class="material"><div class="mi">🧠</div><b>Berpikir Komputasional</b><p>Cara berpikir sistematis untuk memahami dan menyelesaikan masalah.</p><small><strong>Manfaat:</strong> membantu menyusun solusi yang logis, terstruktur, dan efisien.</small></div>
+    </div>
+  </div>
+  <section class="photo-showcase photo-showcase-three" aria-label="Galeri kegiatan kelas">
+    <div class="photo-panel photo-panel-wide">
+      <div class="photo-panel-kicker">👥 KEBERSAMAAN KELAS</div>
+      <img data-base64-image="galeriKelasBaru" alt="Kebersamaan guru dan siswa" loading="lazy">
+    </div>
+    <div class="photo-panel photo-panel-trophy">
+      <div class="photo-panel-kicker">🏆 SEMANGAT BERPRESTASI</div>
+      <img data-base64-image="tigaSiswaBaru" alt="Siswa berprestasi dengan piala" loading="lazy">
+    </div>
+    <div class="photo-panel photo-panel-group">
+      <div class="photo-panel-kicker">🎓 KEBERSAMAAN SISWA</div>
+      <img data-base64-image="kebersamaanKelasBaru" alt="Kebersamaan siswa dan guru" loading="lazy">
+    </div>
   </section>
-</main>
+
+  <div class="footer-card">
+    <div class="footer-brand">🎲 LUDO EDUKASI</div>
+    <div class="footer-sub">Belajar • Bermain • Berpikir • Berkembang</div>
+    <div class="footer-sub">Berpikir Komputasional · Permainan Kelompok · 3D Bright Edition</div>
+  </div>
+</section>
 
 <div class="finish-toast" id="finishToast"></div>
-<div id="soundFx" class="sound-fx"></div><div id="diceFlight" aria-hidden="true"></div>
+<div id="soundFx" class="sound-fx"></div>
 <div id="m"><div class="box" id="bx"></div></div>
-<script src="foto-base64.js?v=14"></script>
-<script>
-(function(){function g(n){try{return(0,eval)("typeof "+n+"!=='undefined'?"+n+":''")||"";}catch(e){return "";}}
-const map={kelas:g("IMG_FOTO_KELAS"),piala:g("IMG_FOTO_PIALA"),buku:g("IMG_FOTO_BUKU"),galeriKelas:g("IMG_FOTO_GALERI_KELAS"),tigaSiswa:g("IMG_FOTO_TIGA_SISWA"),galeriKelasBaru:g("IMG_FOTO_GALERI_KELAS_BARU"),tigaSiswaBaru:g("IMG_FOTO_TIGA_SISWA_BARU"),kebersamaanKelasBaru:g("IMG_FOTO_KEBERSAMAAN_KELAS_BARU")};
-document.querySelectorAll("[data-base64-image]").forEach(function(img){img.src=map[img.dataset.base64Image]||"";});})();
-</script>
-<script src="bank-soal.js"></script>
-<script src="game.js"></script>
+<script src="foto-base64.js?v=13"></script>
 <script>
 (function(){
-  const q=id=>document.getElementById(id);
-  function guide(){
-    if(typeof modal!=="function") return;
-    modal(`<div class="guide-panel"><div class="guide-hero">🧠 <div><span>QUICK GUIDE</span><h2>Lima langkah menuju juara</h2></div></div><div class="guide-steps"><div><b>01</b><span>🎲</span><p><strong>Lempar dadu</strong><small>Ketuk dadu saat giliranmu aktif.</small></p></div><div><b>02</b><span>❓</span><p><strong>Baca soal</strong><small>Timer 60 detik dimulai saat soal terbuka.</small></p></div><div><b>03</b><span>⚡</span><p><strong>Jawab cepat & tepat</strong><small>Jawaban benar memberi langkah dan poin.</small></p></div><div><b>04</b><span>🏃</span><p><strong>Pion bergerak</strong><small>Gunakan langkah untuk mengejar finish.</small></p></div><div><b>05</b><span>🏆</span><p><strong>Menangkan pertandingan</strong><small>Ranking dan analisis guru tersedia otomatis.</small></p></div></div><div class="guide-tip">💡 <strong>Tips:</strong> kecepatan penting, tetapi memahami soal tetap yang utama.</div><button class="btn" onclick="closeModal()">SIAP BERMAIN 🚀</button></div>`);
-  }
-  function focus(){
-    const active=document.body.classList.toggle("focus-mode");
-    document.body.classList.remove("dashboard-open");
-    [q("focusBtn"),q("quickFocus")].forEach(b=>{if(b)b.textContent=active?"↩️ KEMBALI KE DASHBOARD":"🎯 MODE FOKUS PAPAN"});
-  }
-  function motion(){
-    const off=document.body.classList.toggle("motion-off");
-    const b=q("motionBtn"); if(b)b.textContent=off?"🧘 ANIMASI MINIMAL":"✨ ANIMASI AKTIF";
-  }
-  q("guideBtn")?.addEventListener("click",guide);
-  q("quickGuide")?.addEventListener("click",guide);
-  q("focusBtn")?.addEventListener("click",focus);
-  q("quickFocus")?.addEventListener("click",focus);
-  q("motionBtn")?.addEventListener("click",motion);
-  q("quickTop")?.addEventListener("click",()=>q("arenaTop")?.scrollIntoView({behavior:"smooth",block:"start"}));
+  function g(n){try{return(0,eval)("typeof "+n+"!=='undefined'?"+n+":''")||"";}catch(e){return "";}}
+  const map={kelas:g("IMG_FOTO_KELAS"),piala:g("IMG_FOTO_PIALA"),buku:g("IMG_FOTO_BUKU"),galeriKelas:g("IMG_FOTO_GALERI_KELAS"),tigaSiswa:g("IMG_FOTO_TIGA_SISWA"),galeriKelasBaru:g("IMG_FOTO_GALERI_KELAS_BARU"),tigaSiswaBaru:g("IMG_FOTO_TIGA_SISWA_BARU"),kebersamaanKelasBaru:g("IMG_FOTO_KEBERSAMAAN_KELAS_BARU")};
+  document.querySelectorAll("[data-base64-image]").forEach(function(img){img.src=map[img.dataset.base64Image]||"";});
 })();
 </script>
-<script src="v18-3d-motion.js"></script>
-</body>
-</html>
+<script src="bank-soal.js"></script>
+<script src="game.js"></script></body></html>

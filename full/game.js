@@ -146,23 +146,10 @@ if(bankEl){bankEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 
 <div style="margin-top:6px;font-size:11px;color:#5a7a96">Duplikat di bank: <b>${bi.dup}</b> · Muncul di layar: <b>${S.appeared.length}</b></div>
 <details style="margin-top:6px;font-size:11px"><summary style="cursor:pointer;font-weight:800;color:#24658f">Daftar soal yang sudah muncul (${S.appeared.length})</summary><ol style="margin:6px 0 0 16px;max-height:120px;overflow:auto;padding-right:4px">${S.appeared.map((q,n)=>`<li style="margin:3px 0">${esc(q.length>90?q.slice(0,90)+"…":q)}</li>`).join("")||"<li>(belum ada)</li>"}</ol></details>`;}
 
-$("turn").innerHTML=`<span style="color:${G[S.cur].c==="#ffd800"?"#d58b00":G[S.cur].c}">${G[S.cur].n}</span>`;$("diceBadge").textContent=`${G[S.cur].n.toUpperCase()}`;$("dice").disabled=S.busy||S.over;$("pawnSelector").innerHTML=`<div class="note" style="text-align:center;font-weight:800">♟ Pion · ${S.pos[S.cur][0]===56?"Finish":S.pos[S.cur][0]+"/56"}</div>` }
+$("turn").innerHTML=`<span style="color:${G[S.cur].c==="#ffd800"?"#d58b00":G[S.cur].c}">${G[S.cur].n}</span>`;$("diceBadge").textContent=`${G[S.cur].n.toUpperCase()}`;$("diceHint").textContent=S.busy?(S.info||"Dadu dilempar…"):"Klik dadu untuk melempar";$("dice").disabled=S.busy||S.over;$("pawnSelector").innerHTML=`<div class="note" style="text-align:center;font-weight:800">♟ Pion · ${S.pos[S.cur][0]===56?"Finish":S.pos[S.cur][0]+"/56"}</div>` }
 
 function updateDashboard(){
   const tg=$("teamGrid"),al=$("activityList");
-  // V15 live classroom HUD: non-invasive telemetry derived only from existing game state.
-  const bi=bankInfo();
-  const totalAnswered=S.h.reduce((a,h)=>a+h.length,0);
-  const totalCorrect=S.ok.reduce((a,v)=>a+v,0);
-  const accuracy=totalAnswered?Math.round(totalCorrect/totalAnswered*100):0;
-  const hudSet=(id,v)=>{const el=$(id);if(el)el.textContent=v};
-  const elapsed=Math.max(0,Math.floor((Date.now()-S.startedAt)/1000));
-  hudSet("hudUsed",`${bi.used} / ${bi.unique}`);
-  hudSet("hudAccuracy",accuracy+"%");
-  hudSet("hudStreak",String(S.streak[S.cur]||0));
-  hudSet("hudStatus",S.over?"Pertandingan selesai":`${G[S.cur].n} sedang bermain`);
-  const mm=String(Math.floor(elapsed/60)).padStart(2,"0"),ss=String(elapsed%60).padStart(2,"0");
-  hudSet("matchClock",`${mm}:${ss}`);
   if(!tg||!al||typeof S==="undefined")return;
   const colors=["#1f6fc5","#e8272b","#13a84a","#ffd800"], icons=["🔵","🔴","🟢","🟡"];
   tg.innerHTML=G.map((g,i)=>{
@@ -480,36 +467,34 @@ function roll(){if(S.busy||S.over)return;unlockAudio();S.swapLeft=SWAP_MAX;S.act
 const n=1+Math.random()*6|0,cu=$("cube"),th=$("throw"),sh=$("dshadow");
 cu.classList.remove("idle");cu.style.transition="none";cu.style.transform="rotateX(-24deg) rotateY(32deg)";void cu.offsetWidth;
 const[fx,fy]=FACE[n],sx=(2+Math.random()*2|0)*360,sy=(2+Math.random()*2|0)*360;
-cu.style.transition="transform 1.6s cubic-bezier(.2,.75,.25,1)";cu.style.transform=`rotateX(${fx+sx}deg) rotateY(${fy+sy}deg)`;
-// Dadu asli berputar 3D di kontrol, sementara clone visual mengitari papan.
-th.animate([{transform:"translateY(0) scale(.9) rotate(0deg)"},{transform:"translateY(-12px) scale(1.12) rotate(140deg)",offset:.28},{transform:"translateY(5px) scale(1.02) rotate(330deg)",offset:.62},{transform:"translateY(0) scale(1) rotate(720deg)"}],{duration:1600,easing:"ease-in-out"});
-sh.animate([{transform:"scale(.4)",opacity:.25},{transform:"scale(.78)",opacity:.6,offset:.35},{transform:"scale(1.05)",opacity:1,offset:.65},{transform:"scale(1)",opacity:1}],{duration:1600});
-(function orbitDiceAroundBoard(){
-  try{
-    const host=$("diceFlight"), board=document.querySelector(".arena-board-shell")||document.querySelector(".bd"), src=$('cube');
-    if(!host||!board||!src)return;
-    host.innerHTML="";
-    const wrap=document.createElement("div");wrap.className="flight-cube dice-flight-pop";
-    wrap.innerHTML=src.innerHTML;
-    const ring=document.createElement("div");ring.className="flight-ring";wrap.appendChild(ring);host.appendChild(wrap);
-    const br=board.getBoundingClientRect(), start=$('dice').getBoundingClientRect();
-    const startX=start.left+start.width/2, startY=start.top+start.height/2;
-    const cx=br.left+br.width/2, cy=br.top+br.height/2;
-    const rx=Math.max(br.width/2+34,Math.min(window.innerWidth/2-58,br.width/2+52));
-    const ry=Math.max(br.height/2+34,Math.min(window.innerHeight/2-58,br.height/2+52));
-    const t0=performance.now(),dur=1650;
-    function frame(now){
-      const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3), ang=(-Math.PI/2)+(Math.PI*2*e);
-      const x=cx+rx*Math.cos(ang), y=cy+ry*Math.sin(ang);
-      host.style.transform=`translate3d(${x}px,${y}px,0)`;
-      wrap.style.transform=`scale(${1+.16*Math.sin(e*Math.PI)}) rotateX(${360*e}deg) rotateY(${720*e}deg)`;
-      if(p<1)requestAnimationFrame(frame);else setTimeout(()=>{host.innerHTML="";host.style.transform="translate3d(0,0,0)"},120);
-    }
-    host.style.transform=`translate3d(${startX}px,${startY}px,0)`;
-    requestAnimationFrame(frame);
-  }catch(e){}
-})();
-setTimeout(()=>{S.info=`🎲 Dadu ${n} → 1 soal`;S.left=1;S.total=1;draw();setTimeout(()=>question(),900)},1700)}
+cu.style.transform=`rotateX(${fx+sx}deg) rotateY(${fy+sy}deg)`;
+// Animasi: dadu terbang mengelilingi papan lalu kembali ke tempatnya.
+const FLY=2600;
+try{
+const board=document.querySelector(".bd"),br=board.getBoundingClientRect(),dr=$("dice").getBoundingClientRect();
+const cs=getComputedStyle(cu),cw=cs.width;
+const ghost=document.createElement("div");
+ghost.style.cssText=`position:fixed;left:${dr.left}px;top:${dr.top}px;width:${dr.width}px;height:${dr.height}px;perspective:700px;pointer-events:none;z-index:99999;display:grid;place-items:center;will-change:transform`;
+const gth=th.cloneNode(true);gth.removeAttribute("id");gth.style.cssText="position:absolute;inset:0;display:grid;place-items:center";
+const gcu=gth.querySelector(".cube");gcu.removeAttribute("id");gcu.classList.remove("idle");gcu.style.setProperty("--s",cw);gcu.style.width=cw;gcu.style.height=cw;gcu.style.transition="none";gcu.style.transform="rotateX(-24deg) rotateY(32deg)";
+ghost.appendChild(gth);document.body.appendChild(ghost);
+void gcu.offsetWidth;
+gcu.style.transition=`transform ${FLY}ms cubic-bezier(.25,.6,.3,1)`;
+gcu.style.transform=`rotateX(${fx+sx+720}deg) rotateY(${fy+sy+720}deg)`;
+th.style.visibility="hidden";
+const cx0=dr.left+dr.width/2,cy0=dr.top+dr.height/2,bx=br.left+br.width/2,by=br.top+br.height/2,ax=br.width*.40,ay=br.height*.40,N=64;
+const a0=Math.atan2(cy0-by,cx0-bx),N4=4,pw=(v)=>Math.sign(v)*Math.pow(Math.abs(v),2/N4);
+const kf=[{transform:"translate(0px,0px) scale(1) rotate(0deg)",offset:0}];
+for(let k=0;k<=N;k++){const t=a0+k/N*Math.PI*2,px=bx+ax*pw(Math.cos(t)),py=by+ay*pw(Math.sin(t));
+kf.push({transform:`translate(${px-cx0}px,${py-cy0}px) scale(${(1.25+.2*Math.sin(k/N*Math.PI*6)).toFixed(3)}) rotate(${(k/N*720).toFixed(1)}deg)`,offset:.14+.72*k/N})}
+kf.push({transform:"translate(0px,0px) scale(1) rotate(720deg)",offset:1});
+const anim=ghost.animate(kf,{duration:FLY,easing:"linear",fill:"forwards"});
+const done=()=>{th.style.visibility="";ghost.remove()};
+anim.onfinish=done;setTimeout(done,FLY+300);
+}catch(e){th.style.visibility="";}
+cu.style.transition="none";
+sh.animate([{transform:"scale(.4)",opacity:.3},{transform:"scale(.75)",opacity:.55,offset:.35},{transform:"scale(1.05)",opacity:1,offset:.8},{transform:"scale(1)",opacity:1}],{duration:FLY});
+setTimeout(()=>{S.info=`🎲 Dadu ${n} → 1 soal`;S.left=1;S.total=1;draw();setTimeout(()=>question(),700)},FLY+100)}
 function after(){
   S.left=0;
   S.activePawn=0;
@@ -854,11 +839,6 @@ function openMenu(){
 }
 
 
-
-/* ===== V15 LIVE HUD CLOCK ===== */
-setInterval(()=>{
-  if(typeof updateDashboard==='function' && typeof S!=="undefined" && !document.hidden)updateDashboard();
-},1000);
 
 /* ===== KEYBOARD CONTROLS =====
    Space = lempar dadu.
