@@ -897,7 +897,6 @@ function showMateri(){
     </div>
 
     <h3>🌟 Manfaat Berpikir Komputasional Secara Keseluruhan</h3>
-    <p>🎯 <b>Penerapan dalam kehidupan sehari-hari:</b> Membantu kita menyelesaikan masalah dengan lebih teratur dan efektif.</p>
     <p>🌟 Penerapan Berpikir Komputasional memberikan berbagai manfaat dalam menyelesaikan masalah, baik dalam pembelajaran maupun kehidupan sehari-hari, antara lain:</p>
     <div class="materi-list">
       <div><b>a)</b><span>Melatih kemampuan memecahkan masalah secara runtut dan sistematis.</span></div>
