@@ -164,7 +164,7 @@ if(bankEl){bankEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 
 <div style="margin-top:6px;font-size:11px;color:#5a7a96">Duplikat di bank: <b>${bi.dup}</b> · Muncul di layar: <b>${S.appeared.length}</b></div>
 <details style="margin-top:6px;font-size:11px"><summary style="cursor:pointer;font-weight:800;color:#24658f">Daftar soal yang sudah muncul (${S.appeared.length})</summary><ol style="margin:6px 0 0 16px;max-height:120px;overflow:auto;padding-right:4px">${S.appeared.map((q,n)=>`<li style="margin:3px 0">${esc(q.length>90?q.slice(0,90)+"…":q)}</li>`).join("")||"<li>(belum ada)</li>"}</ol></details>`;}
 
-$("turn").innerHTML=`<span style="color:${G[S.cur].c==="#ffd800"?"#d58b00":G[S.cur].c}">${G[S.cur].n}</span>`;$("diceBadge").textContent=`${G[S.cur].n.toUpperCase()}`;$("diceHint").textContent=S.busy?(S.info||"Dadu dilempar…"):"Klik dadu atau tekan Enter";$("dice").disabled=S.busy||S.over;$("pawnSelector").innerHTML=`<div class="note" style="text-align:center;font-weight:800">♟ Pion · ${S.pos[S.cur][0]===56?"Finish":S.pos[S.cur][0]+"/56"}</div>` }
+$("turn").innerHTML=`<span style="color:${G[S.cur].c==="#ffd800"?"#d58b00":G[S.cur].c}">${G[S.cur].n}</span>`;$("diceBadge").textContent=`${G[S.cur].n.toUpperCase()}`;$("diceHint").textContent=S.busy?(S.info||"Dadu dilempar…"):"Klik dadu untuk melempar";$("dice").disabled=S.busy||S.over;$("pawnSelector").innerHTML=`<div class="note" style="text-align:center;font-weight:800">♟ Pion · ${S.pos[S.cur][0]===56?"Finish":S.pos[S.cur][0]+"/56"}</div>` }
 
 function updateDashboard(){
   const tg=$("teamGrid"),al=$("activityList");
