@@ -15,14 +15,32 @@ const HC={red:[[7,1],[7,2],[7,3],[7,4],[7,5]],blue:[[1,7],[2,7],[3,7],[4,7],[5,7
 // Segitiga tengah: kiri=MERAH, atas=BIRU, kanan=KUNING, bawah=HIJAU (sama dengan warna kolom home di lengan masing-masing).
 const G=[{n:"Kelompok 1",c:"#1f6fc5",k:"blue",s:13,y:[0,9]},{n:"Kelompok 2",c:"#e8272b",k:"red",s:0,y:[0,0]},{n:"Kelompok 3",c:"#13a84a",k:"green",s:39,y:[9,0]},{n:"Kelompok 4",c:"#ffd800",k:"yellow",s:26,y:[9,9]}];
 const SAFE=new Set([0,8,13,21,26,34,39,47]),STAR=new Set([8,21,34,47]),LV=["Mudah","Sedang","Sulit"],RUB=[100,90,80,70];
-const S={pos:[[0],[0],[0],[0]],activePawn:0,ok:[0,0,0,0],pts:[0,0,0,0],finishBonus:[0,0,0,0],finishAt:[null,null,null,null],streak:[0,0,0,0],bestStreak:[0,0,0,0],h:[[],[],[],[]],cur:0,fin:[],used:new Set(),skipQ:[],swapLeft:2,cycle:0,curKey:"",appeared:[],tk:new Set(),quotes:[],left:0,info:"",busy:false,mute:false,over:false,stepFx:false,activity:[],startedAt:Date.now(),finishedAt:0,finalOrder:[],matchId:"LUDO-"+new Date().toISOString().replace(/[-:TZ.]/g,"").slice(0,14),_historySaved:false};
+const S={pos:[[0],[0],[0],[0]],activePawn:0,ok:[0,0,0,0],pts:[0,0,0,0],finishBonus:[0,0,0,0],finishAt:[null,null,null,null],streak:[0,0,0,0],bestStreak:[0,0,0,0],h:[[],[],[],[]],cur:0,fin:[],used:new Set(),skipQ:[],swapLeft:2,cycle:0,curKey:"",appeared:[],tk:new Set(),quotes:[],left:0,info:"",busy:false,mute:false,over:false,stepFx:false,activity:[],startedAt:Date.now(),finishedAt:0,finalOrder:[],pointFx:null,matchId:"LUDO-"+new Date().toISOString().replace(/[-:TZ.]/g,"").slice(0,14),_historySaved:false};
 const COLLISION_PENALTY=2; // pion ditabrak mundur 1 langkah = -2 poin
 function penalize(i,n=COLLISION_PENALTY){const d=Math.min(S.pts[i],n);S.pts[i]-=d;return d}
-const FIN_PTS=[0,500,350,200,50];
-function answerPoints(seconds){const sec=Math.max(1,Math.min(60,Math.ceil(Number(seconds)||0)));return Math.max(1,61-sec)}
-function totalScore(i){return S.pts[i]+(S.finishBonus[i]||0)}
+const FIN_PTS=[0,0,0,0,0];
+function answerPoints(seconds){
+  const sec=Math.max(1,Math.min(60,Math.ceil(Number(seconds)||0)));
+  if(sec<=5)return 10;
+  if(sec<=10)return 9;
+  if(sec<=20)return 8;
+  if(sec<=30)return 7;
+  if(sec<=45)return 6;
+  return 5;
+}
+function answerSteps(seconds){
+  const sec=Math.max(1,Math.min(60,Math.ceil(Number(seconds)||0)));
+  if(sec<=5)return 6;
+  if(sec<=10)return 5;
+  if(sec<=20)return 4;
+  if(sec<=30)return 3;
+  if(sec<=45)return 2;
+  return 1;
+}
+function totalScore(i){return S.pts[i]}
 
 // Hapus soal ganda (teks sama persis) di semua level & soal rebutan.
+// ATURAN RESMI GAME = PANDUAN: 60 detik, skor 10/9/8/7/6/5, langkah 6/5/4/3/2/1, salah/timeout 0, collision -2, ranking berdasarkan urutan FINISH.
 
 
 const $=i=>document.getElementById(i),esc=t=>String(t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])),pick=a=>a[Math.random()*a.length|0],qkey=q=>String(q).replace(/\s+/g," ").trim().toLowerCase();
@@ -134,7 +152,7 @@ const fx=(S.stepFx&&i===S.cur&&pawn===S.activePawn)?" pawn-step-fx":"";
 const img=PION_IMG[g.k];
 s+=`<g class="pawn-3d${fx}" onclick="choosePawn(${pawn})" style="cursor:pointer"><image href="${img}" x="${c-.10+o}" y="${r-.52}" width="1.20" height="1.62" preserveAspectRatio="xMidYMid meet"/></g>`;}});
 $("sv").innerHTML=s;
-const o=[...G.keys()].sort((a,b)=>S.pts[b]-S.pts[a]);$("sb").innerHTML=o.map(i=>`<div class="row ${i==S.cur&&!S.over?"on":""}"><span class="dot" style="background:${G[i].c}"></span><span>${G[i].n}${S.fin.includes(i)?" 🏁 Juara "+(S.fin.indexOf(i)+1):""}<br><small style="font-weight:600;color:#52718f">${S.ok[i]} benar · Performa ${S.pts[i]}${S.finishBonus[i]?` · Finish +${S.finishBonus[i]}`:""}</small></span><span class="sc">${totalScore(i)}</span></div>`).join("");
+const o=[...G.keys()].sort((a,b)=>b-a);$("sb").innerHTML=o.map(i=>{const fx=S.pointFx&&S.pointFx.i===i&&Date.now()-S.pointFx.t<1200?`<b class="point-fx ${S.pointFx.delta<0?"minus":"plus"}">${S.pointFx.delta>0?"+":""}${S.pointFx.delta} ⭐</b>`:"";return `<div class="row ${i==S.cur&&!S.over?"on":""} ${fx?"score-row-pop":""}"><span class="dot" style="background:${G[i].c}"></span><span><b>👥 ${G[i].n}</b>${S.fin.includes(i)?" 🏁 Juara "+(S.fin.indexOf(i)+1):""}<br><small style="font-weight:700;color:#52718f">⭐ ${S.pts[i]} poin · ${S.ok[i]} benar</small></span><span class="sc">⭐ ${S.pts[i]}${fx}</span></div>`}).join("");
 const bi=bankInfo();
 const bankEl=$("bankStats");
 if(bankEl){bankEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;margin-top:4px">
@@ -158,7 +176,7 @@ function updateDashboard(){
     return `<article class="team-card ${i===S.cur&&!S.over?"active":""}" onclick="teamProfile(${i})" title="Lihat detail ${g.n}">
       <div class="team-top"><div class="team-pawn" style="background:${colors[i]}">${icons[i]}</div>
       <div><div class="team-name">${g.n}</div><div class="team-meta"><span>${S.ok[i]} benar</span><span>${total} soal</span></div></div></div>
-      <div class="team-score">${S.pts[i]} <small style="font-size:11px">SKOR PERFORMA</small></div><div class="team-meta"><span>Finish</span><b>+${S.finishBonus[i]||0}</b><span>Total</span><b>${totalScore(i)}</b></div>
+      <div class="team-score">⭐ ${S.pts[i]} <small style="font-size:11px">POIN LIVE</small></div><div class="team-meta"><span>🎯 Poin</span><b>${S.pts[i]}</b><span>🏁 Status</span><b>${S.fin.includes(i)?"FINISH":"BERMAIN"}</b></div>
       <div class="team-meta"><span>Pion</span><b>${S.pos[i][0]===56?"FINISH":S.pos[i][0]+"/56"}</b></div>
       <div class="progress"><i style="width:${pct}%;background:${colors[i]}"></i></div>
       <div class="team-status">${status}</div>
@@ -175,12 +193,12 @@ function updateDashboard(){
   const cp=$("classProgress");if(cp)cp.style.width=pct+"%";
   set("activityState",S.over?"Permainan selesai":`Giliran ${G[S.cur].n}`);
   const current=G[S.cur];
-  const rank=[0,1,2,3].sort((a,b)=>S.pts[b]-S.pts[a]);
+  const rank=[0,1,2,3].sort((a,b)=>{const fa=S.fin.indexOf(a),fb=S.fin.indexOf(b);if(fa>=0&&fb<0)return -1;if(fa<0&&fb>=0)return 1;if(fa>=0&&fb>=0)return fa-fb;return b-a;});
   const rankEl=$("liveRanking");
   if(rankEl){rankEl.innerHTML=rank.map((i,n)=>{
     const lead=n===0?"🥇":n===1?"🥈":n===2?"🥉":"4️⃣";
     const h=S.h[i]||[], avg=h.length?(h.reduce((a,x)=>a+x.t,0)/h.length):0;
-    return `<div class="rank-row"><span class="rank-medal">${lead}</span><span class="rank-name"><b>${G[i].n}</b><small>${S.ok[i]} benar · ${S.pos[i][0]}/56 · </small></span><span class="rank-pts">${S.pts[i].toLocaleString("id-ID")}<small>${avg?avg.toFixed(1)+"s rata-rata":"belum bermain"}</small></span></div>`;
+    return `<div class="rank-row"><span class="rank-medal">${lead}</span><span class="rank-name"><b>${G[i].n}</b><small>${S.ok[i]} benar · ${S.pos[i][0]}/56 · </small></span><span class="rank-pts">⭐ ${S.pts[i].toLocaleString("id-ID")} poin<small>${avg?avg.toFixed(1)+"s rata-rata":"belum bermain"}</small></span></div>`;
   }).join("")}
   const recent=S.activity.length?S.activity.map(a=>`<div class="activity-item"><div class="activity-icon">${a.icon}</div><div><b>${esc(a.title)}</b><small>${esc(a.detail)} · ${a.time}</small></div></div>`).join(""):``;
   al.innerHTML = recent || `<div class="activity-item"><div class="activity-icon">🎲</div><div><b>Belum ada aktivitas.</b><small>Lempar dadu untuk memulai permainan.</small></div></div>`;
@@ -500,14 +518,30 @@ function after(){
   S.activePawn=0;
   next();
 }
-function question(itIn){const i=S.cur,p=S.pos[i][S.activePawn],lv=p<19?0:p<38?1:2,it=itIn||ask();if(!it){S.left=0;msg("Seluruh "+Q.length+" soal unik telah digunakan.");fin2([...S.fin,...[0,1,2,3].filter(j=>!S.fin.includes(j)).sort((a,b)=>S.ok[b]-S.ok[a])]);return}
-show(it,60,`${G[i].n} <span class="lv">Soal berikutnya</span>`,(sel,t)=>{const ok=sel===it.a,seconds=Math.max(1,Math.min(60,Math.ceil(Number(t)||0))),st=seconds<=12?6:seconds<=24?5:seconds<=36?4:seconds<=48?3:2;let pen=0,earned=0;S.h[i].push({q:it.q,o:it.o,sel,a:it.a,ok,t,lv:LV[lv],materi:it.materi||"",nomor:it.id});if(ok){S.ok[i]++;earned=answerPoints(seconds);S.pts[i]+=earned;S.streak[i]++;S.bestStreak[i]=Math.max(S.bestStreak[i],S.streak[i]);logActivity("✅",`${G[i].n} menjawab benar`,`+${earned} poin · pion maju ${st} langkah`);}else{S.streak[i]=0;logActivity("❌",`${G[i].n} salah menjawab`,`0 poin · pion tetap`);}
+function question(itIn){const i=S.cur,p=S.pos[i][S.activePawn],lv=p<19?0:p<38?1:2,it=itIn||ask();if(!it){S.left=0;msg("Seluruh "+Q.length+" soal unik telah digunakan.");fin2([...S.fin,...[0,1,2,3].filter(j=>!S.fin.includes(j))]);return}
+show(it,60,`${G[i].n} <span class="lv">Soal berikutnya</span>`,(sel,t)=>{const ok=sel===it.a,seconds=Math.max(1,Math.min(60,Math.ceil(Number(t)||0))),st=answerSteps(seconds),earned=ok?answerPoints(seconds):0;S.h[i].push({q:it.q,o:it.o,sel,a:it.a,ok,t,lv:LV[lv],materi:it.materi||"",nomor:it.id});if(ok){S.ok[i]++;S.pts[i]+=earned;S.streak[i]++;S.bestStreak[i]=Math.max(S.bestStreak[i],S.streak[i]);logActivity("✅",`${G[i].n} menjawab benar`,`+${earned} poin · pion maju ${st} langkah`);}else{S.streak[i]=0;logActivity("❌",`${G[i].n} salah menjawab`,`0 poin · pion tetap`);}
 document.querySelectorAll(".opt").forEach((b,k)=>{if(ok&&k===it.a)b.classList.add("ok");else if(!ok&&k===sel)b.classList.add("no");});if(ok){sfxCorrect();$("bx").classList.add("boardPulse");setTimeout(()=>$("bx").classList.remove("boardPulse"),700)}else sfxWrong();
 const fb=feedback(ok?"ok":"no");
 $("go").outerHTML=`<div class="answer-feedback ${ok?"ok":"no"}"><span class="feedback-icon">${ok?"🎉":"💪"}</span><div class="mot-label"> </div><div class="feedback-text">${esc(fb)}</div><div class="feedback-sub">${ok?`✅ JAWABAN BENAR! +${earned} poin · pion maju ${st} langkah.`:`❌ ${sel===null?"WAKTU HABIS":"JAWABAN SALAH"}! 0 poin · pion tetap.`}</div></div><button class="btn nx-btn">${ok?"🚀 LANJUTKAN":"👉 COBA LAGI DI SOAL BERIKUTNYA"}</button>`;
 draw();
+if(ok){pointFx(i,earned);impactFx(i,earned,"⭐");}else{pointFx(i,0);}
 document.querySelector("#bx .nx-btn").onclick=()=>{modal("");if(ok)move(i,st,after);else after()}},()=>swapSoal(it))}
 function msg(t){$("msg").textContent=t}
+function pointFx(i,delta){
+  if(!delta)return;
+  S.pointFx={i,delta,t:Date.now()};
+  draw();
+  setTimeout(()=>{if(S.pointFx&&S.pointFx.i===i&&S.pointFx.delta===delta){S.pointFx=null;draw()}},1250);
+}
+function impactFx(i,delta,icon){
+  const el=document.createElement("div");
+  el.className=`floating-point-fx ${delta<0?"minus":"plus"}`;
+  el.textContent=`${icon|| (delta>0?"⭐":"💥")} ${delta>0?"+":""}${delta} poin`;
+  const target=$("sb")?.querySelectorAll(".row")[i];
+  if(target){const r=target.getBoundingClientRect();el.style.left=(r.right-150)+"px";el.style.top=(r.top-8)+"px";}else{el.style.left="50%";el.style.top="35%";}
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1300);
+}
 function move(i,st,cb){
   let k=0,moved=0;
   const iv=setInterval(()=>{
@@ -537,7 +571,7 @@ function continueFT(){const t=$("finishToast");t.classList.remove("show");t.inne
 function showFT(i,r){
   const t=$("finishToast"); if(!t)return;
   const medal=["🥇","🥈","🥉","🏅"][Math.min(r,4)-1],tc=G[i].c;
-  t.innerHTML=`<div class="ft-card r${Math.min(r,4)}"><span class="ft-star" style="left:10px;top:10px">⭐</span><span class="ft-star" style="right:12px;top:18px;animation-delay:.3s">✨</span><span class="ft-star" style="left:16px;bottom:16px;animation-delay:.6s">✨</span><span class="ft-star" style="right:14px;bottom:12px;animation-delay:.15s">⭐</span><span class="ft-trophy">${r==1?"🏆":medal}</span><div class="ft-title">${r<4?"SELAMAT!":"TETAP SEMANGAT!"}</div><div class="ft-team" style="background:${tc}">${G[i].n}</div><div class="ft-rank">${medal} JUARA ${r} ${r<4?"🎉":"💪"}</div><div style="margin-top:8px;font-size:clamp(16px,3.5vw,28px);font-weight:900;color:#0d5c94">+${FIN_PTS[Math.min(r,4)]||0} POIN</div><div class="ft-quote">“${pick(MUT[Math.min(r,4)])}”</div><button class="btn ft-continue" onclick="continueFT()">▶ LANJUTKAN</button></div>`;
+  t.innerHTML=`<div class="ft-card r${Math.min(r,4)}"><span class="ft-star" style="left:10px;top:10px">⭐</span><span class="ft-star" style="right:12px;top:18px;animation-delay:.3s">✨</span><span class="ft-star" style="left:16px;bottom:16px;animation-delay:.6s">✨</span><span class="ft-star" style="right:14px;bottom:12px;animation-delay:.15s">⭐</span><span class="ft-trophy">${r==1?"🏆":medal}</span><div class="ft-title">${r<4?"SELAMAT!":"TETAP SEMANGAT!"}</div><div class="ft-team" style="background:${tc}">${G[i].n}</div><div class="ft-rank">${medal} JUARA ${r} ${r<4?"🎉":"💪"}</div><div style="margin-top:8px;font-size:clamp(16px,3.5vw,28px);font-weight:900;color:#0d5c94">URUTAN FINISH KE-${r}</div><div class="ft-quote">“${pick(MUT[Math.min(r,4)])}”</div><button class="btn ft-continue" onclick="continueFT()">▶ LANJUTKAN</button></div>`;
   t.classList.remove("show");void t.offsetWidth;t.classList.add("show");
   
   const cols=["#ff5b67","#ffd34d","#27c86b","#2d8cff","#9b6cff","#18d8d2","#ff9f1c"];
@@ -554,10 +588,10 @@ function showFT(i,r){
       d.style.cssText=`position:fixed;left:${cx}vw;top:${cy}vh;width:9px;height:9px;border-radius:50%;z-index:65;pointer-events:none;background:${cols[(n+k)%cols.length]};--fx:${Math.cos(a)*dist}px;--fy:${Math.sin(a)*dist}px;animation:ftFirework 1.1s ease-out forwards`;
       document.body.appendChild(d);setTimeout(()=>d.remove(),1200)}},k*500);
 }
-function land(i){const pawn=0,p=S.pos[i][pawn];if(p===56){if(pawnReady(i)&&!S.fin.includes(i)){S.fin.push(i);const r=S.fin.length;const bp=FIN_PTS[r]||0;S.finishBonus[i]=bp;S.finishAt[i]=Date.now();msg(`🏁🎉 ${G[i].n} Juara ${r}! Bonus finish +${bp} poin`);logActivity("🏆",`${G[i].n} FINISH sebagai Juara ${r}`,`Bonus finish +${bp.toLocaleString("id-ID")} poin · Total ${totalScore(i).toLocaleString("id-ID")}`);celebrateFinish(i,r);sfxFinish()}draw();return}
-if(p>0&&p<=50){const x=(G[i].s+p)%52;if(!SAFE.has(x))G.forEach((g,j)=>{if(j===i)return;const v=S.pos[j][0];if(v>0&&v<=50&&(g.s+v)%52===x){S.pos[j][0]=Math.max(0,v-1);const lost=penalize(j,COLLISION_PENALTY);logActivity("💥",`${g.n} ditabrak ${G[i].n}`,`Mundur 1 langkah · -${lost} poin`);msg(`💥 ${G[i].n} menabrak pion ${g.n}: mundur 1 langkah!`)}})}draw()}
-function next(){if(S.fin.length>=2)return endGame();let n=S.cur;do n=(n+1)%4;while(S.fin.includes(n));S.cur=n;S.activePawn=0;S.busy=false;draw()}
-function endGame(){S.busy=true;const r=[0,1,2,3].filter(i=>!S.fin.includes(i)).sort((a,b)=>S.ok[b]-S.ok[a]);if(S.ok[r[0]]==S.ok[r[1]])return tie(r);fin2([...S.fin,...r])}
+function land(i){const pawn=0,p=S.pos[i][pawn];if(p===56){if(pawnReady(i)&&!S.fin.includes(i)){S.fin.push(i);const r=S.fin.length;S.finishBonus[i]=0;S.finishAt[i]=Date.now();msg(`🏁🎉 ${G[i].n} Juara ${r}!`);logActivity("🏆",`${G[i].n} FINISH sebagai Juara ${r}`,`Urutan FINISH menentukan peringkat · ${S.pts[i].toLocaleString("id-ID")} poin`);celebrateFinish(i,r);sfxFinish()}draw();return}
+if(p>0&&p<=50){const x=(G[i].s+p)%52;if(!SAFE.has(x))G.forEach((g,j)=>{if(j===i)return;const v=S.pos[j][0];if(v>0&&v<=50&&(g.s+v)%52===x){S.pos[j][0]=Math.max(0,v-1);const lost=penalize(j,COLLISION_PENALTY);logActivity("💥",`${g.n} ditabrak ${G[i].n}`,`Mundur 1 langkah · -${lost} poin`);msg(`💥 ${G[i].n} menabrak pion ${g.n}: mundur 1 langkah!`);setTimeout(()=>{pointFx(j,-lost);impactFx(j,-lost,"💥")},60)}})}draw()}
+function next(){if(S.fin.length>=4)return endGame();let n=S.cur;do n=(n+1)%4;while(S.fin.includes(n));S.cur=n;S.activePawn=0;S.busy=false;draw()}
+function endGame(){S.busy=true;fin2([...S.fin])}
 function tie(r,round=0){const it=ask();if(!it){return fin2([...S.fin,...r])}const res=[];const go=k=>{if(k>1)return judge();const item=k===0?it:ask();if(!item)return fin2([...S.fin,...r]);show(item,60,`🔥 SOAL REBUTAN - PENENTU JUARA<br>${G[r[k]].n} (${k+1}/2)`,(sel,t)=>{const ok=sel===item.a;const seconds=Math.max(1,Math.min(60,Math.ceil(Number(t)||0)));const earned=ok?answerPoints(seconds):0;S.h[r[k]].push({q:item.q,o:item.o,sel,a:item.a,ok,t,lv:"Rebutan",materi:item.materi||"",nomor:item.id});if(ok){S.pts[r[k]]+=earned;S.streak[r[k]]++;S.bestStreak[r[k]]=Math.max(S.bestStreak[r[k]],S.streak[r[k]]);logActivity("🔥",`${G[r[k]].n} menang soal rebutan`,`+${earned} poin`);}else{S.streak[r[k]]=0;logActivity("❌",`${G[r[k]].n} salah soal rebutan`,`0 poin`);}res.push({ok,t});modal(`<div class="pse">${G[r[k]].n} sudah menjawab.</div><button class="btn nx-btn">${k<1?"Lanjut ke kelompok berikutnya 👉":"Lihat hasil 👉"}</button>`);document.querySelector("#bx .nx-btn").onclick=()=>go(k+1)})};
 const judge=()=>{const[a,b]=res;let w=-1;if(a.ok&&!b.ok)w=0;else if(b.ok&&!a.ok)w=1;else if(a.ok&&b.ok)w=a.t<b.t?0:b.t<a.t?1:(Math.random()<.5?0:1);if(w<0){
   if(round<2){modal(`<div class="pse">Kedua kelompok belum menjawab dengan benar.</div><div class="note">Soal rebutan diulang dengan soal baru (${round+2}/3).</div><button class="btn nx-btn">Soal rebutan berikutnya 👉</button>`);document.querySelector("#bx .nx-btn").onclick=()=>tie(r,round+1);return}
@@ -576,7 +610,7 @@ function reportData(i){const h=S.h[i]||[],m={"Dekomposisi":{ok:0,n:0},"Abstraksi
   const total=h.length,ok=h.filter(x=>x.ok).length,acc=total?Math.round(ok/total*100):0;
   const sorted=[...topics].sort((a,b)=>b.acc-a.acc||b.n-a.n);
   return{total,ok,bad:total-ok,acc,topics,best:sorted[0]||null,weak:sorted[sorted.length-1]||null};}
-function reportCard(i){const d=reportData(i),full=S.fin.includes(i);const best=d.best?`${d.best.name} (${d.best.acc}%)`:"Belum cukup data";const weak=d.weak?`${d.weak.name} (${d.weak.acc}%)`:"Belum cukup data";const steps=S.pos[i][0]||0;return `<div class="report-team ${full?"full":""}"><h4><span style="background:${G[i].c};color:#fff">${G[i].n}</span><span>${full?"🏁 FINISH":"🎮 BERMAIN"}</span></h4><div class="report-bars"><i style="width:${d.acc}%"></i></div><div class="report-stats"><div class="report-stat"><b>${S.pts[i]}</b><small>Skor Performa</small></div><div class="report-stat"><b>+${S.finishBonus[i]||0}</b><small>Bonus Finish</small></div><div class="report-stat"><b>${totalScore(i)}</b><small>Total Skor</small></div><div class="report-stat"><b>${steps}</b><small>Langkah</small></div><div class="report-stat"><b>${d.ok}</b><small>Benar</small></div><div class="report-stat"><b>${d.bad}</b><small>Salah</small></div><div class="report-stat"><b>${d.acc}%</b><small>Akurasi</small></div></div><div class="mastery"><strong>Materi paling dikuasai:</strong><br>${esc(best)}</div><div class="mastery weak"><strong>Materi perlu ditingkatkan:</strong><br>${esc(weak)}</div></div>`}
+function reportCard(i){const d=reportData(i),full=S.fin.includes(i);const best=d.best?`${d.best.name} (${d.best.acc}%)`:"Belum cukup data";const weak=d.weak?`${d.weak.name} (${d.weak.acc}%)`:"Belum cukup data";const steps=S.pos[i][0]||0;return `<div class="report-team ${full?"full":""}"><h4><span style="background:${G[i].c};color:#fff">${G[i].n}</span><span>${full?"🏁 FINISH":"🎮 BERMAIN"}</span></h4><div class="report-bars"><i style="width:${d.acc}%"></i></div><div class="report-stats"><div class="report-stat"><b>${S.pts[i]}</b><small>Skor Performa</small></div><div class="report-stat"><b>${S.pts[i]}</b><small>Total Poin</small></div><div class="report-stat"><b>${steps}</b><small>Langkah</small></div><div class="report-stat"><b>${d.ok}</b><small>Benar</small></div><div class="report-stat"><b>${d.bad}</b><small>Salah</small></div><div class="report-stat"><b>${d.acc}%</b><small>Akurasi</small></div></div><div class="mastery"><strong>Materi paling dikuasai:</strong><br>${esc(best)}</div><div class="mastery weak"><strong>Materi perlu ditingkatkan:</strong><br>${esc(weak)}</div></div>`}
 function selfTest(){
   const checks=[];
   checks.push(["HTML modal",!!$("m")&&!!$("bx")]);
@@ -593,7 +627,7 @@ function teamProfile(i){
  const finishRank=S.fin.indexOf(i)+1;
  const rank=finishRank>0?finishRank:null;
  const rows=d.topics.map(t=>`<div class="topic-mini"><span>${esc(t.name)}</span><b>${t.acc}%</b><small>${t.ok}/${t.n} benar</small></div>`).join("")||`<div class="note">Belum ada data materi.</div>`;
- modal(`<div class="profile-card"><div class="profile-title"><span style="background:${G[i].c}">${G[i].n}</span><b>${rank?(rank===1?"🥇":rank===2?"🥈":rank===3?"🥉":"4️⃣")+" Peringkat "+rank:"🎮 Belum Finish"}</b></div><div class="profile-stats"><div><b>${S.pts[i].toLocaleString("id-ID")}</b><small>SKOR PERFORMA</small><b>${(S.finishBonus[i]||0).toLocaleString("id-ID")}</b><small>BONUS FINISH</small><b>${totalScore(i).toLocaleString("id-ID")}</b><small>TOTAL SKOR</small></div><div><b>${S.pos[i][0]}</b><small>LANGKAH</small></div><div><b>${d.ok}</b><small>BENAR</small></div><div><b>${d.bad}</b><small>SALAH</small></div><div><b>${d.acc}%</b><small>AKURASI</small></div><div><b>${avg?avg.toFixed(1)+"s":"—"}</b><small>RATA-RATA</small></div></div><h3 style="margin-top:12px">🧠 Penguasaan Materi</h3><div class="topic-list">${rows}</div><button class="btn" onclick="teacherReport()">📊 Kembali ke Rekap Guru</button></div>`);
+ modal(`<div class="profile-card"><div class="profile-title"><span style="background:${G[i].c}">${G[i].n}</span><b>${rank?(rank===1?"🥇":rank===2?"🥈":rank===3?"🥉":"4️⃣")+" Peringkat "+rank:"🎮 Belum Finish"}</b></div><div class="profile-stats"><div><b>${S.pts[i].toLocaleString("id-ID")}</b><small>SKOR PERFORMA</small><b>${S.pts[i].toLocaleString("id-ID")}</b><small>TOTAL POIN</small></div><div><b>${S.pos[i][0]}</b><small>LANGKAH</small></div><div><b>${d.ok}</b><small>BENAR</small></div><div><b>${d.bad}</b><small>SALAH</small></div><div><b>${d.acc}%</b><small>AKURASI</small></div><div><b>${avg?avg.toFixed(1)+"s":"—"}</b><small>RATA-RATA</small></div></div><h3 style="margin-top:12px">🧠 Penguasaan Materi</h3><div class="topic-list">${rows}</div><button class="btn" onclick="teacherReport()">📊 Kembali ke Rekap Guru</button></div>`);
 }
 function resultOrder(order){
   return order && order.length ? [...order] : (S.finalOrder&&S.finalOrder.length?[...S.finalOrder]:[0,1,2,3].sort((a,b)=>S.pts[b]-S.pts[a]));
@@ -740,18 +774,17 @@ function fin2(o){
   S.over=true;
   S.finishedAt=S.finishedAt||Date.now();
   S.finalOrder=[...o];
-  // Simpan bonus finish secara terpisah agar skor performa tetap transparan.
-  o.forEach((g,i)=>{const r=i+1;if(!S.finishBonus[g])S.finishBonus[g]=FIN_PTS[r]||0;if(!S.finishAt[g])S.finishAt[g]=Date.now();});
+  // Peringkat final hanya mengikuti urutan FINISH; tidak ada bonus finish.
+  o.forEach((g,i)=>{S.finishBonus[g]=0;if(!S.finishAt[g])S.finishAt[g]=Date.now();});
   draw();music(0);if(!S._j3){S._j3=1;if(o[2]!=null)celebrateFinish(o[2],3);if(o[3]!=null)celebrateFinish(o[3],4)}
   const rows=o.map((g,i)=>{
     const benar=(S.h[g]||[]).filter(x=>x.ok).length, salah=(S.h[g]||[]).filter(x=>!x.ok).length, total=benar+salah;
-    return `<tr><td>${i==0?"Juara 1":i==1?"Juara 2":i==2?"Juara 3":"Juara 4"}</td><td style="color:${G[g].c==="#ffd800"?"#d58b00":G[g].c}">${G[g].n}</td><td>${benar}</td><td>${salah}</td><td><b>${total?Math.round(benar/total*100):0}%</b></td><td>${total}</td><td><b>${S.pts[g]}</b></td><td>+${S.finishBonus[g]||0}</td><td><b>${totalScore(g)}</b></td></tr>`;
+    return `<tr><td>${i==0?"Juara 1":i==1?"Juara 2":i==2?"Juara 3":"Juara 4"}</td><td style="color:${G[g].c==="#ffd800"?"#d58b00":G[g].c}">${G[g].n}</td><td>${benar}</td><td>${salah}</td><td><b>${total?Math.round(benar/total*100):0}%</b></td><td>${total}</td><td><b>${S.pts[g]}</b></td></tr>`;
   }).join("");
   modal(`<h1 style="text-align:center;color:#17609a">🏆 PERMAINAN SELESAI</h1>
   <div class="note" style="text-align:center;margin:4px 0 10px">Hasil lengkap setiap kelompok</div>
-  <table><tr><th>Peringkat</th><th>Kelompok</th><th>Benar</th><th>Salah</th><th>Akurasi</th><th>Total soal</th><th>Performa</th><th>Bonus Finish</th><th>Total Skor</th></tr>${rows}</table>
-  <div class="note" style="margin-top:8px">Bonus finish: Juara 1 = 500 · Juara 2 = 350 · Juara 3 = 200 · Juara 4 = 50</div>
-    <div class="note">Belajar adalah perjalanan, setiap jawaban adalah langkah maju. Urutan finish menentukan juara. Jika hasil finish benar-benar bersamaan, poin performa menjadi tie-breaker; jika masih sama, jumlah jawaban benar lalu rata-rata waktu menjawab.</div>
+  <table><tr><th>Peringkat</th><th>Kelompok</th><th>Benar</th><th>Salah</th><th>Akurasi</th><th>Total soal</th><th>Poin</th></tr>${rows}</table>
+  <div class="note">Urutan mencapai FINISH menentukan Juara 1, Juara 2, Juara 3, dan Juara 4 — bukan jumlah poin.</div>
   <button class="btn" onclick="teacherReport()">📊 REKAP / PROGRESS GURU</button>
   <button class="btn" onclick="detailedResults()">📋 HASIL DETAIL</button>
   <button class="btn" onclick="saveResultJSON()">💾 SIMPAN HASIL</button>
@@ -760,7 +793,7 @@ function fin2(o){
   persistHistory();
 }
 
-function review(t){modal(`<h2>Mode review</h2><div class="tabs">`+G.map((g,i)=>`<button class="${i==t?"a":""}" onclick="review(${i})">${g.n} (${S.ok[i]} benar · ${S.h[i].filter(x=>!x.ok).length} salah)</button>`).join("")+`</div>`+(S.h[t].map((x,n)=>`<div class="rv ${x.ok?"ok":"no"}"><b>${n+1}. ${esc(x.q)}</b><br>Jawaban kelompok: ${x.sel===null?"(waktu habis)":esc(x.o[x.sel])}<br>Kunci: ${esc(x.o[x.a])} · ${Math.round(x.t)} detik</div>`).join("")||"<p>Belum ada jawaban.</p>")+`<button class="btn" onclick="fin2([...S.fin,...[0,1,2,3].filter(i=>!S.fin.includes(i)).sort((a,b)=>S.ok[b]-S.ok[a])])">⬅ Kembali</button>`)}
+function review(t){modal(`<h2>Mode review</h2><div class="tabs">`+G.map((g,i)=>`<button class="${i==t?"a":""}" onclick="review(${i})">${g.n} (${S.ok[i]} benar · ${S.h[i].filter(x=>!x.ok).length} salah)</button>`).join("")+`</div>`+(S.h[t].map((x,n)=>`<div class="rv ${x.ok?"ok":"no"}"><b>${n+1}. ${esc(x.q)}</b><br>Jawaban kelompok: ${x.sel===null?"(waktu habis)":esc(x.o[x.sel])}<br>Kunci: ${esc(x.o[x.a])} · ${Math.round(x.t)} detik</div>`).join("")||"<p>Belum ada jawaban.</p>")+`<button class="btn" onclick="fin2([...S.fin,...[0,1,2,3].filter(i=>!S.fin.includes(i))])">⬅ Kembali</button>`)}
 
 function openDashboard(){
   document.body.classList.add("dashboard-open");
@@ -905,21 +938,41 @@ window.addEventListener("keydown",e=>{
   }
 });
 
-draw();modal(`<h2>🎮 Panduan Bermain Ludo Edukas</h2><p class="note">
-<b>1. 🎲 Lempar Dadu</b><br>
-Tekan <b>Dadu 🎲</b> untuk mendapatkan soal 📚.<br><br>
-<b>2. 📝 Jawab Soal</b><br>
-Pilih jawaban ✅, lalu tekan <b>JAWAB SEKARANG 🚀</b>. Waktu menjawab <b>60 detik ⏱️</b> dimulai setelah soal dibuka.<br><br>
-<b>3. ✅ Jawaban Benar</b><br>
-Jawaban benar membuat pion <b>bergerak maju 🚶‍♂️➡️</b> dan mendapatkan poin ⭐.<br><br>
-<b>4. ❌ Jawaban Salah</b><br>
-Jawaban salah membuat pion <b>tetap di tempat 🛑</b> dan mendapat <b>0 poin</b>. Tidak ada soal tambahan dari lemparan yang sama 🔒.<br><br>
-<b>5. ⏰ Waktu Habis</b><br>
-Jika waktu <b>60 detik ⏱️</b> habis sebelum menjawab, jawaban dianggap <b>gagal ❌</b> dan pion tetap di tempat 🛑.<br><br>
-<b>6. 💥 Tabrak Lawan</b><br>
-Jika pion berhenti di petak yang ditempati pion lawan 🎯, pion lawan akan <b>mundur 1 langkah ⬅️</b> dan kehilangan <b>2 poin 💔</b>.<br><br>
-<b>7. ⚔️ Soal Rebutan</b><br>
-Soal rebutan muncul secara otomatis jika terdapat <b>nilai seri 🤝</b> bagi kelompok yang belum sampai <b>finish 🏁</b>.<br><br>
-<b>8. 🏆 Menjadi Juara</b><br>
-Kelompok dengan hasil terbaik dan mencapai <b>finish 🏁</b> akan menjadi <b>pemenang 🥇🎉</b>.
-</p><button class="btn" onclick="modal('');ac()">MENGERTI 👍</button>`);
+draw();modal(`<h2>🎲 Panduan Bermain Ludo Edukasi</h2>
+<div class="note guide-content">
+<b>1. 👥 Giliran Kelompok</b><br>
+Kelompok bermain secara bergiliran. Setiap anggota mendapat kesempatan maju ke depan secara bergantian. Dalam setiap kelompok memilih 1 orang yang bertugas menyampaikan jawaban akhir hasil diskusi agar permainan tetap tertib.<br><br>
+
+<b>2. 🎲 Lempar Dadu</b><br>
+Siswa yang mendapat giliran maju klik <b>Dadu 🎲</b> di komputer/laptop dan membaca soal yang muncul.<br><br>
+
+<b>3. 🤔 Pilih Cara Menjawab</b><br>
+Siswa yang maju boleh langsung menjawab pertanyaan jika yakin. Jika ragu, siswa dapat berdiskusi dengan kelompok, kemudian jawaban disampaikan oleh anggota yang ditunjuk.<br><br>
+
+<b>4. 📝 Jawab Sekarang</b><br>
+Setelah menentukan jawaban, siswa memilih jawaban pada layar lalu menekan <b>JAWAB SEKARANG 🚀</b>.<br><br>
+
+<b>5. ⏱️ Batas Waktu</b><br>
+Waktu untuk membaca, berdiskusi, dan menjawab adalah <b>60 detik</b>.<br><br>
+
+<b>6. ✅ Jawaban Benar</b><br>
+Jawaban benar → pion maju dan mendapat poin ⭐ sesuai aturan:<br><br>
+<table class="guide-score-table"><thead><tr><th>Waktu</th><th>Langkah</th><th>Poin</th></tr></thead><tbody>
+<tr><td>≤ 5 detik</td><td>6</td><td>10</td></tr>
+<tr><td>6–10 detik</td><td>5</td><td>9</td></tr>
+<tr><td>11–20 detik</td><td>4</td><td>8</td></tr>
+<tr><td>21–30 detik</td><td>3</td><td>7</td></tr>
+<tr><td>31–45 detik</td><td>2</td><td>6</td></tr>
+<tr><td>&gt; 45 detik</td><td>1</td><td>5</td></tr>
+</tbody></table><br>
+
+<b>7. ❌ Salah atau Waktu Habis</b><br>
+Jawaban salah atau waktu habis, pion tetap di tempat dan mendapat <b>0 poin</b>.<br><br>
+
+<b>8. 💥 Tabrak Lawan</b><br>
+Jika pion mendarat di petak yang sama dengan pion lawan, maka pion lawan mundur <b>1 langkah</b> dan kehilangan <b>2 poin</b>.<br><br>
+
+<b>9. 🏆 Menjadi Juara</b><br>
+Kelompok yang paling dulu mencapai <b>FINISH 🏁</b> menjadi Juara 1. Kelompok berikutnya menjadi Juara 2, Juara 3, dan seterusnya. 🎉<br><br>
+<b>Catatan:</b> Urutan mencapai FINISH menentukan peringkat juara, bukan jumlah poin.
+</div><button class="btn" onclick="modal('');ac()">MENGERTI 👍</button>`);

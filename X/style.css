@@ -1446,3 +1446,56 @@ body:before,body:after{opacity:.32;filter:blur(18px)}
 
 /* Materi dipindah ke Menu (☰ Menu > Belajar) */
 .material-card{display:none!important}
+
+/* Panduan Bermain — tabel skor responsif */
+.guide-score-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid #cfe8f6;border-radius:12px;background:#fff;font-size:13px;box-shadow:0 6px 16px rgba(38,91,145,.08)}
+.guide-score-table th,.guide-score-table td{padding:8px 9px;text-align:center;border-bottom:1px solid #e5f1f7}
+.guide-score-table th{background:linear-gradient(135deg,#dff7ff,#fff2c8);color:#17548a;font-weight:900}
+.guide-score-table tr:last-child td{border-bottom:0}
+.guide-score-table td{color:#214d70;font-weight:700}
+@media(max-width:520px){.guide-score-table{font-size:12px}.guide-score-table th,.guide-score-table td{padding:7px 5px}}
+
+
+/* ===== FINAL LIVE SCORE + FULL GAME ANIMATION ===== */
+.side .score-card{display:block!important;visibility:visible!important;opacity:1!important}
+.score-card{position:relative;overflow:visible}
+.score-card h3{display:flex;align-items:center;gap:6px}
+.score-card #sb{display:grid;gap:7px;margin-top:10px}
+.score-card .row{position:relative;display:grid;grid-template-columns:16px minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px 11px;border-radius:15px;background:linear-gradient(145deg,#ffffff,#eef9ff);border:1px solid #d7edf8;box-shadow:0 7px 16px rgba(36,91,130,.08);transition:transform .25s ease,box-shadow .25s ease}
+.score-card .row.on{transform:translateY(-2px) scale(1.015);box-shadow:0 0 0 3px rgba(255,211,77,.38),0 12px 24px rgba(36,91,130,.13)}
+.score-card .row .sc{position:relative;font-size:18px;font-weight:1000;color:#155d8d;white-space:nowrap}
+.score-card .row.score-row-pop{animation:scoreRowPop .62s cubic-bezier(.2,.8,.25,1)}
+.point-fx{position:absolute;right:0;top:-15px;font-size:13px;font-weight:1000;pointer-events:none;white-space:nowrap;animation:pointFloat 1.15s ease-out both}
+.point-fx.plus{color:#0b9b57}.point-fx.minus{color:#e33b45}
+.floating-point-fx{position:fixed;z-index:100000;padding:7px 12px;border-radius:999px;background:#fff;box-shadow:0 12px 28px rgba(20,65,100,.2);font-weight:1000;font-size:16px;pointer-events:none;animation:floatingPoint 1.25s cubic-bezier(.2,.75,.25,1) both}
+.floating-point-fx.plus{color:#079b58;border:2px solid #9ce9bd}.floating-point-fx.minus{color:#e43d49;border:2px solid #ffc0c6}
+@keyframes scoreRowPop{0%{transform:scale(1)}35%{transform:scale(1.045) translateY(-2px)}100%{transform:scale(1)}}
+@keyframes pointFloat{0%{opacity:0;transform:translateY(8px) scale(.7)}20%{opacity:1;transform:translateY(0) scale(1.12)}100%{opacity:0;transform:translateY(-28px) scale(.95)}}
+@keyframes floatingPoint{0%{opacity:0;transform:translateY(14px) scale(.7) rotate(-2deg)}18%{opacity:1;transform:translateY(0) scale(1.08) rotate(0)}72%{opacity:1;transform:translateY(-38px) scale(1)}100%{opacity:0;transform:translateY(-72px) scale(.88)}}
+
+/* stronger pawn feedback */
+.pawn-step-fx{animation:pawnStepFx .32s cubic-bezier(.2,.85,.3,1) both;filter:drop-shadow(0 0 7px rgba(255,211,77,.95))}
+@keyframes pawnStepFx{0%{transform:translateY(0) scale(.94)}45%{transform:translateY(-.18px) scale(1.08) rotate(-2deg)}100%{transform:translateY(0) scale(1) rotate(0)}}
+
+/* question / answer feedback */
+.answer-feedback{animation:feedbackIn .5s cubic-bezier(.2,.8,.25,1) both}
+@keyframes feedbackIn{0%{opacity:0;transform:translateY(16px) scale(.92)}60%{opacity:1;transform:translateY(-2px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.boardPulse{animation:boardPulse .7s ease both}
+@keyframes boardPulse{0%{filter:brightness(1)}35%{filter:brightness(1.15) saturate(1.2)}100%{filter:brightness(1)}}
+
+/* dice: energetic 3D throw */
+#dice:not(:disabled){animation:diceReady 2.2s ease-in-out infinite}
+#dice:active{transform:scale(.94)}
+@keyframes diceReady{0%,100%{filter:drop-shadow(0 8px 10px rgba(25,90,135,.18))}50%{filter:drop-shadow(0 14px 20px rgba(25,90,135,.3))}}
+#dice:disabled{cursor:wait}
+
+/* collision feedback */
+.collision-shake{animation:collisionShake .55s ease both}
+@keyframes collisionShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+@media(max-width:520px){
+  .side .score-card{display:block!important}
+  .score-card .row{padding:9px 9px}
+  .score-card .row .sc{font-size:16px}
+  .floating-point-fx{font-size:14px;padding:6px 10px}
+}
