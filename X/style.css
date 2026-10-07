@@ -1439,3 +1439,7 @@ body:before,body:after{opacity:.32;filter:blur(18px)}
     transition-duration:.001ms!important;
   }
 }
+
+/* Hanya dadu yang tampil: sembunyikan semua teks di wadah dadu */
+#diceHint,#diceBadge,.dice-dock-label,.dice-dock-help{display:none!important}
+.dice-dock{padding-top:10px!important;padding-bottom:10px!important}

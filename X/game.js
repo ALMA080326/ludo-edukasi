@@ -467,11 +467,34 @@ function roll(){if(S.busy||S.over)return;unlockAudio();S.swapLeft=SWAP_MAX;S.act
 const n=1+Math.random()*6|0,cu=$("cube"),th=$("throw"),sh=$("dshadow");
 cu.classList.remove("idle");cu.style.transition="none";cu.style.transform="rotateX(-24deg) rotateY(32deg)";void cu.offsetWidth;
 const[fx,fy]=FACE[n],sx=(2+Math.random()*2|0)*360,sy=(2+Math.random()*2|0)*360;
-cu.style.transition="transform 1.6s cubic-bezier(.2,.75,.25,1)";cu.style.transform=`rotateX(${fx+sx}deg) rotateY(${fy+sy}deg)`;
-// Animasi dadu tetap di area kontrol bawah papan; tidak lagi mengorbit di atas jalur pion.
-th.animate([{transform:"translateY(0) scale(.9) rotate(0deg)"},{transform:"translateY(-9px) scale(1.08) rotate(120deg)",offset:.28},{transform:"translateY(4px) scale(1.02) rotate(300deg)",offset:.62},{transform:"translateY(0) scale(1) rotate(720deg)"}],{duration:1600,easing:"ease-in-out"});
-sh.animate([{transform:"scale(.4)",opacity:.3},{transform:"scale(.75)",opacity:.55,offset:.35},{transform:"scale(1.05)",opacity:1,offset:.65},{transform:"scale(1)",opacity:1}],{duration:1600});
-setTimeout(()=>{S.info=`🎲 Dadu ${n} → 1 soal`;S.left=1;S.total=1;draw();setTimeout(()=>question(),900)},1700)}
+cu.style.transform=`rotateX(${fx+sx}deg) rotateY(${fy+sy}deg)`;
+// Animasi: dadu terbang mengelilingi papan lalu kembali ke tempatnya.
+const FLY=2600;
+try{
+const board=document.querySelector(".bd"),br=board.getBoundingClientRect(),dr=$("dice").getBoundingClientRect();
+const cs=getComputedStyle(cu),cw=cs.width;
+const ghost=document.createElement("div");
+ghost.style.cssText=`position:fixed;left:${dr.left}px;top:${dr.top}px;width:${dr.width}px;height:${dr.height}px;perspective:700px;pointer-events:none;z-index:99999;display:grid;place-items:center;will-change:transform`;
+const gth=th.cloneNode(true);gth.removeAttribute("id");gth.style.cssText="position:absolute;inset:0;display:grid;place-items:center";
+const gcu=gth.querySelector(".cube");gcu.removeAttribute("id");gcu.classList.remove("idle");gcu.style.setProperty("--s",cw);gcu.style.width=cw;gcu.style.height=cw;gcu.style.transition="none";gcu.style.transform="rotateX(-24deg) rotateY(32deg)";
+ghost.appendChild(gth);document.body.appendChild(ghost);
+void gcu.offsetWidth;
+gcu.style.transition=`transform ${FLY}ms cubic-bezier(.25,.6,.3,1)`;
+gcu.style.transform=`rotateX(${fx+sx+720}deg) rotateY(${fy+sy+720}deg)`;
+th.style.visibility="hidden";
+const cx0=dr.left+dr.width/2,cy0=dr.top+dr.height/2,bx=br.left+br.width/2,by=br.top+br.height/2,ax=br.width*.40,ay=br.height*.40,N=64;
+const a0=Math.atan2(cy0-by,cx0-bx),N4=4,pw=(v)=>Math.sign(v)*Math.pow(Math.abs(v),2/N4);
+const kf=[{transform:"translate(0px,0px) scale(1) rotate(0deg)",offset:0}];
+for(let k=0;k<=N;k++){const t=a0+k/N*Math.PI*2,px=bx+ax*pw(Math.cos(t)),py=by+ay*pw(Math.sin(t));
+kf.push({transform:`translate(${px-cx0}px,${py-cy0}px) scale(${(1.25+.2*Math.sin(k/N*Math.PI*6)).toFixed(3)}) rotate(${(k/N*720).toFixed(1)}deg)`,offset:.14+.72*k/N})}
+kf.push({transform:"translate(0px,0px) scale(1) rotate(720deg)",offset:1});
+const anim=ghost.animate(kf,{duration:FLY,easing:"linear",fill:"forwards"});
+const done=()=>{th.style.visibility="";ghost.remove()};
+anim.onfinish=done;setTimeout(done,FLY+300);
+}catch(e){th.style.visibility="";}
+cu.style.transition="none";
+sh.animate([{transform:"scale(.4)",opacity:.3},{transform:"scale(.75)",opacity:.55,offset:.35},{transform:"scale(1.05)",opacity:1,offset:.8},{transform:"scale(1)",opacity:1}],{duration:FLY});
+setTimeout(()=>{S.info=`🎲 Dadu ${n} → 1 soal`;S.left=1;S.total=1;draw();setTimeout(()=>question(),700)},FLY+100)}
 function after(){
   S.left=0;
   S.activePawn=0;
