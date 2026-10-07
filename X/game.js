@@ -851,6 +851,15 @@ function openMenu(){
     </div>
 
     <section class="menu-section menu-section-blue">
+      <div class="menu-section-title"><span>📚</span> BELAJAR</div>
+      <button class="menu-item-modern" onclick="showMateri()">
+        <span class="menu-item-icon orange">📚</span>
+        <span><b>Materi Berpikir Komputasional</b><small>Pelajari 4 pilar utama sebelum atau sesudah bermain.</small></span>
+        <i>›</i>
+      </button>
+    </section>
+
+    <section class="menu-section menu-section-blue">
       <div class="menu-section-title"><span>📊</span> DATA PERMAINAN</div>
       <button class="menu-item-modern" onclick="teacherReport()">
         <span class="menu-item-icon blue">📊</span>
@@ -865,15 +874,6 @@ function openMenu(){
       <button class="menu-item-modern" onclick="showHistory()">
         <span class="menu-item-icon purple">🏆</span>
         <span><b>Riwayat Pertandingan</b><small>Lihat catatan pertandingan yang sudah berlangsung.</small></span>
-        <i>›</i>
-      </button>
-    </section>
-
-    <section class="menu-section menu-section-blue">
-      <div class="menu-section-title"><span>📚</span> BELAJAR</div>
-      <button class="menu-item-modern" onclick="showMateri()">
-        <span class="menu-item-icon orange">📚</span>
-        <span><b>Materi Berpikir Komputasional</b><small>Pelajari 5 konsep dasar sebelum atau sesudah bermain.</small></span>
         <i>›</i>
       </button>
     </section>
@@ -897,54 +897,73 @@ function openMenu(){
 }
 
 
-
 /* ===== KEYBOARD CONTROLS =====
-   Space = lempar dadu.
-   1-4 = langsung pilih dan kirim jawaban (tanpa klik tombol JAWAB).
-   Enter = lanjut ke tahap/soal berikutnya setelah jawaban diproses.
+   Enter = lempar dadu saat giliran.
+   1-4 = memilih jawaban A-D tanpa langsung mengirim.
+   Space = lanjutkan / coba lagi setelah jawaban diproses.
+   Escape = batalkan soal dengan konfirmasi; menu/informasi ditutup langsung.
    Kontrol sentuh/tap tetap tersedia untuk pengguna HP.
 */
 window.addEventListener("keydown",e=>{
   if(e.repeat)return;
+  const key=e.key;
   const modalOpen=$("m")&&$("m").style.display==="flex";
   if(modalOpen){
     const opts=[...document.querySelectorAll(".opt:not(:disabled)")];
-    if(e.key===" "){e.preventDefault();return;}
+    const feedbackNext=document.querySelector("#bx .nx-btn");
 
-    // 1-4: pilih jawaban sekaligus langsung submit.
-    if(/^[1-4]$/.test(e.key)&&opts.length){
+    // 1-4 hanya memilih opsi. Pengiriman tetap melalui JAWAB SEKARANG.
+    if(/^[1-4]$/.test(key)&&opts.length){
       e.preventDefault();
-      const b=opts[Number(e.key)-1];
-      if(b){
-        b.click();
-        const go=$("go");
-        if(go&&!go.disabled)go.click();
-      }
+      const b=opts[Number(key)-1];
+      if(b)b.click();
       return;
     }
 
-    // Enter: setelah jawaban diproses, lanjutkan ke soal/tahap berikutnya.
-    if(e.key==="Enter"){
-      const nextBtn=document.querySelector("#bx .nx-btn");
-      if(nextBtn){e.preventDefault();nextBtn.click();return;}
+    // Space hanya aktif setelah jawaban diproses (Lanjutkan/Coba Lagi).
+    if(key===" "){
+      if(feedbackNext){e.preventDefault();feedbackNext.click();}
+      return;
+    }
+
+    // Enter: jika tombol jawab tersedia, kirim jawaban; jika hasil sudah muncul,
+    // lanjutkan ke tahap berikutnya. Enter tidak menggantikan fungsi Space.
+    if(key==="Enter"){
       const go=$("go");
-      if(go&&!go.disabled){e.preventDefault();go.click();}
+      if(go&&!go.disabled){e.preventDefault();go.click();return;}
+      if(feedbackNext){e.preventDefault();feedbackNext.click();return;}
       return;
     }
 
-    if(e.key==="Escape"){
-      /* Escape hanya menutup panel informasi/menu.
-         Saat soal aktif, timer tetap berjalan agar tidak bisa dieksploitasi. */
-      if(!document.querySelector(".opt"))closeModal();
+    if(key==="Escape"){
+      e.preventDefault();
+      // Soal aktif: minta konfirmasi agar tidak ada pembatalan tidak sengaja.
+      if(opts.length){
+        const yes=confirm("⚠️ Batalkan soal?\n\nSoal yang sedang berlangsung akan dibatalkan. Giliran ini selesai dan tidak mendapat poin.");
+        if(yes){
+          const go=$("go");
+          if(go&&!go.disabled){go.click();}
+          else{
+            const first=opts[0];
+            if(first){first.click();}
+            setTimeout(()=>{const g=$("go");if(g&&!g.disabled)g.click();},0);
+          }
+        }
+      }else{
+        closeModal();
+      }
       return;
     }
     return;
   }
-  if(e.key===" "&&!S.busy&&!S.over){
+
+  // Enter = lempar dadu. Hanya saat permainan aktif dan bukan sedang sibuk.
+  if(key==="Enter"&&!S.busy&&!S.over){
     e.preventDefault();
     roll();
   }
 });
+
 
 draw();modal(`<h2>🎲 Panduan Bermain Ludo Edukasi</h2>
 <div class="note guide-content">
