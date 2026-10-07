@@ -1551,3 +1551,13 @@ body:before,body:after{opacity:.32;filter:blur(18px)}
   line-height:1.72;
   margin:0 0 13px;
 }
+
+/* ===== MATERI: HURUF a), b), c) SEJAJAR ===== */
+.materi-list{display:flex;flex-direction:column;gap:7px;margin:5px 0 15px;padding:0 2px}
+.materi-list>div{display:grid;grid-template-columns:32px minmax(0,1fr);column-gap:6px;align-items:start;margin:0;padding:0}
+.materi-list>div>b{font-weight:900;text-align:left;white-space:nowrap;color:#17609a}
+.materi-list>div>span{text-align:justify;text-justify:inter-word}
+@media(max-width:600px){
+  .materi-list{gap:6px;margin-bottom:13px}
+  .materi-list>div{grid-template-columns:28px minmax(0,1fr);column-gap:4px}
+}

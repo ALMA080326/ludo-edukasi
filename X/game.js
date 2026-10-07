@@ -827,11 +827,87 @@ function showMateri(){
   modal(`<div class="materi-full">
     <h2>🧠📚 Materi Berpikir Komputasional 🚀</h2>
     <p>🧠 <strong>Berpikir Komputasional</strong> adalah cara menyelesaikan masalah secara logis, sistematis, dan efisien. Berpikir Komputasional tidak harus menggunakan komputer atau HP. Tanpa disadari, kita sering menerapkannya dalam kehidupan sehari-hari, seperti saat membagi tugas, menyusun jadwal, mencari pola, atau menentukan langkah terbaik untuk menyelesaikan suatu pekerjaan. Berpikir Komputasional memiliki empat pilar utama, yaitu dekomposisi, pengenalan pola, abstraksi, dan algoritma.</p>
-    <h3>1. 🧩 Dekomposisi (Decomposition)</h3><p>Dekomposisi adalah proses memecah masalah yang besar dan kompleks menjadi beberapa bagian yang lebih kecil, sederhana, dan mudah dikelola. Setiap bagian dapat diselesaikan secara terpisah, kemudian hasilnya digabungkan untuk memperoleh solusi secara utuh.</p><p>📝 <b>Contoh:</b> Dalam membuat jadwal piket kelas, masalah tersebut dapat dipecah menjadi: a) Menentukan hari piket, misalnya Senin sampai Sabtu. b) Menentukan jenis tugas piket. c) Menentukan jumlah petugas setiap hari.</p><p>✨ <b>Dekomposisi bermanfaat untuk:</b> a) Membuat masalah terasa lebih sederhana dan mudah dipahami. b) Memudahkan penyelesaian masalah secara bertahap. c) Memungkinkan tugas dibagi kepada beberapa orang. d) Membantu menemukan bagian masalah yang perlu diperbaiki.</p>
-    <h3>2. 🔍 Pengenalan Pola (Pattern Recognition)</h3><p>Pengenalan pola adalah kemampuan untuk menemukan kesamaan, keteraturan, atau pengulangan dalam suatu masalah maupun di antara beberapa masalah. Pola yang ditemukan dapat digunakan untuk membuat prediksi dan mempercepat proses penyelesaian masalah.</p><p>📝 <b>Contoh:</b> Dalam jadwal piket kelas, terdapat beberapa pola: a) Jenis tugas piket dapat dibuat sama setiap hari. b) Jumlah petugas dapat dibuat sama setiap hari. c) Jadwal piket dapat berulang setiap minggu, dari Senin sampai Sabtu, kemudian kembali ke Senin.</p><p>✨ <b>Pengenalan pola bermanfaat untuk:</b> a) Menghindari pengerjaan masalah yang sama dari awal secara berulang. b) Memungkinkan solusi yang sudah ditemukan digunakan kembali. c) Mempercepat proses penyelesaian masalah. d) Membantu membuat prediksi berdasarkan pola yang ditemukan.</p>
-    <h3>3. 💡 Abstraksi (Abstraction)</h3><p>Abstraksi adalah proses menyaring informasi dengan mengambil hal-hal yang penting dan relevan serta mengabaikan detail yang tidak diperlukan. Dengan demikian, masalah dapat ditampilkan dalam bentuk yang lebih sederhana sehingga lebih mudah dipahami dan diselesaikan.</p><p>📝 <b>Contoh:</b> Dalam membuat jadwal piket kelas, informasi yang diperlukan antara lain: a) Nama siswa. b) Hari piket. c) Jenis tugas piket. Sementara itu, informasi seperti warna sapu, merek pel, atau posisi tempat duduk siswa tidak diperlukan dalam pembuatan jadwal sehingga dapat diabaikan.</p><p>✨ <b>Abstraksi bermanfaat untuk:</b> a) Membantu fokus pada inti permasalahan. b) Membuat solusi lebih sederhana dan mudah dipahami. c) Mengurangi informasi yang tidak relevan. d) Menghemat waktu dan usaha dalam menyelesaikan masalah.</p>
-    <h3>4. ⚙️ Algoritma (Algorithm)</h3><p>Algoritma adalah rangkaian langkah-langkah yang berurutan, jelas, dan terhingga untuk menyelesaikan suatu masalah atau mencapai tujuan tertentu. Setiap langkah dalam algoritma harus tepat, logis, dan tidak menimbulkan kebingungan.</p><p>📝 <b>Contoh langkah membuat jadwal piket kelas:</b> a) Menulis daftar seluruh siswa, misalnya 30 orang. b) Membagi siswa ke dalam enam hari piket, yaitu Senin sampai Sabtu, sehingga setiap hari terdiri atas 5 orang. c) Menentukan jenis tugas piket, misalnya menyapu, mengelap papan tulis, menyiram tanaman, membuang sampah, dan merapikan meja. d) Membagikan satu jenis tugas kepada setiap petugas. e) Menyusun dan menempelkan jadwal piket di dinding kelas. f) Setiap minggu, menggeser pembagian tugas agar setiap siswa memperoleh giliran tugas yang berbeda.</p><p>✨ <b>Algoritma bermanfaat untuk:</b> a) Membuat penyelesaian masalah lebih teratur dan sistematis. b) Menghasilkan langkah kerja yang jelas. c) Membantu pembagian tugas secara adil. d) Memungkinkan solusi dilakukan kembali oleh siapa pun dengan mengikuti langkah yang sama.</p>
-    <h3>🌟 Manfaat Berpikir Komputasional Secara Keseluruhan</h3><p>🎯 <b>Penerapan dalam kehidupan sehari-hari:</b> Membantu kita menyelesaikan masalah dengan lebih teratur dan efektif.<br><br>🌟 Penerapan Berpikir Komputasional memberikan berbagai manfaat dalam menyelesaikan masalah, baik dalam pembelajaran maupun kehidupan sehari-hari, antara lain: a) Melatih kemampuan memecahkan masalah secara runtut dan sistematis. b) Meningkatkan kemampuan berpikir logis dan kritis serta ketelitian. c) Membuat pekerjaan lebih efisien dan menghemat waktu. d) Melatih kreativitas dalam menemukan berbagai alternatif solusi. e) Mendukung kerja sama tim melalui pembagian masalah dan tugas. f) Menjadi dasar dalam mempelajari pemrograman dan teknologi. g) Dapat diterapkan dalam kehidupan sehari-hari dan berbagai mata pelajaran.</p>
+
+    <h3>1. 🧩 Dekomposisi (Decomposition)</h3>
+    <p>Dekomposisi adalah proses memecah masalah yang besar dan kompleks menjadi beberapa bagian yang lebih kecil, sederhana, dan mudah dikelola. Setiap bagian dapat diselesaikan secara terpisah, kemudian hasilnya digabungkan untuk memperoleh solusi secara utuh.</p>
+    <p>📝 <b>Contoh:</b> Dalam membuat jadwal piket kelas, masalah tersebut dapat dipecah menjadi:</p>
+    <div class="materi-list">
+      <div><b>a)</b><span>Menentukan hari piket, misalnya Senin sampai Sabtu.</span></div>
+      <div><b>b)</b><span>Menentukan jenis tugas piket.</span></div>
+      <div><b>c)</b><span>Menentukan jumlah petugas setiap hari.</span></div>
+    </div>
+    <p>✨ <b>Dekomposisi bermanfaat untuk:</b></p>
+    <div class="materi-list">
+      <div><b>a)</b><span>Membuat masalah terasa lebih sederhana dan mudah dipahami.</span></div>
+      <div><b>b)</b><span>Memudahkan penyelesaian masalah secara bertahap.</span></div>
+      <div><b>c)</b><span>Memungkinkan tugas dibagi kepada beberapa orang.</span></div>
+      <div><b>d)</b><span>Membantu menemukan bagian masalah yang perlu diperbaiki.</span></div>
+    </div>
+
+    <h3>2. 🔍 Pengenalan Pola (Pattern Recognition)</h3>
+    <p>Pengenalan pola adalah kemampuan untuk menemukan kesamaan, keteraturan, atau pengulangan dalam suatu masalah maupun di antara beberapa masalah. Pola yang ditemukan dapat digunakan untuk membuat prediksi dan mempercepat proses penyelesaian masalah.</p>
+    <p>📝 <b>Contoh:</b> Dalam jadwal piket kelas, terdapat beberapa pola:</p>
+    <div class="materi-list">
+      <div><b>a)</b><span>Jenis tugas piket dapat dibuat sama setiap hari.</span></div>
+      <div><b>b)</b><span>Jumlah petugas dapat dibuat sama setiap hari.</span></div>
+      <div><b>c)</b><span>Jadwal piket dapat berulang setiap minggu, dari Senin sampai Sabtu, kemudian kembali ke Senin.</span></div>
+    </div>
+    <p>✨ <b>Pengenalan pola bermanfaat untuk:</b></p>
+    <div class="materi-list">
+      <div><b>a)</b><span>Menghindari pengerjaan masalah yang sama dari awal secara berulang.</span></div>
+      <div><b>b)</b><span>Memungkinkan solusi yang sudah ditemukan digunakan kembali.</span></div>
+      <div><b>c)</b><span>Mempercepat proses penyelesaian masalah.</span></div>
+      <div><b>d)</b><span>Membantu membuat prediksi berdasarkan pola yang ditemukan.</span></div>
+    </div>
+
+    <h3>3. 💡 Abstraksi (Abstraction)</h3>
+    <p>Abstraksi adalah proses menyaring informasi dengan mengambil hal-hal yang penting dan relevan serta mengabaikan detail yang tidak diperlukan. Dengan demikian, masalah dapat ditampilkan dalam bentuk yang lebih sederhana sehingga lebih mudah dipahami dan diselesaikan.</p>
+    <p>📝 <b>Contoh:</b> Dalam membuat jadwal piket kelas, informasi yang diperlukan antara lain:</p>
+    <div class="materi-list">
+      <div><b>a)</b><span>Nama siswa.</span></div>
+      <div><b>b)</b><span>Hari piket.</span></div>
+      <div><b>c)</b><span>Jenis tugas piket.</span></div>
+    </div>
+    <p>Sementara itu, informasi seperti warna sapu, merek pel, atau posisi tempat duduk siswa tidak diperlukan dalam pembuatan jadwal sehingga dapat diabaikan.</p>
+    <p>✨ <b>Abstraksi bermanfaat untuk:</b></p>
+    <div class="materi-list">
+      <div><b>a)</b><span>Membantu fokus pada inti permasalahan.</span></div>
+      <div><b>b)</b><span>Membuat solusi lebih sederhana dan mudah dipahami.</span></div>
+      <div><b>c)</b><span>Mengurangi informasi yang tidak relevan.</span></div>
+      <div><b>d)</b><span>Menghemat waktu dan usaha dalam menyelesaikan masalah.</span></div>
+    </div>
+
+    <h3>4. ⚙️ Algoritma (Algorithm)</h3>
+    <p>Algoritma adalah rangkaian langkah-langkah yang berurutan, jelas, dan terhingga untuk menyelesaikan suatu masalah atau mencapai tujuan tertentu. Setiap langkah dalam algoritma harus tepat, logis, dan tidak menimbulkan kebingungan.</p>
+    <p>📝 <b>Contoh langkah membuat jadwal piket kelas:</b></p>
+    <div class="materi-list">
+      <div><b>a)</b><span>Menulis daftar seluruh siswa, misalnya 30 orang.</span></div>
+      <div><b>b)</b><span>Membagi siswa ke dalam enam hari piket, yaitu Senin sampai Sabtu, sehingga setiap hari terdiri atas 5 orang.</span></div>
+      <div><b>c)</b><span>Menentukan jenis tugas piket, misalnya menyapu, mengelap papan tulis, menyiram tanaman, membuang sampah, dan merapikan meja.</span></div>
+      <div><b>d)</b><span>Membagikan satu jenis tugas kepada setiap petugas.</span></div>
+      <div><b>e)</b><span>Menyusun dan menempelkan jadwal piket di dinding kelas.</span></div>
+      <div><b>f)</b><span>Setiap minggu, menggeser pembagian tugas agar setiap siswa memperoleh giliran tugas yang berbeda.</span></div>
+    </div>
+    <p>✨ <b>Algoritma bermanfaat untuk:</b></p>
+    <div class="materi-list">
+      <div><b>a)</b><span>Membuat penyelesaian masalah lebih teratur dan sistematis.</span></div>
+      <div><b>b)</b><span>Menghasilkan langkah kerja yang jelas.</span></div>
+      <div><b>c)</b><span>Membantu pembagian tugas secara adil.</span></div>
+      <div><b>d)</b><span>Memungkinkan solusi dilakukan kembali oleh siapa pun dengan mengikuti langkah yang sama.</span></div>
+    </div>
+
+    <h3>🌟 Manfaat Berpikir Komputasional Secara Keseluruhan</h3>
+    <p>🎯 <b>Penerapan dalam kehidupan sehari-hari:</b> Membantu kita menyelesaikan masalah dengan lebih teratur dan efektif.</p>
+    <p>🌟 Penerapan Berpikir Komputasional memberikan berbagai manfaat dalam menyelesaikan masalah, baik dalam pembelajaran maupun kehidupan sehari-hari, antara lain:</p>
+    <div class="materi-list">
+      <div><b>a)</b><span>Melatih kemampuan memecahkan masalah secara runtut dan sistematis.</span></div>
+      <div><b>b)</b><span>Meningkatkan kemampuan berpikir logis dan kritis serta ketelitian.</span></div>
+      <div><b>c)</b><span>Membuat pekerjaan lebih efisien dan menghemat waktu.</span></div>
+      <div><b>d)</b><span>Melatih kreativitas dalam menemukan berbagai alternatif solusi.</span></div>
+      <div><b>e)</b><span>Mendukung kerja sama tim melalui pembagian masalah dan tugas.</span></div>
+      <div><b>f)</b><span>Menjadi dasar dalam mempelajari pemrograman dan teknologi.</span></div>
+      <div><b>g)</b><span>Dapat diterapkan dalam kehidupan sehari-hari dan berbagai mata pelajaran.</span></div>
+    </div>
     <button class="btn" onclick="openMenu()">‹ KEMBALI KE MENU</button>
   </div>`);
 }
