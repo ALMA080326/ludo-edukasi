@@ -309,14 +309,15 @@ button:active,.ng-answer:active,.tim-kartu:active{transform:translateY(1px) scal
   <div id="layarMain" class="layar">
     <header class="spanduk" role="img" aria-label="Tiga siswa bersorak memegang piala">
       <div class="spanduk-teks">
-        <div class="judul">FAMILY 100<small>Algoritma Edition</small></div>
+        <div class="judul">SURVEY 100<small>Algoritma Edition</small></div>
         <div class="babak" id="namaBabak"></div>
       </div>
     </header>
     <div class="sisa" id="infoSisa"></div>
+    <div id="rebutBox" style="display:none;margin:10px 0;text-align:center"><button id="btnRebut" type="button" onclick="rebutSekarang()" style="width:100%;padding:17px;border:0;border-radius:20px;background:linear-gradient(135deg,#ff4d67,#ff9f1c);color:#fff;font:900 1.25rem Poppins,sans-serif;box-shadow:0 8px 0 #b62b3f,0 18px 35px rgba(255,77,103,.35);animation:pulseGlow 1.2s infinite">🚨 REBUT! 🚨</button></div>
     <div id="studentGroupBadge" style="text-align:center;margin:8px 0;padding:10px 14px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.28);font-weight:900;box-shadow:0 8px 22px rgba(0,0,0,.14)">👥 ANDA: KELOMPOK 1</div>
     <section class="student-hud" aria-label="Informasi permainan siswa">
-      <div class="student-card"><div class="student-title">🎯 Papan Pertandingan</div><div class="student-sub">Lihat soal, jawaban yang sudah dibuka, dan poin semua tim secara langsung.</div><div class="student-tip">💡 <span>Jawaban siswa <b>disampaikan secara lisan</b>. Guru yang membuka jawaban.</span></div></div>
+      <div class="student-card"><div class="student-title">🎯 Papan Pertandingan • 5 Kelompok</div><div class="student-sub">Lihat soal, jawaban yang sudah dibuka, dan poin semua tim secara langsung.</div><div class="student-tip">💡 <span>Jawaban siswa <b>disampaikan secara lisan</b>. Guru yang membuka jawaban.</span></div></div>
       <div class="student-card"><div class="student-title">📡 Status Ruang</div><div class="student-sub" id="studentRoomHint">Menunggu sinkronisasi dari guru…</div><div class="student-tip">🏆 <span>Target: kumpulkan poin sebanyak mungkin!</span></div></div>
     </section>
 
@@ -510,11 +511,20 @@ function keluarRuang(){ return logoutSiswa(); }
 
 /* ---------- tampilan ---------- */
 function arr5(a, f){ return [0,1,2,3,4].map(i => f((a || [])[i])); }
+async function rebutSekarang(){
+  if(!roomRef || !db || !SFX || studentGroup<0) return;
+  try{
+    SFX.play('rebutan');
+    const ref=roomRef.child('rebutClaim');
+    const result=await ref.transaction(cur=>cur || {group:studentGroup,uid:(firebase.auth().currentUser||{}).uid||'',at:Date.now()});
+    if(result.committed && result.snapshot.val() && result.snapshot.val().group===studentGroup) banner('🚨 '+NAMA_TIM[studentGroup]+' BERHASIL REBUT!');
+  }catch(e){ banner('⚠️ Rebutan gagal: '+e.message); }
+}
 function renderRekap(scores, perSoal, babakSkor){
   const maks = Math.max(1, ...scores);
   const urut = [0,1,2,3,4].sort((a, b) => scores[b] - scores[a] || a - b);
   $('rekapIsi').innerHTML = urut.map((t, r) => {
-    const rinci = [0,1,2,3].map(b => { const v = babakSkor[b][t]; return '<span class="' + (v ? '' : 'nol') + '">Babak ' + (b + 1) + ': ' + v + '</span>'; }).join('');
+    const rinci = [0,1,2,3,4].map(b => { const v = babakSkor[b][t]; return '<span class="' + (v ? '' : 'nol') + '">Babak ' + (b + 1) + ': ' + v + '</span>'; }).join('');
     return '<div class="rk ' + KELAS_TIM[t] + '"><div class="rk-no">' + (r + 1) + '</div><div class="rk-nama">Tim ' + NAMA_TIM[t] + '</div><div class="rk-total">' + scores[t] + '</div>'
       + '<div class="rk-bar"><i style="width:' + Math.max(3, Math.round(scores[t] / maks * 100)) + '%"></i></div>'
       + '<div class="rk-rinci"><span class="ini' + (perSoal[t] ? '' : ' nol') + '">Soal ini: ' + (perSoal[t] > 0 ? '+' : '') + perSoal[t] + '</span>' + rinci + '</div></div>';
@@ -529,10 +539,11 @@ function render(st){
   const answers = Array.isArray(st.answers) ? st.answers : [];
   const oleh = Array.isArray(st.answerTeams) ? st.answerTeams : [];
   const bonus = arr5(st.questionBonus, v => v || 0);
-  const babakSkor = [0,1,2,3].map(b => arr5((st.roundScores || [])[b], v => v || 0));
+  const babakSkor = [0,1,2,3,4].map(b => arr5((st.roundScores || [])[b], v => v || 0));
   const active = (typeof st.activeTeam === 'number') ? st.activeTeam : 0;
   const waiting = st.gameStatus === 'waiting';
   const gb = $('studentGroupBadge'); if(gb) gb.innerHTML = '👥 ANDA: <b>' + NAMA_TIM[studentGroup] + '</b> &nbsp;•&nbsp; 🎯 GILIRAN: <b>' + NAMA_TIM[active] + '</b>';
+  const rb=$('rebutBox'), rbtn=$('btnRebut'); const canRebut=!waiting && st.roundMode==='serang' && !st.rebutClaim && studentGroup>=0; if(rb) rb.style.display=canRebut?'block':'none'; if(rbtn) rbtn.disabled=!canRebut;
 
   $('namaBabak').textContent = st.currentRound || '';
   $('pertanyaan').textContent = waiting ? '⏳ Menunggu guru memulai permainan…' : (st.questionText || '');
@@ -617,6 +628,53 @@ window.addEventListener('load', () => {
   let saved = ''; try{ saved = localStorage.getItem(NG_SAVED) || ''; }catch(e){}
   if(saved){ $('code').value = saved; joinRoom(saved); }
 });
+</script>
+
+<!-- SFX-PACK-2026 -->
+<div id="sfxControl" style="position:fixed;left:12px;bottom:12px;z-index:99999">
+  <button id="sfxToggle" type="button" aria-label="Suara" style="border:0;border-radius:999px;padding:10px 14px;font-weight:900;background:linear-gradient(135deg,#fff,#dff8ff);color:#18223b;box-shadow:0 10px 25px rgba(0,0,0,.25);cursor:pointer">🔊 SUARA ON</button>
+</div>
+<audio id="sfx-notifikasi" preload="auto" src="sounds/notifikasi.mp3"></audio>
+<audio id="sfx-rebutan" preload="auto" src="sounds/rebutan.mp3"></audio>
+<audio id="sfx-tick" preload="auto" src="sounds/tick.mp3"></audio>
+<audio id="sfx-habis" preload="auto" src="sounds/habis.mp3"></audio>
+<audio id="sfx-babak" preload="auto" src="sounds/babak.mp3"></audio>
+<audio id="sfx-juara" preload="auto" src="sounds/juara.mp3"></audio>
+<audio id="sfx-klik" preload="auto" src="sounds/klik.mp3"></audio>
+<audio id="sfx-benar2" preload="auto" src="sounds/benar.mp3"></audio>
+<audio id="sfx-salah2" preload="auto" src="sounds/salah.mp3"></audio>
+<script>
+(function(){
+  const KEY='survey100_sfx_on';
+  let on=true; try{ on=localStorage.getItem(KEY)!=='0'; }catch(e){}
+  const btn=document.getElementById('sfxToggle');
+  function paint(){ if(btn){btn.textContent=on?'🔊 SUARA ON':'🔇 SUARA OFF';btn.style.opacity=on?'1':'.72';} }
+  function play(name){ if(!on)return; const a=document.getElementById('sfx-'+name); if(!a)return; try{a.currentTime=0; const p=a.play(); if(p&&p.catch)p.catch(()=>{});}catch(e){} }
+  window.SFX={play,set:function(v){on=!!v;try{localStorage.setItem(KEY,on?'1':'0')}catch(e){}paint();},get:function(){return on}};
+  if(btn) btn.addEventListener('click',function(){SFX.set(!on);play('klik');});
+  document.addEventListener('pointerdown',function(){ if(!on)return; ['notifikasi','rebutan','tick','habis','babak','juara','klik','benar2','salah2'].forEach(function(n){const a=document.getElementById('sfx-'+n);if(a){a.muted=true;try{const p=a.play();if(p&&p.then)p.then(()=>{a.pause();a.currentTime=0;a.muted=false}).catch(()=>{a.muted=false})}catch(e){a.muted=false}}});},{once:true});
+  paint();
+})();
+</script>
+<script id="sfx-hooks-student">
+(function(){
+  if(typeof render!=='function'||!window.SFX)return;
+  const oldRender=render; let p=null;
+  render=function(st){
+    const first=!p;
+    oldRender(st);
+    if(first){p={q:st.currentQuestion,r:st.currentRound,a:st.activeTeam,o:(st.openedAnswers||[]).filter(Boolean).length,x:(st.strikes||[]).slice(),w:st.winner||'',m:st.roundMode};return;}
+    const opened=(st.openedAnswers||[]).filter(Boolean).length;
+    const strikes=(st.strikes||[]).slice();
+    if(st.winner && !p.w){SFX.play('juara');}
+    else if(st.currentRound!==p.r){SFX.play('babak');}
+    else if(st.roundMode==='serang' && p.m!=='serang'){SFX.play('rebutan');}
+    else if(typeof st.activeTeam==='number' && st.activeTeam!==p.a){SFX.play('notifikasi');}
+    else if(opened>p.o){SFX.play('benar2');}
+    else if(strikes.some((v,i)=>v>(p.x[i]||0))){SFX.play('salah2');}
+    p={q:st.currentQuestion,r:st.currentRound,a:st.activeTeam,o:opened,x:strikes,w:st.winner||'',m:st.roundMode};
+  };
+})();
 </script>
 </body>
 </html>

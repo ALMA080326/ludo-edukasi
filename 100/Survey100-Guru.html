@@ -1002,17 +1002,8 @@ BANK_SOAL_LAMA.forEach(q => {
   q.jawaban = u.map((t,i) => ({teks:t, poin:PTS8[i], kata:[t.toLowerCase()]}));
 });
 BANK_SOAL_LAMA.forEach(q => { q.langkah = !NON_LANGKAH.includes(q.soal); });
-const BANK_SOAL = BANK_SOAL_LAMA.concat(BANK_DOCX.map(b => ({
-  soal: b[0], pengali: 1, langkah: !NON_LANGKAH.includes(b[0]),
-  jawaban: b[1].map((t,i) => ({teks:t, poin:PTS8[i], kata:[t.toLowerCase()]}))
-})));
-/* ---- bank tambahan: 5 jawaban (Babak 1) & 10 jawaban (Babak 4), urutan = langkah algoritma ---- */
-const PTS5 = [30,25,20,15,10], PTS10 = [22,18,15,12,10,8,6,4,3,2];
-const BANK_5 = [["Langkah mencuci muka?", ["Buka keran", "Basahi wajah", "Pakai sabun muka", "Bilas sampai bersih", "Keringkan dengan handuk"]], ["Langkah menelepon teman?", ["Buka aplikasi telepon", "Pilih nama kontak", "Tekan tombol panggil", "Sampaikan pesan", "Akhiri panggilan"]], ["Langkah menanam biji?", ["Siapkan pot", "Isi dengan tanah", "Tanam biji", "Siram air", "Letakkan di tempat terang"]], ["Langkah menyeberang jalan?", ["Berhenti di tepi jalan", "Lihat kanan dan kiri", "Pastikan kendaraan berhenti", "Menyeberang dengan tertib", "Lanjutkan perjalanan dengan aman"]], ["Langkah membuat susu cokelat?", ["Siapkan gelas", "Tuang bubuk cokelat", "Tuang air panas", "Aduk sampai larut", "Tambahkan susu"]], ["Langkah menggunakan kalkulator?", ["Nyalakan kalkulator", "Ketik angka pertama", "Pilih tanda operasi", "Ketik angka kedua", "Tekan tombol sama dengan"]], ["Langkah mengisi baterai HP?", ["Siapkan charger", "Colok kabel ke HP", "Colok charger ke listrik", "Tunggu baterai terisi", "Cabut charger"]], ["Langkah menulis surat?", ["Siapkan kertas dan pulpen", "Tulis salam pembuka", "Tulis isi surat", "Tulis salam penutup", "Tanda tangani surat"]], ["Langkah merebus telur?", ["Siapkan panci berisi air", "Masukkan telur", "Rebus sampai matang", "Angkat dan tiriskan", "Kupas kulit telur"]], ["Langkah membuat pesawat kertas?", ["Siapkan kertas", "Lipat menjadi dua", "Lipat kedua sudut ke tengah", "Lipat sayap ke bawah", "Terbangkan pesawat"]]];
-const BANK_10 = [["Langkah membuat nasi goreng?", ["Siapkan bahan", "Iris bawang", "Panaskan minyak di wajan", "Tumis bawang sampai harum", "Masukkan telur dan orak-arik", "Masukkan nasi", "Tambahkan bumbu", "Aduk sampai rata", "Angkat dari kompor", "Sajikan di piring"]], ["Langkah membuat presentasi PowerPoint?", ["Tentukan topik", "Cari bahan materi", "Buka PowerPoint", "Pilih desain slide", "Buat slide judul", "Isi slide materi", "Tambahkan gambar", "Periksa tulisan", "Simpan file", "Latihan presentasi"]], ["Langkah mengerjakan tugas sampai dikumpulkan?", ["Baca perintah tugas", "Catat tenggat waktu", "Kumpulkan bahan", "Susun kerangka", "Kerjakan tugas", "Periksa hasil", "Perbaiki kesalahan", "Simpan file", "Kirim tugas", "Pastikan terkirim"]], ["Langkah membuat program sederhana?", ["Pahami masalah", "Tentukan input", "Tentukan output", "Susun langkah penyelesaian", "Tulis kode", "Jalankan program", "Cari kesalahan", "Perbaiki kesalahan", "Uji dengan data lain", "Simpan program"]], ["Langkah mencuci pakaian dengan mesin cuci?", ["Pisahkan pakaian", "Periksa isi kantong", "Masukkan pakaian", "Tuang deterjen", "Isi air", "Pilih program cuci", "Tekan tombol start", "Tunggu sampai selesai", "Angkat pakaian", "Jemur pakaian"]], ["Langkah bepergian naik bus?", ["Tentukan tujuan", "Cari halte terdekat", "Tunggu bus datang", "Naik bus", "Bayar tiket", "Duduk atau berpegangan", "Perhatikan halte tujuan", "Tekan tombol berhenti", "Periksa barang bawaan", "Turun dengan hati-hati"]], ["Langkah melakukan percobaan IPA?", ["Tentukan tujuan percobaan", "Siapkan alat dan bahan", "Buat dugaan awal", "Rakit alat", "Lakukan percobaan", "Amati hasil", "Catat data", "Analisis data", "Tarik kesimpulan", "Buat laporan"]]];
-BANK_5.forEach(b => BANK_SOAL.push({soal:b[0], pengali:1, langkah:true, jawaban:b[1].map((t,i) => ({teks:t, poin:PTS5[i], kata:[t.toLowerCase()]}))}));
-BANK_10.forEach(b => BANK_SOAL.push({soal:b[0], pengali:1, langkah:true, jawaban:b[1].map((t,i) => ({teks:t, poin:PTS10[i], kata:[t.toLowerCase()]}))}));
-const BANK_VER = '3';
+const BANK_SOAL = [{"soal":"Ketika akan berangkat ke sekolah, kegiatan apa yang biasanya dilakukan secara berurutan?","langkah":true,"jawaban":[{"teks":"Mandi","poin":30,"kata":["mandi"]},{"teks":"Memakai seragam","poin":25,"kata":["memakai seragam"]},{"teks":"Sarapan","poin":20,"kata":["sarapan"]},{"teks":"Menyiapkan tas/buku","poin":15,"kata":["menyiapkan tas/buku"]},{"teks":"Berangkat ke sekolah","poin":10,"kata":["berangkat ke sekolah"]}]},{"soal":"Saat ingin membuat mi instan, apa yang biasanya dilakukan terlebih dahulu?","langkah":true,"jawaban":[{"teks":"Menyiapkan alat dan bahan","poin":35,"kata":["menyiapkan alat dan bahan"]},{"teks":"Merebus air","poin":30,"kata":["merebus air"]},{"teks":"Membuka kemasan mi","poin":15,"kata":["membuka kemasan mi"]},{"teks":"Menyiapkan bumbu","poin":10,"kata":["menyiapkan bumbu"]},{"teks":"Menyiapkan mangkuk","poin":10,"kata":["menyiapkan mangkuk"]}]},{"soal":"Ketika akan keluar rumah dan melihat langit mendung, apa yang biasanya kamu lakukan?","langkah":true,"jawaban":[{"teks":"Membawa payung","poin":40,"kata":["membawa payung"]},{"teks":"Mengecek prakiraan cuaca","poin":25,"kata":["mengecek prakiraan cuaca"]},{"teks":"Tetap berangkat","poin":15,"kata":["tetap berangkat"]},{"teks":"Menunggu hujan reda","poin":10,"kata":["menunggu hujan reda"]},{"teks":"Membawa jas hujan","poin":10,"kata":["membawa jas hujan"]}]},{"soal":"Saat membeli makanan menggunakan uang Rp20.000, apa yang biasanya kamu pertimbangkan?","langkah":true,"jawaban":[{"teks":"Harga makanan","poin":40,"kata":["harga makanan"]},{"teks":"Uang yang tersedia","poin":25,"kata":["uang yang tersedia"]},{"teks":"Kebutuhan/keinginan","poin":15,"kata":["kebutuhan/keinginan"]},{"teks":"Rasa makanan","poin":10,"kata":["rasa makanan"]},{"teks":"Kembalian","poin":10,"kata":["kembalian"]}]},{"soal":"Saat login ke akun media sosial tetapi password salah, apa yang biasanya dilakukan?","langkah":true,"jawaban":[{"teks":"Memasukkan password lagi","poin":35,"kata":["memasukkan password lagi"]},{"teks":"Memeriksa password","poin":25,"kata":["memeriksa password"]},{"teks":"Menggunakan \"Lupa Password\"","poin":20,"kata":["menggunakan \"lupa password\""]},{"teks":"Memeriksa username/email","poin":10,"kata":["memeriksa username/email"]},{"teks":"Meminta bantuan","poin":10,"kata":["meminta bantuan"]}]},{"soal":"Saat mencari barang yang hilang di kamar, apa yang biasanya dilakukan?","langkah":true,"jawaban":[{"teks":"Mengingat tempat terakhir melihat barang","poin":35,"kata":["mengingat tempat terakhir melihat barang"]},{"teks":"Mencari di meja","poin":25,"kata":["mencari di meja"]},{"teks":"Mencari di tas","poin":20,"kata":["mencari di tas"]},{"teks":"Mencari di tempat tidur","poin":10,"kata":["mencari di tempat tidur"]},{"teks":"Bertanya kepada orang lain","poin":10,"kata":["bertanya kepada orang lain"]}]},{"soal":"Ketika HP hampir habis baterai, apa yang biasanya kamu lakukan?","langkah":true,"jawaban":[{"teks":"Mengisi daya","poin":40,"kata":["mengisi daya"]},{"teks":"Mencari charger","poin":25,"kata":["mencari charger"]},{"teks":"Menghemat penggunaan HP","poin":15,"kata":["menghemat penggunaan hp"]},{"teks":"Mengaktifkan mode hemat baterai","poin":10,"kata":["mengaktifkan mode hemat baterai"]},{"teks":"Meminjam charger","poin":10,"kata":["meminjam charger"]}]},{"soal":"Ketika akan membeli barang secara online, apa yang biasanya kamu lakukan terlebih dahulu?","langkah":true,"jawaban":[{"teks":"Mencari barang","poin":30,"kata":["mencari barang"]},{"teks":"Membandingkan harga","poin":25,"kata":["membandingkan harga"]},{"teks":"Membaca ulasan","poin":20,"kata":["membaca ulasan"]},{"teks":"Mengecek rating toko","poin":15,"kata":["mengecek rating toko"]},{"teks":"Mengecek ongkir","poin":10,"kata":["mengecek ongkir"]}]},{"soal":"Saat ingin mengirim tugas melalui Google Classroom/WhatsApp, langkah apa yang biasanya dilakukan?","langkah":true,"jawaban":[{"teks":"Membuka aplikasi","poin":25,"kata":["membuka aplikasi"]},{"teks":"Memilih tugas/chat","poin":25,"kata":["memilih tugas/chat"]},{"teks":"Memilih file","poin":20,"kata":["memilih file"]},{"teks":"Mengunggah/mengirim file","poin":20,"kata":["mengunggah/mengirim file"]},{"teks":"Mengecek apakah sudah terkirim","poin":10,"kata":["mengecek apakah sudah terkirim"]}]},{"soal":"Saat akan pergi ke suatu tempat yang belum pernah kamu kunjungi, apa yang biasanya dilakukan?","langkah":true,"jawaban":[{"teks":"Membuka Google Maps","poin":35,"kata":["membuka google maps"]},{"teks":"Menentukan lokasi tujuan","poin":25,"kata":["menentukan lokasi tujuan"]},{"teks":"Memilih rute","poin":20,"kata":["memilih rute"]},{"teks":"Melihat jarak/waktu","poin":10,"kata":["melihat jarak/waktu"]},{"teks":"Mengikuti petunjuk arah","poin":10,"kata":["mengikuti petunjuk arah"]}]},{"soal":"Ketika memasak nasi menggunakan rice cooker, apa saja langkah yang biasanya dilakukan?","langkah":true,"jawaban":[{"teks":"Menyiapkan beras","poin":25,"kata":["menyiapkan beras"]},{"teks":"Mencuci beras","poin":25,"kata":["mencuci beras"]},{"teks":"Menambahkan air","poin":20,"kata":["menambahkan air"]},{"teks":"Memasukkan ke rice cooker","poin":15,"kata":["memasukkan ke rice cooker"]},{"teks":"Menekan tombol memasak","poin":15,"kata":["menekan tombol memasak"]}]},{"soal":"Ketika ingin memilih pakaian untuk pergi, apa yang biasanya dipertimbangkan?","langkah":true,"jawaban":[{"teks":"Cuaca","poin":30,"kata":["cuaca"]},{"teks":"Tempat tujuan","poin":25,"kata":["tempat tujuan"]},{"teks":"Kenyamanan","poin":20,"kata":["kenyamanan"]},{"teks":"Warna/model","poin":15,"kata":["warna/model"]},{"teks":"Kesesuaian dengan kegiatan","poin":10,"kata":["kesesuaian dengan kegiatan"]}]},{"soal":"Kamu sudah siap berangkat sekolah, tetapi tiba-tiba hujan deras. Apa langkah yang paling mungkin kamu lakukan?","langkah":true,"jawaban":[{"teks":"Mengambil payung/jas hujan","poin":35,"kata":["mengambil payung/jas hujan"]},{"teks":"Mengecek kondisi hujan","poin":25,"kata":["mengecek kondisi hujan"]},{"teks":"Menunggu hujan reda","poin":20,"kata":["menunggu hujan reda"]},{"teks":"Menghubungi sekolah jika terlambat","poin":10,"kata":["menghubungi sekolah jika terlambat"]},{"teks":"Tetap berangkat dengan perlengkapan hujan","poin":10,"kata":["tetap berangkat dengan perlengkapan hujan"]}]},{"soal":"Kamu mendapat tugas membuat presentasi. Bagaimana urutan kegiatan yang biasanya dilakukan?","langkah":true,"jawaban":[{"teks":"Memahami tugas","poin":30,"kata":["memahami tugas"]},{"teks":"Mencari informasi","poin":25,"kata":["mencari informasi"]},{"teks":"Membuat materi","poin":20,"kata":["membuat materi"]},{"teks":"Membuat slide","poin":15,"kata":["membuat slide"]},{"teks":"Memeriksa dan memperbaiki","poin":10,"kata":["memeriksa dan memperbaiki"]}]},{"soal":"Jika kamu ingin menyelesaikan masalah sehari-hari dengan cara yang teratur, apa yang sebaiknya dilakukan?","langkah":true,"jawaban":[{"teks":"Memahami masalah","poin":30,"kata":["memahami masalah"]},{"teks":"Menentukan tujuan","poin":25,"kata":["menentukan tujuan"]},{"teks":"Menyusun langkah-langkah","poin":20,"kata":["menyusun langkah-langkah"]},{"teks":"Melaksanakan langkah","poin":15,"kata":["melaksanakan langkah"]},{"teks":"Mengevaluasi hasil","poin":10,"kata":["mengevaluasi hasil"]}]}];
+const BANK_VER = '4-DOCX-15Q';
 let BANK_DUP_DIBUANG = 0;
 /* buang soal kembar (teks pertanyaan sama) — yang pertama dipertahankan */
 (function(){
@@ -1025,14 +1016,15 @@ let BANK_DUP_DIBUANG = 0;
   BANK_SOAL.forEach(q => { if(q.langkah === false && q.jawaban.length === 8) q.jawaban.forEach((j,i) => { j.poin = PTS8[i]; }); });
 })();
 const BABAK_CFG = [
-  {no:1, nama:'🎯 Pemanasan', mode:'rebutan', jumlah:1, n:5, info:'1 soal · 5 jawaban. Tiap tim menjawab bergantian.'},
-  {no:2, nama:'🔄 Semua Tim', mode:'rebutan', jumlah:5, n:8, info:'Semua tim berebut! 8 jawaban per soal. Klik kartu tim yang menjawab.'},
-  {no:3, nama:'⚡ Rebutan', mode:'serang', jumlah:3, n:8, info:'Rebutan! Tim mana pun boleh mengisi jawaban yang belum terbuka (8 jawaban).'},
-  {no:4, nama:'🏆 Final', mode:'rebutan', jumlah:2, n:10, info:'FINAL! 10 jawaban per soal — siapa juara?'}
+  {no:1, nama:'🎯 Pemanasan', mode:'pemanasan', jumlah:2, n:5, info:'2 soal · semua kelompok berdiskusi, lalu jawaban disampaikan bergantian.'},
+  {no:2, nama:'⚡ Tantangan Cepat', mode:'giliran', jumlah:3, n:5, info:'3 soal · giliran 15 detik. Jika tidak cocok, kesempatan berpindah ke kelompok berikutnya.'},
+  {no:3, nama:'🚨 Rebutan', mode:'serang', jumlah:4, n:5, info:'4 soal · semua kelompok siap dan kelompok tercepat menekan REBUT mendapat kesempatan.'},
+  {no:4, nama:'💎 Double Point', mode:'double', jumlah:3, n:5, info:'3 soal · diskusi 30–45 detik, jawaban dibuka bersama, poin ×2.'},
+  {no:5, nama:'🏆 Final 100', mode:'final', jumlah:3, n:5, info:'3 soal · FINAL 100 sesuai urutan permainan.'}
 ];
-const TOTAL_SOAL = 11;
+const TOTAL_SOAL = 15;
 let daftarSoal = [], sesiIdx = [], gameId = '';
-const kosongBabak = () => [0,1,2,3].map(() => [0,0,0,0,0]);
+const kosongBabak = () => [0,1,2,3,4].map(() => [0,0,0,0,0]);
 let skorBabak = kosongBabak();
 let urutanAktif = false;
 const normSoal = t => t.toLowerCase().replace(/[^a-z0-9 ]/g,'').trim();
@@ -1053,7 +1045,7 @@ function bangunDariIndeks(idx){
       if(k === 0){ judul = 'BABAK ' + b.no + ' — ' + b.nama.toUpperCase() + '!'; teks = b.jumlah + ' Soal · ' + b.info + (b.mode === 'giliran' ? ' Sekarang: ' + namaTim[0] : ''); }
       else { judul = '📝 SOAL ' + (k+1) + ' DARI ' + b.jumlah; teks = b.mode === 'giliran' ? namaTim[k] + ' · diskusi 20 detik lalu sampaikan jawaban!' : b.info; }
       out.push({babak:'BABAK ' + b.no + ' — ' + b.nama, babakNo:b.no, mode:b.mode, urut:k+1, jumlahBabak:b.jumlah,
-        timGiliran: b.mode === 'giliran' ? k : -1, langkah: q.langkah !== false, judulPopup:judul, teksPopup:teks, soal:q.soal, pengali:1, jawaban:q.jawaban});
+        timGiliran: b.mode === 'giliran' ? k : -1, langkah: q.langkah !== false, judulPopup:judul, teksPopup:teks, soal:q.soal, pengali:(b.mode === 'double' ? 2 : 1), jawaban:q.jawaban});
     }
   });
   return out;
@@ -1065,29 +1057,19 @@ function sesiValid(idx){
   return true;
 }
 function bangunSesi(){
-  const pakai = new Set(), idx = [];
-  BABAK_CFG.forEach(b => {
-    const pool = acak(BANK_SOAL.map((q,i) => i).filter(i => BANK_SOAL[i].jawaban.length === b.n && BANK_SOAL[i].langkah !== false));
-    let ambil = 0;
-    for(const i of pool){
-      const n = normSoal(BANK_SOAL[i].soal);
-      if(pakai.has(n)) continue;
-      pakai.add(n); idx.push(i);
-      if(++ambil === b.jumlah) break;
-    }
-  });
-  sesiIdx = idx;
+  const idx = BANK_SOAL.map((_,i)=>i);
+  sesiIdx = idx.slice(0, TOTAL_SOAL);
   gameId = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
-  return bangunDariIndeks(idx);
+  return bangunDariIndeks(sesiIdx);
 }
 function perbaruiModeInfo(){
   const s = daftarSoal[soalSkrg], el = document.getElementById('modeInfo'); if(!s || !el) return;
   const tim = timAktif >= 0 ? 'Tim menjawab: ' + namaTim[timAktif] : 'klik kartu tim yang menjawab';
-  if(s.mode === 'giliran') el.textContent = '🎯 GILIRAN ' + namaTim[s.timGiliran] + ' — 3× salah = giliran selesai';
-  else if(s.mode === 'serang') el.textContent = '⚡ SERANG BALIK — ' + tim + ' (tim mana pun boleh mengisi jawaban tersisa)';
-  else if(s.babakNo === 1) el.textContent = '🎯 PEMANASAN — ' + tim;
-  else if(s.babakNo === 4) el.textContent = '🏆 FINAL — ' + tim;
-  else el.textContent = '🔄 SEMUA TIM BEREBUT — ' + tim;
+  if(s.mode === 'giliran') el.textContent = '⚡ GILIRAN ' + namaTim[s.timGiliran] + ' — 15 detik';
+  else if(s.mode === 'serang') el.textContent = '🚨 REBUTAN — kelompok tercepat mendapat kesempatan';
+  else if(s.mode === 'double') el.textContent = '💎 DOUBLE POINT — jawaban dibuka bersama • POIN ×2';
+  else if(s.mode === 'final') el.textContent = '🏆 FINAL 100';
+  else el.textContent = '🎯 PEMANASAN — semua kelompok berdiskusi dan menjawab bergantian';
 }
 function tampilkanGiliranTim(idx){
   const s = daftarSoal[soalSkrg];
@@ -1117,7 +1099,7 @@ function mulaiGame(){
   setTimeout(() => { document.getElementById('layarMain').classList.add('aktif'); resetSkor(); muatSoal(); }, 300);
 }
 function mulaiUlang(){
-  if(!confirm('Mulai ulang? Skor direset dan 11 soal diacak baru dari bank soal.')) return;
+  if(!confirm('Mulai ulang? Skor direset dan 15 soal sesuai aturan DOCX dari bank soal.')) return;
   daftarSoal = bangunSesi(); resetSkor(); muatSoal(); toast('🎲 Soal diacak ulang!');
 }
 function gantiSoalIni(){
@@ -1163,12 +1145,12 @@ function toggleUrutan(){
   toast(urutanAktif ? '🔢 Jawaban harus dibuka berurutan sesuai langkah algoritma.' : '🔓 Urutan langkah dimatikan — jawaban boleh dibuka bebas.');
 }
 /* ===== NILAI PER BABAK + RESET ===== */
-const NAMA_BABAK_PENDEK = ['🎯 Pemanasan','🔄 Semua Tim','⚡ Rebutan','🏆 Final'];
+const NAMA_BABAK_PENDEK = ['🎯 Pemanasan','⚡ Tantangan Cepat','🚨 Rebutan','💎 Double Point','🏆 Final 100'];
 function renderRekap(){
   const el = document.getElementById('rekapTabel'); if(!el) return;
   const cur = babakIdx(), pendek = ['🔴','🔵','🟡','🟢','🟣'];
   let h = '<table style="width:100%;border-collapse:collapse;font-size:.85rem;text-align:center"><tr><th style="text-align:left;padding:6px">Babak</th>' + pendek.map(p => '<th style="padding:6px">' + p + '</th>').join('') + '<th style="padding:6px">Aksi</th></tr>';
-  for(let b = 0; b < 4; b++){
+  for(let b = 0; b < 5; b++){
     const total = skorBabak[b].reduce((a,c) => a + c, 0);
     h += '<tr style="' + (b === cur ? 'background:rgba(255,212,59,.22);' : '') + 'border-top:1px solid rgba(255,255,255,.2)"><td style="text-align:left;padding:6px;font-weight:800">' + NAMA_BABAK_PENDEK[b] + (b === cur ? ' ◀' : '') + '</td>' + skorBabak[b].map(v => '<td style="padding:6px;font-weight:800">' + v + '</td>').join('') + '<td style="padding:6px"><button type="button" class="btn-merah" style="padding:5px 10px;font-size:.75rem" onclick="resetBabak(' + (b+1) + ')"' + (total === 0 ? ' disabled style="opacity:.45;padding:5px 10px;font-size:.75rem"' : '') + '>↺ RESET</button></td></tr>';
   }
@@ -1458,6 +1440,7 @@ function ngSnapshot(){
     answerTeams: (oleh || []).slice(), questionBonus: (bonusSoal || []).slice(),
     /* teks jawaban HANYA dikirim kalau sudah dibuka, supaya siswa tidak bisa mengintip */
     answers: s.jawaban.map((j, i) => ({ points: j.poin * s.pengali, text: opened[i] ? j.teks : '' })),
+    rebutClaim: ngRebutClaim,
     gameStatus: ngGameStatus,
     winner: ngWinner,
     updatedAt: firebase.database.ServerValue.TIMESTAMP
@@ -1576,6 +1559,11 @@ function bukaJawabanDariPanel(index, bebas){
   perbaruiInfoSisa();
   ngRenderButtons();
   ngWrite();                                   // → Firebase → HP siswa
+  if(soal.mode === 'pemanasan' || soal.mode === 'giliran'){
+    const doneTeam=timAktif;
+    timAktif=(timAktif+1)%5;
+    setTimeout(()=>{ perbaruiSkor(); ngWrite(); toast('➡️ Giliran berikutnya: '+namaTim[timAktif]); }, 450);
+  }
   if(jawabanTerbuka.length === soal.jawaban.length){
     setTimeout(() => {
       if(soalSkrg < daftarSoal.length - 1) toast('✅ Semua jawaban terbuka! Klik SOAL BERIKUTNYA →');
@@ -1588,20 +1576,23 @@ function bukaJawabanDariPanel(index, bebas){
 function tambahSalah(){
   if(timAktif < 0){ toast('👆 Pilih dulu tim yang salah (klik kartu tim).'); return; }
   const _m = (daftarSoal[soalSkrg] || {}).mode;
-  if(gugur[timAktif] || strike[timAktif] >= 3){ if(_m === 'giliran'){ toast('Tim ini sudah gugur.'); return; } mainSuaraSalah(); return; }
   mainSuaraSalah();
-  strike[timAktif]++;
+  strike[timAktif] = Math.min(3, strike[timAktif] + 1);
   const el = document.getElementById('s' + timAktif + '-' + strike[timAktif]);
   if(el) el.classList.add('x');
-  let pindah = false;
-  if(_m === 'giliran' && strike[timAktif] >= 3 && !gugur[timAktif]){
-    gugur[timAktif] = true;
-    toast('❌ ' + namaTim[timAktif] + ' gugur! Klik BUKA SEMUA lalu SOAL BERIKUTNYA.');
-    pindah = false;
+  if(_m === 'giliran'){
+    const salahTim=timAktif;
+    timAktif = (timAktif + 1) % 5;
+    toast('❌ '+namaTim[salahTim]+' salah. Giliran pindah ke '+namaTim[timAktif]+'.');
+  } else if(_m === 'serang'){
+    ngRebutClaim = null;
+    timAktif = -1;
+    toast('❌ Jawaban tidak cocok. 🚨 REBUTAN dibuka lagi.');
   }
-  ngWrite();                                   // X langsung dikirim dulu
-  if(pindah) gantiGiliran();
+  perbaruiSkor();
+  ngWrite();
 }
+
 function beriBonus(){
   if(timAktif < 0){ toast('👆 Pilih dulu tim penerima bonus.'); return; }
   skor[timAktif] += 20;
@@ -1613,7 +1604,7 @@ function beriBonus(){
 
 /* aksi lama yang dibungkus supaya otomatis terkirim */
 const ngOldMuat = muatSoal;
-muatSoal = function(){ ngGameStatus = 'playing'; ngWinner = ''; ngOldMuat(); oleh = daftarSoal[soalSkrg].jawaban.map(() => -1); bonusSoal = [0,0,0,0,0]; ngRenderButtons(); ngWrite(); };
+muatSoal = function(){ ngGameStatus = 'playing'; ngWinner = ''; ngRebutClaim = null; ngOldMuat(); oleh = daftarSoal[soalSkrg].jawaban.map(() => -1); bonusSoal = [0,0,0,0,0]; ngRenderButtons(); ngWrite(); };
 const ngOldPilih = pilihTim;
 pilihTim = function(i, s){ ngOldPilih(i, s); ngWrite(); };
 const ngOldLihat = lihatkanJawaban;
@@ -1653,10 +1644,11 @@ async function ngCreateRoom(){
     if(!ok) throw new Error('Gagal membuat kode unik, coba lagi.');
     ngRoomCode = code;
     ngRoomRef = ngDb.ref(NG_ROOT + '/' + code);
+    ngRebutClaim = null;
     if(document.getElementById('layarAwal').classList.contains('aktif')) ngGameStatus = 'waiting';
     await ngRoomRef.set(ngSnapshot());
     try{ localStorage.setItem(NG_SAVED, code); }catch(e){}
-    ngShowRoom(); ngRenderButtons();
+    ngShowRoom(); ngListenRebut(); ngRenderButtons();
     document.getElementById('ngResume').style.display = 'none';
   }catch(e){ ngSetStatus('🔴 ' + e.message, 'bad'); sysDariError(e); }
 }
@@ -1671,9 +1663,10 @@ async function ngResumeRoom(){
     const st = snap.val();
     if(st.hostUid !== ngUid) throw new Error('Ruang ' + code + ' dibuat oleh perangkat/browser lain, tidak bisa dilanjutkan.');
     if(st.bankVer !== BANK_VER) throw new Error('Ruang ' + code + ' dibuat dengan bank soal versi lama. Buat ruang baru.');
-    ngRoomCode = code; ngRoomRef = ref;
+    ngRoomCode = code; ngRoomRef = ref; ngRebutClaim = st.rebutClaim || null;
     ngRestore(st);
-    ngShowRoom(); ngRenderButtons();
+    ngListenRebut();
+    ngShowRoom(); ngListenRebut(); ngRenderButtons();
     document.getElementById('ngResume').style.display = 'none';
     ngWrite();
   }catch(e){ ngSetStatus('🔴 ' + e.message, 'bad'); sysDariError(e); }
@@ -1684,7 +1677,7 @@ function ngRestore(st){
   soalSkrg = st.currentQuestion || 0;
   skor = [0,1,2,3,4].map(i => (st.scores || [])[i] || 0);
   strike = [0,1,2,3,4].map(i => (st.strikes || [])[i] || 0);
-  skorBabak = [0,1,2,3].map(bb => [0,1,2,3,4].map(t => (((st.roundScores || [])[bb] || [])[t]) || 0));
+  skorBabak = [0,1,2,3,4].map(bb => [0,1,2,3,4].map(t => (((st.roundScores || [])[bb] || [])[t]) || 0));
   gugur = [0,1,2,3,4].map(i => !!(st.eliminatedTeams || [])[i]);
   timAktif = (typeof st.activeTeam === 'number') ? st.activeTeam : 0;
   const s = daftarSoal[soalSkrg];
@@ -1744,5 +1737,53 @@ window.addEventListener('load', () => {
 });
 </script>
 
+
+<!-- SFX-PACK-2026 -->
+<div id="sfxControl" style="position:fixed;left:12px;bottom:12px;z-index:99999">
+  <button id="sfxToggle" type="button" aria-label="Suara" style="border:0;border-radius:999px;padding:10px 14px;font-weight:900;background:linear-gradient(135deg,#fff,#dff8ff);color:#18223b;box-shadow:0 10px 25px rgba(0,0,0,.25);cursor:pointer">🔊 SUARA ON</button>
+</div>
+<audio id="sfx-notifikasi" preload="auto" src="sounds/notifikasi.mp3"></audio>
+<audio id="sfx-rebutan" preload="auto" src="sounds/rebutan.mp3"></audio>
+<audio id="sfx-tick" preload="auto" src="sounds/tick.mp3"></audio>
+<audio id="sfx-habis" preload="auto" src="sounds/habis.mp3"></audio>
+<audio id="sfx-babak" preload="auto" src="sounds/babak.mp3"></audio>
+<audio id="sfx-juara" preload="auto" src="sounds/juara.mp3"></audio>
+<audio id="sfx-klik" preload="auto" src="sounds/klik.mp3"></audio>
+<audio id="sfx-benar2" preload="auto" src="sounds/benar.mp3"></audio>
+<audio id="sfx-salah2" preload="auto" src="sounds/salah.mp3"></audio>
+<script>
+(function(){
+  const KEY='survey100_sfx_on';
+  let on=true; try{ on=localStorage.getItem(KEY)!=='0'; }catch(e){}
+  const btn=document.getElementById('sfxToggle');
+  function paint(){ if(btn){btn.textContent=on?'🔊 SUARA ON':'🔇 SUARA OFF';btn.style.opacity=on?'1':'.72';} }
+  function play(name){ if(!on)return; const a=document.getElementById('sfx-'+name); if(!a)return; try{a.currentTime=0; const p=a.play(); if(p&&p.catch)p.catch(()=>{});}catch(e){} }
+  window.SFX={play,set:function(v){on=!!v;try{localStorage.setItem(KEY,on?'1':'0')}catch(e){}paint();},get:function(){return on}};
+  if(btn) btn.addEventListener('click',function(){SFX.set(!on);play('klik');});
+  document.addEventListener('pointerdown',function(){ if(!on)return; ['notifikasi','rebutan','tick','habis','babak','juara','klik','benar2','salah2'].forEach(function(n){const a=document.getElementById('sfx-'+n);if(a){a.muted=true;try{const p=a.play();if(p&&p.then)p.then(()=>{a.pause();a.currentTime=0;a.muted=false}).catch(()=>{a.muted=false})}catch(e){a.muted=false}}});},{once:true});
+  paint();
+})();
+</script>
+<script id="sfx-hooks-guru">
+(function(){
+  if(!window.SFX)return;
+  function wrap(name, sound){
+    if(typeof window[name]!=='function')return;
+    const old=window[name];
+    window[name]=function(){const r=old.apply(this,arguments); if(sound) setTimeout(()=>SFX.play(sound),80); return r;};
+  }
+  wrap('tambahSalah','salah2');
+  wrap('beriBonus','notifikasi');
+  wrap('mulaiGame','babak');
+  wrap('mulaiUlang','klik');
+  wrap('gantiSoalIni','klik');
+  wrap('cekPemenang','juara');
+  const oldPilih=window.pilihTim;
+  if(typeof oldPilih==='function') window.pilihTim=function(i,s){const before=window.timAktif;const r=oldPilih.apply(this,arguments);if(!s&&i!==before&&i>=0)SFX.play('notifikasi');return r;};
+  const oldOpen=window.bukaJawabanDariPanel;
+  if(typeof oldOpen==='function') window.bukaJawabanDariPanel=function(){const before=(window.jawabanTerbuka||[]).length;const r=oldOpen.apply(this,arguments);if((window.jawabanTerbuka||[]).length>before)SFX.play('benar2');return r;};
+  document.addEventListener('click',e=>{if(e.target.closest('button,.play-btn,.tim-kartu,.ng-answer'))SFX.play('klik');},{passive:true});
+})();
+</script>
 </body>
 </html>
