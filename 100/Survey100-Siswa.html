@@ -46,6 +46,8 @@ button{font-family:inherit;cursor:pointer;border:0}
 .gerbang{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(10,10,44,.9);backdrop-filter:blur(8px);overflow:auto}
 .gerbang-kotak{width:min(420px,100%);background:#fff;color:#18223b;border-radius:26px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5)}
 .gerbang-foto{height:160px;background:#000 var(--foto) center 12%/cover no-repeat}
+.gerbang-foto-baru{width:100%;background:#071342;line-height:0;border-bottom:3px solid rgba(255,201,60,.65);overflow:hidden}
+.gerbang-foto-baru img{display:block;width:100%;height:auto;max-height:240px;object-fit:contain;background:#071342}
 .gerbang-isi{padding:20px 24px 24px;text-align:center}
 .gerbang h1{font-family:var(--display);font-size:1.9rem;line-height:1.1;font-weight:800;color:#2a2f9e}
 .gerbang p{color:#5a6480;line-height:1.5;margin-top:6px;font-size:.95rem}
@@ -289,7 +291,7 @@ button:active,.ng-answer:active,.tim-kartu:active{transform:translateY(1px) scal
 
 <div id="joinScreen" class="gerbang">
   <div class="gerbang-kotak" role="dialog" aria-labelledby="gTitle">
-    <div class="gerbang-foto" role="img" aria-label="Tiga siswa bersorak memegang piala"></div>
+    <div class="gerbang-foto-baru"><img src="assets/family100-banner.jpg" alt="Family 100 — Berpikir Komputasional"></div>
     <div class="gerbang-isi">
       <h1 id="gTitle">🎯 SURVEY 100</h1>
       <p>Panel Siswa. Minta kode ruang kepada guru, lalu masukkan di bawah.</p>
