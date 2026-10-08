@@ -526,6 +526,9 @@ body:before,body:after{z-index:-1;filter:blur(1px);opacity:.9}
 }
 .side .card:nth-child(2){display:none!important}
 
+/* Permanently hide the activity feed card while keeping its data/logic intact. */
+.activity-card{display:none!important}
+
 /* Hide the large secondary dashboard until the teacher explicitly opens it. */
 .full-dashboard{display:none!important}
 body.dashboard-open .full-dashboard{display:grid!important}
@@ -1560,4 +1563,43 @@ body:before,body:after{opacity:.32;filter:blur(18px)}
 @media(max-width:600px){
   .materi-list{gap:6px;margin-bottom:13px}
   .materi-list>div{grid-template-columns:28px minmax(0,1fr);column-gap:4px}
+}
+
+
+/* ===== FINAL TEXT CONTRAST / LANGUAGE CLEANUP ===== */
+.top h1{color:#123c68!important}
+.top .sub{color:#315f7f!important}
+.hero-copy p{color:#315f7f!important}
+.section-head p{color:#315f7f!important}
+.footer-card{background:linear-gradient(135deg,#1767a3,#2389bd)!important;color:#fff!important}
+.footer-brand{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.12)}
+.footer-sub{color:#fff!important;opacity:1!important;font-weight:800!important}
+
+/* HEADER ILLUSTRATION — full artwork, exact aspect ratio, no crop */
+.hero.hero-illustrated{
+  position:relative;
+  overflow:hidden;
+  width:100%;
+  aspect-ratio:2172 / 724;
+  min-height:0!important;
+  height:auto!important;
+  padding:0!important;
+  border-radius:26px;
+  background:#eaf7ff url('ludo-header-illustration.jpg') center center / 100% 100% no-repeat!important;
+  border:1px solid #d5eaf7;
+  box-shadow:0 14px 30px rgba(38,93,130,.12);
+}
+.hero.hero-illustrated::before,
+.hero.hero-illustrated::after{display:none!important;content:none!important}
+.hero-illustration{position:absolute;inset:0;background:transparent}
+@media (max-width:700px){
+  .hero.hero-illustrated{
+    width:100%;
+    aspect-ratio:2172 / 724;
+    min-height:0!important;
+    height:auto!important;
+    border-radius:20px;
+    background-position:center center!important;
+    background-size:100% 100%!important;
+  }
 }

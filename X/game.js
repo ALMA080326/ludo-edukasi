@@ -613,7 +613,7 @@ function reportData(i){const h=S.h[i]||[],m={"Dekomposisi":{ok:0,n:0},"Abstraksi
   const total=h.length,ok=h.filter(x=>x.ok).length,acc=total?Math.round(ok/total*100):0;
   const sorted=[...topics].sort((a,b)=>b.acc-a.acc||b.n-a.n);
   return{total,ok,bad:total-ok,acc,topics,best:sorted[0]||null,weak:sorted[sorted.length-1]||null};}
-function reportCard(i){const d=reportData(i),full=S.fin.includes(i);const best=d.best?`${d.best.name} (${d.best.acc}%)`:"Belum cukup data";const weak=d.weak?`${d.weak.name} (${d.weak.acc}%)`:"Belum cukup data";const steps=S.pos[i][0]||0;return `<div class="report-team ${full?"full":""}"><h4><span style="background:${G[i].c};color:#fff">${G[i].n}</span><span>${full?"🏁 FINISH":"🎮 BERMAIN"}</span></h4><div class="report-bars"><i style="width:${d.acc}%"></i></div><div class="report-stats"><div class="report-stat"><b>${S.pts[i]}</b><small>Skor Performa</small></div><div class="report-stat"><b>${S.pts[i]}</b><small>Total Poin</small></div><div class="report-stat"><b>${steps}</b><small>Langkah</small></div><div class="report-stat"><b>${d.ok}</b><small>Benar</small></div><div class="report-stat"><b>${d.bad}</b><small>Salah</small></div><div class="report-stat"><b>${d.acc}%</b><small>Akurasi</small></div></div><div class="mastery"><strong>Materi paling dikuasai:</strong><br>${esc(best)}</div><div class="mastery weak"><strong>Materi perlu ditingkatkan:</strong><br>${esc(weak)}</div></div>`}
+function reportCard(i){const d=reportData(i),full=S.fin.includes(i);const best=d.best?`${d.best.name} (${d.best.acc}%)`:"Belum cukup data";const weak=d.weak?`${d.weak.name} (${d.weak.acc}%)`:"Belum cukup data";const steps=S.pos[i][0]||0;return `<div class="report-team ${full?"full":""}"><h4><span style="background:${G[i].c};color:#fff">${G[i].n}</span><span>${full?"🏁 FINISH":"🎮 BERMAIN"}</span></h4><div class="report-bars"><i style="width:${d.acc}%"></i></div><div class="report-stats"><div class="report-stat"><b>${S.pts[i]}</b><small>Skor</small></div><div class="report-stat"><b>${S.pts[i]}</b><small>Total Poin</small></div><div class="report-stat"><b>${steps}</b><small>Langkah</small></div><div class="report-stat"><b>${d.ok}</b><small>Benar</small></div><div class="report-stat"><b>${d.bad}</b><small>Salah</small></div><div class="report-stat"><b>${d.acc}%</b><small>Akurasi</small></div></div><div class="mastery"><strong>Materi paling dikuasai:</strong><br>${esc(best)}</div><div class="mastery weak"><strong>Materi perlu ditingkatkan:</strong><br>${esc(weak)}</div></div>`}
 function selfTest(){
   const checks=[];
   checks.push(["HTML modal",!!$("m")&&!!$("bx")]);
@@ -630,7 +630,7 @@ function teamProfile(i){
  const finishRank=S.fin.indexOf(i)+1;
  const rank=finishRank>0?finishRank:null;
  const rows=d.topics.map(t=>`<div class="topic-mini"><span>${esc(t.name)}</span><b>${t.acc}%</b><small>${t.ok}/${t.n} benar</small></div>`).join("")||`<div class="note">Belum ada data materi.</div>`;
- modal(`<div class="profile-card"><div class="profile-title"><span style="background:${G[i].c}">${G[i].n}</span><b>${rank?(rank===1?"🥇":rank===2?"🥈":rank===3?"🥉":"4️⃣")+" Peringkat "+rank:"🎮 Belum Finish"}</b></div><div class="profile-stats"><div><b>${S.pts[i].toLocaleString("id-ID")}</b><small>SKOR PERFORMA</small><b>${S.pts[i].toLocaleString("id-ID")}</b><small>TOTAL POIN</small></div><div><b>${S.pos[i][0]}</b><small>LANGKAH</small></div><div><b>${d.ok}</b><small>BENAR</small></div><div><b>${d.bad}</b><small>SALAH</small></div><div><b>${d.acc}%</b><small>AKURASI</small></div><div><b>${avg?avg.toFixed(1)+"s":"—"}</b><small>RATA-RATA</small></div></div><h3 style="margin-top:12px">🧠 Penguasaan Materi</h3><div class="topic-list">${rows}</div><button class="btn" onclick="teacherReport()">📊 Kembali ke Rekap Guru</button></div>`);
+ modal(`<div class="profile-card"><div class="profile-title"><span style="background:${G[i].c}">${G[i].n}</span><b>${rank?(rank===1?"🥇":rank===2?"🥈":rank===3?"🥉":"4️⃣")+" Peringkat "+rank:"🎮 Belum Finish"}</b></div><div class="profile-stats"><div><b>${S.pts[i].toLocaleString("id-ID")}</b><small>SKOR</small><b>${S.pts[i].toLocaleString("id-ID")}</b><small>TOTAL POIN</small></div><div><b>${S.pos[i][0]}</b><small>LANGKAH</small></div><div><b>${d.ok}</b><small>BENAR</small></div><div><b>${d.bad}</b><small>SALAH</small></div><div><b>${d.acc}%</b><small>AKURASI</small></div><div><b>${avg?avg.toFixed(1)+"s":"—"}</b><small>RATA-RATA</small></div></div><h3 style="margin-top:12px">🧠 Penguasaan Materi</h3><div class="topic-list">${rows}</div><button class="btn" onclick="teacherReport()">📊 Kembali ke Rekap Guru</button></div>`);
 }
 function resultOrder(order){
   return order && order.length ? [...order] : (S.finalOrder&&S.finalOrder.length?[...S.finalOrder]:[0,1,2,3].sort((a,b)=>S.pts[b]-S.pts[a]));
@@ -734,7 +734,7 @@ function detailedResults(){
       <span>Jawaban: ${esc(q.selected??"(tidak menjawab)")} · Kunci: ${esc(q.correctAnswer)}</span>
     </div>`).join("")||`<div class="note">Belum ada soal.</div>`;
     const mats=t.materials.map(m=>`${esc(m.name)}: <b>${m.acc}%</b> (${m.ok}/${m.n})`).join(" · ")||"Belum ada data materi";
-    return `<details class="result-team-detail" ${t.rank===1?"open":""}><summary>${t.rank===1?"🥇":t.rank===2?"🥈":t.rank===3?"🥉":"4️⃣"} ${esc(t.team)} · Performa ${Number(t.points).toLocaleString("id-ID")} · Total ${Number(t.totalScore).toLocaleString("id-ID")} · ${t.accuracy}%</summary>
+    return `<details class="result-team-detail" ${t.rank===1?"open":""}><summary>${t.rank===1?"🥇":t.rank===2?"🥈":t.rank===3?"🥉":"4️⃣"} ${esc(t.team)} · Skor ${Number(t.points).toLocaleString("id-ID")} · Total ${Number(t.totalScore).toLocaleString("id-ID")} · ${t.accuracy}%</summary>
       <div class="result-team-body">
         <div class="result-kpi-grid">
           <div class="result-kpi"><b>${t.correct}</b><small>Benar</small></div>
@@ -772,7 +772,7 @@ function downloadCSV(){
   const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;a.download=`ludo-edukasi-hasil-${S.matchId}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function teacherReport(){modal(`<div class="teacher-report"><div class="report-head"><div><div class="report-title">📊 HASIL & PROGRESS KELOMPOK</div><div class="report-sub">Rekap live untuk guru · data diperbarui setiap jawaban</div></div></div><div class="report-grid">${G.map((_,i)=>reportCard(i)).join("")}</div><div class="note" style="margin-top:10px">Tekan <b>Tutup</b> untuk kembali ke permainan. Akurasi dihitung dari jawaban yang sudah dikerjakan. Materi teratas/terendah ditampilkan dari kategori soal yang sudah muncul pada kelompok.</div></div><button class="btn" onclick="detailedResults()">📋 HASIL DETAIL</button><button class="btn" onclick="closeModal()">Tutup</button>`)}
+function teacherReport(){modal(`<div class="teacher-report"><div class="report-head"><div><div class="report-title">📊 HASIL PERMAINAN KELOMPOK</div><div class="report-sub">Rekap untuk guru · data diperbarui setiap jawaban</div></div></div><div class="report-grid">${G.map((_,i)=>reportCard(i)).join("")}</div><div class="note" style="margin-top:10px">Tekan <b>Tutup</b> untuk kembali ke permainan. Akurasi dihitung dari jawaban yang sudah dikerjakan. Materi teratas/terendah ditampilkan dari kategori soal yang sudah muncul pada kelompok.</div></div><button class="btn" onclick="detailedResults()">📋 HASIL DETAIL</button><button class="btn" onclick="closeModal()">Tutup</button>`)}
 function fin2(o){
   S.over=true;
   S.finishedAt=S.finishedAt||Date.now();
@@ -826,7 +826,7 @@ function toggleDashboardFromMenu(){
 function showMateri(){
   modal(`<div class="materi-full">
     <h2>🧠📚 Materi Berpikir Komputasional 🚀</h2>
-    <p>🧠 <strong>Berpikir Komputasional</strong> adalah cara menyelesaikan masalah secara logis, sistematis, dan efisien. Berpikir Komputasional tidak harus menggunakan komputer atau HP. Tanpa disadari, kita sering menerapkannya dalam kehidupan sehari-hari, seperti saat membagi tugas, menyusun jadwal, mencari pola, atau menentukan langkah terbaik untuk menyelesaikan suatu pekerjaan. Berpikir Komputasional memiliki empat pilar utama, yaitu dekomposisi, pengenalan pola, abstraksi, dan algoritma.</p>
+    <p>🧠 <strong>Berpikir Komputasional</strong> adalah cara menyelesaikan masalah secara logis, sistematis, dan efisien. Berpikir Komputasional tidak harus menggunakan komputer atau ponsel. Tanpa disadari, kita sering menerapkannya dalam kehidupan sehari-hari, seperti saat membagi tugas, menyusun jadwal, mencari pola, atau menentukan langkah terbaik untuk menyelesaikan suatu pekerjaan. Berpikir Komputasional memiliki empat pilar utama, yaitu dekomposisi, pengenalan pola, abstraksi, dan algoritma.</p>
 
     <h3>1. 🧩 Dekomposisi (Decomposition)</h3>
     <p>Dekomposisi adalah proses memecah masalah yang besar dan kompleks menjadi beberapa bagian yang lebih kecil, sederhana, dan mudah dikelola. Setiap bagian dapat diselesaikan secara terpisah, kemudian hasilnya digabungkan untuk memperoleh solusi secara utuh.</p>
@@ -913,8 +913,8 @@ function showMateri(){
 
 function openMenu(){
   const dash=document.body.classList.contains("dashboard-open");
-  const dashLabel=dash?"Sembunyikan Pusat Pertandingan":"Tampilkan Pusat Pertandingan";
-  const dashDesc=dash?"Sembunyikan tampilan dashboard tanpa menghapus data.":"Tampilkan kembali dashboard pertandingan.";
+  const dashLabel=dash?"Sembunyikan Aktivitas Permainan":"Tampilkan Aktivitas Permainan";
+  const dashDesc=dash?"Sembunyikan aktivitas permainan tanpa menghapus data.":"Tampilkan kembali aktivitas permainan.";
   modal(`<div class="menu-guru-modern">
     <div class="menu-guru-head">
       <div class="menu-guru-icon">👩‍🏫</div>
@@ -977,7 +977,7 @@ function openMenu(){
    1-4 = memilih jawaban A-D tanpa langsung mengirim.
    Space = lanjutkan / coba lagi setelah jawaban diproses.
    Escape = batalkan soal dengan konfirmasi; menu/informasi ditutup langsung.
-   Kontrol sentuh/tap tetap tersedia untuk pengguna HP.
+   Kontrol sentuh/tap tetap tersedia untuk pengguna ponsel.
 */
 window.addEventListener("keydown",e=>{
   if(e.repeat)return;
