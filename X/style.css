@@ -1603,3 +1603,153 @@ body:before,body:after{opacity:.32;filter:blur(18px)}
     background-size:100% 100%!important;
   }
 }
+
+
+/* ===== FINAL TARGET UI — MATCH MOBILE REFERENCE =====
+   Visual/layout only. Gameplay, question bank and scoring logic are untouched. */
+
+/* Header: use the artwork as the visual identity; keep Menu/Sound as floating controls. */
+.top{
+  position:absolute!important;
+  top:12px!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  width:min(1240px,calc(100% - 16px))!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:8px!important;
+  z-index:80!important;
+  border:0!important;
+  border-radius:18px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+.top>div:first-child{display:none!important}
+.top>div:last-child{margin-left:auto!important;gap:8px!important}
+.top .sound-pill{
+  min-height:40px!important;
+  padding:9px 14px!important;
+  border:1px solid rgba(255,255,255,.95)!important;
+  background:rgba(255,255,255,.94)!important;
+  color:#174b75!important;
+  box-shadow:0 8px 22px rgba(22,72,110,.16)!important;
+  backdrop-filter:blur(12px)!important;
+}
+#teacherReport{display:none!important}
+
+.hero.hero-illustrated{
+  margin-top:0!important;
+  margin-bottom:12px!important;
+  width:100%!important;
+  aspect-ratio:3.25!important;
+  min-height:0!important;
+  height:auto!important;
+  padding:0!important;
+  border-radius:22px!important;
+  background-position:center center!important;
+  background-size:100% 100%!important;
+  box-shadow:0 16px 34px rgba(25,89,133,.16)!important;
+}
+
+/* Main game area: board + turn/dice stay side-by-side on normal phones/tablets. */
+.wrap{
+  width:100%!important;
+  max-width:1240px!important;
+  margin:0 auto!important;
+  grid-template-columns:minmax(0,1.58fr) minmax(240px,.92fr)!important;
+  gap:12px!important;
+  align-items:start!important;
+}
+.board-column{min-width:0!important}
+.bd{width:100%!important;max-width:none!important}
+.side{min-width:0!important;gap:10px!important}
+.side .score-card{display:none!important}
+
+/* Turn/dice panel: compact card, larger dice focal point, clear action button. */
+.turn-card{
+  padding:14px!important;
+  border-radius:22px!important;
+}
+.turn-head h3{font-size:13px!important}
+.turn{font-size:21px!important}
+.turn-live{font-size:9px!important;padding:5px 8px!important}
+.turn-note{margin-top:8px!important}
+.dice-dock{
+  min-height:0!important;
+  height:auto!important;
+  margin-top:9px!important;
+  padding:10px 8px 8px!important;
+  border-radius:18px!important;
+}
+#diceArea{width:172px!important;height:172px!important;min-width:172px!important;min-height:172px!important}
+#dice{width:160px!important;height:160px!important}
+.cube{--s:clamp(88px,14vw,122px)!important}
+.pawn-selector{margin-top:7px!important}
+
+/* Hide Activity section visually but keep its DOM/data for later use. */
+.full-dashboard>.section-head{display:none!important}
+.info-grid{display:none!important}
+
+/* Four compact live team cards directly under the game area. */
+.team-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:9px!important;
+  margin-top:10px!important;
+}
+.team-grid>*{min-width:0!important}
+.team-card{padding:11px!important;border-radius:17px!important}
+.team-card .team-score{font-size:27px!important;margin:8px 0 4px!important}
+.team-stats-compact{gap:4px!important}
+.team-stats-compact span{font-size:10px!important;padding:4px 6px!important}
+.team-card .progress{height:8px!important}
+
+/* Keep the three photo panels as a compact gallery. */
+.photo-showcase{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:10px!important;
+  margin-top:11px!important;
+}
+.photo-panel{min-width:0!important;border-radius:18px!important}
+.photo-panel-kicker{font-size:10px!important;padding:8px 9px!important}
+.photo-panel img{object-fit:contain!important}
+
+/* Shorter footer: brand + one useful tagline only. */
+.footer-card{
+  margin-top:11px!important;
+  padding:13px 14px!important;
+  border-radius:20px!important;
+}
+.footer-brand{font-size:16px!important}
+.footer-sub{font-size:9px!important;line-height:1.35!important}
+.footer-sub:last-child{display:none!important}
+
+/* Preserve the target composition down to 600px wide. */
+@media (min-width:600px) and (max-width:900px){
+  body{padding:8px!important}
+  .top{width:calc(100% - 16px)!important}
+  .wrap{grid-template-columns:minmax(0,1.58fr) minmax(240px,.92fr)!important;gap:10px!important}
+  .team-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  .photo-showcase{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+
+/* Small phones: stack only when the viewport is genuinely narrow. */
+@media (max-width:599px){
+  .top{top:7px!important;width:calc(100% - 12px)!important;padding:5px!important}
+  .top .sound-pill{min-height:34px!important;padding:7px 9px!important}
+  .menu-pill{font-size:0!important;width:38px!important;padding:0!important}
+  .menu-pill:after{content:"☰";font-size:17px}
+  #snd{font-size:0!important;width:38px!important;padding:0!important}
+  #snd:before{content:"🔊";font-size:15px}
+  .hero.hero-illustrated{aspect-ratio:3.1!important;border-radius:18px!important;margin-bottom:9px!important}
+  .wrap{grid-template-columns:1fr!important;gap:9px!important}
+  .team-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .photo-showcase{grid-template-columns:1fr!important}
+  #diceArea{width:142px!important;height:142px!important;min-width:142px!important;min-height:142px!important}
+  #dice{width:132px!important;height:132px!important}
+  .cube{--s:clamp(76px,24vw,100px)!important}
+}
+
+/* Never allow the hidden activity area to reappear through later legacy rules. */
+.full-dashboard .info-grid{display:none!important}
+.full-dashboard>.section-head{display:none!important}
