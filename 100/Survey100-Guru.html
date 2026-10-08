@@ -1375,8 +1375,9 @@ function cekBankLabel(r){
    ========================================================= */
 const NG_ROOT = 'rooms';
 const NG_SAVED = 'family100_guru_room';
-let ngDb = null, ngUid = null, ngRoomCode = '', ngRoomRef = null;
+let ngDb = null, ngUid = null, ngRoomCode = '', ngRoomRef = null, ngRebutListenerRef = null;
 let ngOnline = false, ngGameStatus = 'waiting', ngWinner = '';
+let ngRebutClaim = null;
 
 /* ---------- tampilan status ---------- */
 function ngSetStatus(msg, cls){
@@ -1616,6 +1617,23 @@ cekPemenang = function(){
 };
 const ngOldMulai = mulaiGame;
 mulaiGame = function(){ ngGameStatus = 'playing'; ngOldMulai(); };   // muatSoal (dipanggil mulaiGame) yang mengirim state
+
+/* ---------- sinkronisasi klaim rebutan realtime ---------- */
+function ngListenRebut(){
+  if(!ngRoomRef) return;
+  if(ngRebutListenerRef){ try{ ngRebutListenerRef.off('value'); }catch(e){} }
+  ngRebutListenerRef = ngRoomRef.child('rebutClaim');
+  ngRebutListenerRef.on('value', snap => {
+    const next = snap.val() || null;
+    if(JSON.stringify(next) === JSON.stringify(ngRebutClaim)) return;
+    ngRebutClaim = next;
+    ngRenderButtons();
+    /* Klaim siswa disalin ke snapshot guru agar semua HP menerima state yang konsisten. */
+    if(ngRoomRef) ngWrite();
+  }, err => {
+    ngSetStatus('🔴 Gagal memantau rebutan: ' + err.message, 'bad');
+  });
+}
 
 /* ---------- buat / lanjutkan ruang ---------- */
 function ngMakeCode(){
