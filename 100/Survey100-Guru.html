@@ -1380,6 +1380,7 @@ const NG_ROOT = 'rooms';
 const NG_SAVED = 'family100_guru_room';
 let ngDb = null, ngUid = null, ngRoomCode = '', ngRoomRef = null;
 let ngOnline = false, ngGameStatus = 'waiting', ngWinner = '';
+let ngTimerStartedAt = 0, ngTimerDuration = 0;
 
 /* ---------- tampilan status ---------- */
 function ngSetStatus(msg, cls){
@@ -1418,6 +1419,18 @@ async function ngInit(){
   });
 }
 
+/* ---------- timer sinkron siswa ---------- */
+function ngDurasiTimer(mode){
+  if(mode === 'pemanasan' || mode === 'giliran') return 15;
+  if(mode === 'double') return 45; // aturan rinci DOCX: 30–45 detik
+  return 0; // rebutan/final tidak diberi countdown eksplisit di DOCX
+}
+function ngResetTimer(){
+  const s = daftarSoal[soalSkrg];
+  ngTimerDuration = s ? ngDurasiTimer(s.mode) : 0;
+  ngTimerStartedAt = ngTimerDuration ? Date.now() : 0;
+}
+
 /* ---------- snapshot state game ---------- */
 function ngSnapshot(){
   const s = daftarSoal[soalSkrg];
@@ -1433,6 +1446,7 @@ function ngSnapshot(){
     roundMode: s.mode, roundScores: skorBabak.map(a => [...a]), langkahAktif: urutanAktif, gameId: gameId, session: sesiIdx.slice(),
     questionMultiplier: s.pengali,
     activeTeam: timAktif,
+    timerStartedAt: ngTimerStartedAt, timerDuration: ngTimerDuration,
     scores: [...skor],
     strikes: [...strike],
     eliminatedTeams: [...gugur],
@@ -1604,9 +1618,9 @@ function beriBonus(){
 
 /* aksi lama yang dibungkus supaya otomatis terkirim */
 const ngOldMuat = muatSoal;
-muatSoal = function(){ ngGameStatus = 'playing'; ngWinner = ''; ngRebutClaim = null; ngOldMuat(); oleh = daftarSoal[soalSkrg].jawaban.map(() => -1); bonusSoal = [0,0,0,0,0]; ngRenderButtons(); ngWrite(); };
+muatSoal = function(){ ngGameStatus = 'playing'; ngWinner = ''; ngRebutClaim = null; ngResetTimer(); ngOldMuat(); oleh = daftarSoal[soalSkrg].jawaban.map(() => -1); bonusSoal = [0,0,0,0,0]; ngRenderButtons(); ngWrite(); };
 const ngOldPilih = pilihTim;
-pilihTim = function(i, s){ ngOldPilih(i, s); ngWrite(); };
+pilihTim = function(i, s){ ngOldPilih(i, s); const q=daftarSoal[soalSkrg]; if(q && (q.mode==='pemanasan' || q.mode==='giliran')) ngResetTimer(); ngWrite(); };
 const ngOldLihat = lihatkanJawaban;
 lihatkanJawaban = function(){ ngOldLihat(); ngRenderButtons(); ngWrite(); };
 const ngOldCek = cekPemenang;
@@ -1680,6 +1694,8 @@ function ngRestore(st){
   skorBabak = [0,1,2,3,4].map(bb => [0,1,2,3,4].map(t => (((st.roundScores || [])[bb] || [])[t]) || 0));
   gugur = [0,1,2,3,4].map(i => !!(st.eliminatedTeams || [])[i]);
   timAktif = (typeof st.activeTeam === 'number') ? st.activeTeam : 0;
+  ngTimerStartedAt = Number(st.timerStartedAt || 0);
+  ngTimerDuration = Number(st.timerDuration || 0);
   const s = daftarSoal[soalSkrg];
   jawabanTerbuka = [];
   (st.openedAnswers || []).forEach((o, i) => { if(o) jawabanTerbuka.push(i); });

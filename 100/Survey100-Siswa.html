@@ -105,6 +105,26 @@ button{font-family:inherit;cursor:pointer;border:0}
 .ubin.flip{animation:balik .55s cubic-bezier(.2,.8,.2,1)}
 @keyframes balik{0%{transform:rotateX(90deg);opacity:.2}100%{transform:rotateX(0);opacity:1}}
 
+/* ===== HUD AKSI SISWA: GILIRAN + TIMER + SKOR ===== */
+.student-action{display:grid;grid-template-columns:1.35fr .65fr;gap:12px;margin:0 0 14px}
+.action-status{padding:15px 16px;border-radius:22px;background:linear-gradient(135deg,rgba(30,230,255,.18),rgba(99,76,255,.16));border:2px solid rgba(32,230,255,.35);box-shadow:0 14px 32px rgba(0,0,0,.18);min-height:92px}
+.action-status.your-turn{background:linear-gradient(135deg,rgba(34,201,129,.28),rgba(255,201,60,.2));border-color:rgba(34,201,129,.6);animation:statusPulse 1.5s ease-in-out infinite}
+.action-status.wait-turn{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.06));border-color:rgba(255,255,255,.15)}
+.action-status.rebut-turn{background:linear-gradient(135deg,rgba(255,77,103,.3),rgba(255,159,28,.22));border-color:rgba(255,77,103,.65);animation:statusPulse .9s ease-in-out infinite}
+.action-kecil{font-size:.68rem;font-weight:900;letter-spacing:.08em;color:var(--redup);text-transform:uppercase}
+.action-besar{font-family:var(--display);font-size:clamp(1.1rem,4.5vw,1.55rem);font-weight:900;margin-top:2px;color:#fff}
+.action-detail{font-size:.74rem;font-weight:800;color:var(--redup);margin-top:3px}
+.timer-card{padding:12px 14px;border-radius:22px;background:linear-gradient(145deg,#11184c,#26378b);border:2px solid rgba(255,201,60,.35);box-shadow:0 14px 32px rgba(0,0,0,.2);text-align:center}
+.timer-label{font-size:.65rem;font-weight:900;color:var(--redup);letter-spacing:.08em}
+.timer-value{font-family:var(--display);font-size:clamp(2rem,7vw,3rem);font-weight:900;line-height:1;color:var(--emas);font-variant-numeric:tabular-nums;text-shadow:0 4px 16px rgba(255,201,60,.25)}
+.timer-card.warning .timer-value{color:#ffb020;animation:timerPulse .65s ease-in-out infinite}
+.timer-card.danger .timer-value{color:#ff4d67;animation:timerPulse .35s ease-in-out infinite}
+.timer-bar{height:7px;margin-top:8px;border-radius:99px;background:rgba(0,0,0,.35);overflow:hidden}.timer-bar i{display:block;height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,#22c981,#ffc93c,#ff4d67);transform-origin:left center}
+.focus-score{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.12);font-size:.75rem;font-weight:900}.focus-score strong{font-family:var(--display);font-size:1.25rem;color:#fff}.focus-rank{color:var(--emas)}
+@keyframes statusPulse{50%{transform:translateY(-2px);box-shadow:0 18px 36px rgba(34,201,129,.2)}}
+@keyframes timerPulse{50%{transform:scale(1.08)}}
+@media(max-width:720px){.student-action{grid-template-columns:1fr}.timer-card{display:grid;grid-template-columns:auto 1fr;align-items:center;text-align:left;gap:10px}.timer-label{grid-column:1/3}.timer-bar{grid-column:1/3;width:100%;margin-top:2px}}
+
 /* papan poin per tim */
 .rekap{margin-top:16px;padding:16px;border-radius:24px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.1)}
 .rekap h2{font-family:var(--display);font-size:1.25rem;font-weight:800;color:var(--emas);margin-bottom:10px}
@@ -318,6 +338,19 @@ button:active,.ng-answer:active,.tim-kartu:active{transform:translateY(1px) scal
     <div class="sisa" id="infoSisa"></div>
     <div id="rebutBox" style="display:none;margin:10px 0;text-align:center"><button id="btnRebut" type="button" onclick="rebutSekarang()" style="width:100%;padding:17px;border:0;border-radius:20px;background:linear-gradient(135deg,#ff4d67,#ff9f1c);color:#fff;font:900 1.25rem Poppins,sans-serif;box-shadow:0 8px 0 #b62b3f,0 18px 35px rgba(255,77,103,.35);animation:pulseGlow 1.2s infinite">🚨 REBUT! 🚨</button></div>
     <div id="studentGroupBadge" style="text-align:center;margin:8px 0;padding:10px 14px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.28);font-weight:900;box-shadow:0 8px 22px rgba(0,0,0,.14)">👥 ANDA: KELOMPOK 1</div>
+    <section class="student-action" aria-label="Status giliran dan timer">
+      <div id="studentAction" class="action-status wait-turn">
+        <div class="action-kecil">STATUS PERMAINAN</div>
+        <div id="studentActionBig" class="action-besar">⏳ Menunggu guru...</div>
+        <div id="studentActionDetail" class="action-detail">Siap untuk bermain.</div>
+        <div class="focus-score"><span>🏆 Skor Anda: <strong id="studentOwnScore">0</strong></span><span id="studentRank" class="focus-rank">Posisi #–</span></div>
+      </div>
+      <div id="studentTimerCard" class="timer-card">
+        <div class="timer-label">⏱️ WAKTU</div>
+        <div id="studentTimer" class="timer-value">--</div>
+        <div class="timer-bar"><i id="studentTimerBar"></i></div>
+      </div>
+    </section>
     <section class="student-hud" aria-label="Informasi permainan siswa">
       <div class="student-card"><div class="student-title">🎯 Papan Pertandingan • 5 Kelompok</div><div class="student-sub">Lihat soal, jawaban yang sudah dibuka, dan poin semua tim secara langsung.</div><div class="student-tip">💡 <span>Jawaban siswa <b>disampaikan secara lisan</b>. Guru yang membuka jawaban.</span></div></div>
       <div class="student-card"><div class="student-title">📡 Status Ruang</div><div class="student-sub" id="studentRoomHint">Menunggu sinkronisasi dari guru…</div><div class="student-tip">🏆 <span>Target: kumpulkan poin sebanyak mungkin!</span></div></div>
@@ -407,6 +440,7 @@ const NG_ROOT = 'rooms', NG_SAVED = 'family100_siswa_room';
 const NAMA_TIM = ['Kelompok 1','Kelompok 2','Kelompok 3','Kelompok 4','Kelompok 5'];
 const KELAS_TIM = ['merah','biru','kuning','hijau','ungu'];
 let db = null, roomRef = null, roomCode = '', prev = null, online = false, questionKey = null, bannerTimer = null, fbTimer = null;
+let timerRAF = 0, lastTimerState = '', lastOwnTurn = false, lastRebutMode = false, timerSoundKey = '';
 let studentGroup = 0;
 const STUDENT_GROUP_KEY = 'survey100_student_group';
 
@@ -532,6 +566,80 @@ function renderRekap(scores, perSoal, babakSkor){
       + '<div class="rk-rinci"><span class="ini' + (perSoal[t] ? '' : ' nol') + '">Soal ini: ' + (perSoal[t] > 0 ? '+' : '') + perSoal[t] + '</span>' + rinci + '</div></div>';
   }).join('');
 }
+function studentTimerDuration(mode){
+  if(mode === 'pemanasan' || mode === 'giliran') return 15;
+  if(mode === 'double') return 45;
+  return 0;
+}
+function updateStudentTimer(st){
+  cancelAnimationFrame(timerRAF);
+  const card=$('studentTimerCard'), val=$('studentTimer'), bar=$('studentTimerBar');
+  const duration=Number(st.timerDuration || studentTimerDuration(st.roundMode) || 0);
+  const started=Number(st.timerStartedAt || 0);
+  if(!duration || !started || st.gameStatus==='waiting' || st.gameStatus==='finished'){
+    if(val) val.textContent = st.roundMode==='serang' ? 'REBUT' : '--';
+    if(bar) bar.style.width='100%';
+    if(card) card.className='timer-card';
+    return;
+  }
+  const soundKey=String(st.currentQuestion)+'|'+started+'|'+duration+'|'+studentGroup;
+  if(timerSoundKey!==soundKey) timerSoundKey=soundKey;
+  const tick=()=>{
+    const left=Math.max(0, duration-Math.max(0,(Date.now()-started)/1000));
+    const sec=Math.ceil(left);
+    if(val) val.textContent=String(sec).padStart(2,'0');
+    if(bar) bar.style.width=Math.max(0,Math.min(100,left/duration*100))+'%';
+    if(card) card.className='timer-card '+(left<=5?'danger':left<=10?'warning':'');
+    const isMyTurn=Number(st.activeTeam)===studentGroup;
+    const canSound=isMyTurn || st.roundMode==='double';
+    if(canSound && sec>=1 && sec<=5 && timerSoundKey!==soundKey+'|tick|'+sec){
+      timerSoundKey=soundKey+'|tick|'+sec;
+      if(window.SFX) SFX.play('tick');
+      if(isMyTurn) beriGetaran(35);
+    }
+    if(left<=0){
+      if(canSound && timerSoundKey!==soundKey+'|done'){
+        timerSoundKey=soundKey+'|done';
+        if(window.SFX) SFX.play('habis');
+        if(isMyTurn) beriGetaran([120,60,120]);
+      }
+      if(val) val.textContent='00';
+      return;
+    }
+    timerRAF=requestAnimationFrame(tick);
+  };
+  tick();
+}
+function updateStudentAction(st,scores){
+  const box=$('studentAction'), big=$('studentActionBig'), detail=$('studentActionDetail');
+  const own = scores[studentGroup] || 0;
+  const order=[0,1,2,3,4].sort((a,b)=>scores[b]-scores[a]||a-b);
+  const rank=Math.max(1,order.indexOf(studentGroup)+1);
+  if($('studentOwnScore')) $('studentOwnScore').textContent=own;
+  if($('studentRank')) $('studentRank').textContent='Posisi #'+rank;
+  if(st.gameStatus==='waiting'){
+    box.className='action-status wait-turn'; big.textContent='⏳ Menunggu guru memulai'; detail.textContent='Semua siap? Permainan akan dimulai dari Panel Guru.';
+    return;
+  }
+  if(st.gameStatus==='finished'){
+    box.className='action-status your-turn'; big.textContent='🏆 PERMAINAN SELESAI!'; detail.textContent=st.winner ? 'Pemenang: '+st.winner : 'Lihat hasil akhir di bawah.'; return;
+  }
+  if(st.roundMode==='serang'){
+    if(st.rebutClaim){
+      const g=Number(st.rebutClaim.group); box.className=g===studentGroup?'action-status your-turn':'action-status wait-turn';
+      big.textContent=g===studentGroup?'🚨 ANDA MENANG REBUTAN!':'🔒 REBUTAN DIMENANGKAN';
+      detail.textContent='Kesempatan: '+NAMA_TIM[g];
+    }else{
+      box.className='action-status rebut-turn'; big.textContent='🚨 REBUTAN DIMULAI!'; detail.textContent='Tekan tombol REBUT secepat mungkin!';
+    }
+    return;
+  }
+  const active=Number(st.activeTeam);
+  if(active===studentGroup){ box.className='action-status your-turn'; big.textContent='🟢 GILIRAN ANDA!'; detail.textContent='🎤 Silakan sampaikan jawaban kepada guru.'; }
+  else { box.className='action-status wait-turn'; big.textContent='🔒 MENUNGGU '+NAMA_TIM[active]; detail.textContent='Tetap siap — giliran dapat berpindah ke kelompok Anda.'; }
+}
+function beriGetaran(pattern){ try{ if('vibrate' in navigator) navigator.vibrate(pattern); }catch(e){} }
+
 function render(st){
   const first = prev === null;
   const scores = arr5(st.scores, v => v || 0);
@@ -544,6 +652,8 @@ function render(st){
   const babakSkor = [0,1,2,3,4].map(b => arr5((st.roundScores || [])[b], v => v || 0));
   const active = (typeof st.activeTeam === 'number') ? st.activeTeam : 0;
   const waiting = st.gameStatus === 'waiting';
+  updateStudentAction(st, scores);
+  updateStudentTimer(st);
   const gb = $('studentGroupBadge'); if(gb) gb.innerHTML = '👥 ANDA: <b>' + NAMA_TIM[studentGroup] + '</b> &nbsp;•&nbsp; 🎯 GILIRAN: <b>' + NAMA_TIM[active] + '</b>';
   const rb=$('rebutBox'), rbtn=$('btnRebut'); const canRebut=!waiting && st.roundMode==='serang' && !st.rebutClaim && studentGroup>=0; if(rb) rb.style.display=canRebut?'block':'none'; if(rbtn) rbtn.disabled=!canRebut;
 
@@ -614,10 +724,12 @@ function render(st){
 
   /* suara & animasi hanya untuk perubahan baru (bukan saat pertama kali tersambung) */
   if(!first){
-    if(strikeBaru){ flashX(); suara('audioSalah'); }
-    else if(bukaBaru && !newQuestion){ suara('audioBenar'); }
+    if(strikeBaru){ flashX(); suara('audioSalah'); beriGetaran([80,50,80]); }
+    else if(bukaBaru && !newQuestion){ suara('audioBenar'); beriGetaran(45); }
+    if(active !== prev.active && active === studentGroup){ beriGetaran([120,60,120]); }
+    if(st.roundMode==='serang' && !prev.rebut && st.rebutClaim){ beriGetaran([100,50,180]); }
   }
-  prev = { strikes, active };
+  prev = { strikes, active, rebut:!!st.rebutClaim };
 }
 
 window.addEventListener('online', () => { online = true; showConn(); });
