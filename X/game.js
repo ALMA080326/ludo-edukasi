@@ -4,7 +4,26 @@
  * Ganti/isi bank-soal.js tanpa menyentuh mesin permainan.
  */
 
-const Q=Array.isArray(window.BANK_SOAL)?window.BANK_SOAL:[];
+const BUILTIN_Q=Array.isArray(window.BANK_SOAL)?window.BANK_SOAL:[];
+// Samakan nama materi tanpa peduli huruf besar/kecil & spasi ganda ("algoritma" => "Algoritma").
+function canonMaterial(name,list){
+  const n=String(name||"").replace(/\s+/g," ").trim();if(!n)return "";
+  const lc=n.toLowerCase(),known=["Dekomposisi","Algoritma","Pengenalan Pola","Abstraksi"];
+  BUILTIN_Q.forEach(q=>{if(typeof q[4]==="string"&&q[4].trim())known.push(q[4].replace(/\s+/g," ").trim())});
+  (list||[]).forEach(q=>{if(q&&q.material)known.push(String(q.material).replace(/\s+/g," ").trim())});
+  return known.find(k=>k.toLowerCase()===lc)||n;
+}
+function readCustomQuestions(){
+  try{const value=JSON.parse(localStorage.getItem("ludoEdukasiCustomQuestions")||"[]");
+    if(!Array.isArray(value))return [];
+    const seen=[];
+    return value.filter(q=>q&&q.id&&q.material&&q.question&&Array.isArray(q.options)&&q.options.length===4&&["A","B","C","D"].includes(q.correctAnswer)).map(q=>{const m=canonMaterial(q.material,seen);seen.push({material:m});return {...q,material:m}});
+  }catch(e){return []}
+}
+// Format Q: [pertanyaan,[A,B,C,D],indexKunci,nomor,materi,pembahasan]
+function customToQ(q){return [q.question,q.options,"ABCD".indexOf(q.correctAnswer),"CUSTOM-"+q.id,q.material,q.explanation||""]}
+const CUSTOM_QUESTIONS=readCustomQuestions();
+const Q=[...BUILTIN_Q,...CUSTOM_QUESTIONS.map(customToQ)];
 if(!Q.length){
   console.error("Bank soal kosong. Pastikan bank-soal.js dimuat sebelum game.js.");
 }
@@ -43,7 +62,7 @@ function totalScore(i){return S.pts[i]}
 // ATURAN RESMI GAME = PANDUAN: 60 detik, skor 10/9/8/7/6/5, langkah 6/5/4/3/2/1, salah/timeout 0, collision -2, ranking berdasarkan urutan FINISH.
 
 
-const $=i=>document.getElementById(i),esc=t=>String(t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])),pick=a=>a[Math.random()*a.length|0],qkey=q=>String(q).replace(/\s+/g," ").trim().toLowerCase();
+const $=i=>document.getElementById(i),esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),pick=a=>a[Math.random()*a.length|0],qkey=q=>String(q).replace(/\s+/g," ").trim().toLowerCase();
 function bankInfo(){const keys=Q.map(q=>qkey(q[0]));const uniq=new Set(keys);const total=Q.length,unique=uniq.size,dup=total-unique,used=S.used.size,sisa=Math.max(0,unique-used);return{total,unique,dup,used,sisa};}
 function logActivity(icon,title,detail){
   S.activity.unshift({icon,title,detail,time:new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit"})});
@@ -240,7 +259,7 @@ function unlockAudio(){
 // Soal yang sudah digunakan tetap terkunci sampai bank habis.
 // ============================================================
 
-const MATERI_ORDER=["Dekomposisi","Algoritma","Pengenalan Pola","Abstraksi"];
+let MATERI_ORDER=[...new Set(["Dekomposisi","Algoritma","Pengenalan Pola","Abstraksi",...Q.map(q=>typeof q[4]==="string"?q[4].trim():"").filter(Boolean)])];
 const MATERI_KEYS={
   "Dekomposisi":["dekomposisi","memecah","memecahkan","membagi","bagian kecil","sub-tugas","subtugas","memisahkan","dipecah"],
   "Algoritma":["algoritma","urutan langkah","langkah terurut","langkah-langkah","prosedur","prosedur langkah","instruksi berurutan"],
@@ -249,7 +268,7 @@ const MATERI_KEYS={
 };
 
 function materiSoal(q){
-  if(q && ["Algoritma","Dekomposisi","Abstraksi","Pengenalan Pola"].includes(q[4])) return q[4];
+  if(q && typeof q[4]==="string" && q[4].trim()) return q[4].trim();
   const text=qkey(q[0]);
   const opts=(q[1]||[]).map(x=>qkey(x));
   const correct=(typeof q[2]==="number"&&opts[q[2]])?opts[q[2]]:"";
@@ -408,7 +427,7 @@ function mkItem(q,m){
   const idx=q[1].map((_,i)=>i);
   for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}
   S.curKey=qkey(q[0]);
-  return{q:q[0],o:idx.map(i=>q[1][i]),a:idx.indexOf(q[2]),id:q[3],materi:m};
+  return{q:q[0],o:idx.map(i=>q[1][i]),a:idx.indexOf(q[2]),id:q[3],materi:m,ex:q[5]||""};
 }
 
 // Satu bank soal GLOBAL untuk semua pemain.
@@ -525,7 +544,7 @@ function question(itIn){const i=S.cur,p=S.pos[i][S.activePawn],lv=p<19?0:p<38?1:
 show(it,60,`${G[i].n} <span class="lv">Soal berikutnya</span>`,(sel,t)=>{const ok=sel===it.a,seconds=Math.max(1,Math.min(60,Math.ceil(Number(t)||0))),st=answerSteps(seconds),earned=ok?answerPoints(seconds):0;S.h[i].push({q:it.q,o:it.o,sel,a:it.a,ok,t,lv:LV[lv],materi:it.materi||"",nomor:it.id});if(ok){S.ok[i]++;S.pts[i]+=earned;S.streak[i]++;S.bestStreak[i]=Math.max(S.bestStreak[i],S.streak[i]);logActivity("✅",`${G[i].n} menjawab benar`,`+${earned} poin · pion maju ${st} langkah`);}else{S.streak[i]=0;logActivity("❌",`${G[i].n} salah menjawab`,`0 poin · pion tetap`);}
 document.querySelectorAll(".opt").forEach((b,k)=>{if(ok&&k===it.a)b.classList.add("ok");else if(!ok&&k===sel)b.classList.add("no");});if(ok){sfxCorrect();$("bx").classList.add("boardPulse");setTimeout(()=>$("bx").classList.remove("boardPulse"),700)}else sfxWrong();
 const fb=feedback(ok?"ok":"no");
-$("go").outerHTML=`<div class="answer-feedback ${ok?"ok":"no"}"><span class="feedback-icon">${ok?"🎉":"💪"}</span><div class="mot-label"> </div><div class="feedback-text">${esc(fb)}</div><div class="feedback-sub">${ok?`✅ JAWABAN BENAR! +${earned} poin · pion maju ${st} langkah.`:`❌ ${sel===null?"WAKTU HABIS":"JAWABAN SALAH"}! 0 poin · pion tetap.`}</div></div><button class="btn nx-btn">${ok?"🚀 LANJUTKAN":"👉 COBA LAGI DI SOAL BERIKUTNYA"}</button>`;
+$("go").outerHTML=`<div class="answer-feedback ${ok?"ok":"no"}"><span class="feedback-icon">${ok?"🎉":"💪"}</span><div class="mot-label"> </div><div class="feedback-text">${esc(fb)}</div><div class="feedback-sub">${ok?`✅ JAWABAN BENAR! +${earned} poin · pion maju ${st} langkah.`:`❌ ${sel===null?"WAKTU HABIS":"JAWABAN SALAH"}! 0 poin · pion tetap.`}</div>${it.ex?`<div class="answer-explain"><b>💡 Pembahasan</b><span>${esc(it.ex)}</span></div>`:""}</div><button class="btn nx-btn">${ok?"🚀 LANJUTKAN":"👉 COBA LAGI DI SOAL BERIKUTNYA"}</button>`;
 draw();
 if(ok){pointFx(i,earned);impactFx(i,earned,"⭐");}else{pointFx(i,0);}
 document.querySelector("#bx .nx-btn").onclick=()=>{modal("");if(ok)move(i,st,after);else after()}},()=>swapSoal(it))}
@@ -911,6 +930,90 @@ function showMateri(){
   </div>`);
 }
 
+function customQuestionStore(){return readCustomQuestions()}
+// Masukkan/refresh soal buatan guru ke bank yang sedang berjalan TANPA reload halaman.
+function syncCustomLive(){
+  const isC=q=>String(q[3]).startsWith("CUSTOM-");
+  for(let i=Q.length-1;i>=0;i--)if(isC(Q[i]))Q.splice(i,1);
+  for(const [k,q] of [...QBYKEY])if(isC(q))QBYKEY.delete(k);
+  Object.keys(materiPool).forEach(m=>{materiPool[m]=materiPool[m].filter(q=>!isC(q))});
+  readCustomQuestions().forEach(c=>{
+    const q=customToQ(c);Q.push(q);const k=qkey(q[0]);if(!QBYKEY.has(k))QBYKEY.set(k,q);
+    const m=materiOf(q);
+    if(!MATERI_ORDER.includes(m))MATERI_ORDER.push(m);
+    if(!materiPool[m])materiPool[m]=[];
+    if(!materiTertunda[m])materiTertunda[m]=[];
+    if(materiUsedCount[m]===undefined){const v=Object.values(materiUsedCount);materiUsedCount[m]=v.length?Math.min(...v):0}
+    materiPool[m].push(q);
+  });
+}
+function optionsDuplicate(opts){const n=opts.map(x=>String(x).replace(/\s+/g," ").trim().toLowerCase());return new Set(n).size<n.length}
+function manageCustomQuestions(){
+  const list=customQuestionStore();
+  modal(`<div class="custom-bank-wrap">
+    <div class="custom-bank-head"><div><h2>📝 Materi &amp; Soal Saya</h2><p>Bank soal tambahan untuk permainan Ludo Edukasi.</p></div><button class="menu-close-x" onclick="openMenu()" aria-label="Kembali">×</button></div>
+    <div class="custom-bank-notice">💾 Soal disimpan di perangkat ini dan langsung masuk ke bank permainan tanpa perlu memuat ulang. Bank soal bawaan tidak diubah.</div>
+    <div class="custom-bank-stats"><b>${list.length}</b><span>soal buatan guru</span><b>${new Set(list.map(q=>q.material)).size}</b><span>materi khusus</span></div>
+    <form class="custom-question-form" onsubmit="saveCustomQuestion(event)">
+      <h3>➕ Tambah soal baru</h3>
+      <label>Nama materi<input name="material" required maxlength="80" placeholder="Contoh: Jaringan Komputer"></label>
+      <label>Judul / topik<input name="title" required maxlength="100" placeholder="Contoh: Dasar jaringan komputer"></label>
+      <label>Pertanyaan<textarea name="question" required maxlength="1200" rows="3" placeholder="Tulis pertanyaan di sini"></textarea></label>
+      <div class="custom-options-grid">
+        <label>Pilihan A<input name="optionA" required maxlength="300" placeholder="Jawaban A"></label>
+        <label>Pilihan B<input name="optionB" required maxlength="300" placeholder="Jawaban B"></label>
+        <label>Pilihan C<input name="optionC" required maxlength="300" placeholder="Jawaban C"></label>
+        <label>Pilihan D<input name="optionD" required maxlength="300" placeholder="Jawaban D"></label>
+      </div>
+      <div class="custom-options-grid">
+        <label>Kunci jawaban<select name="correctAnswer" required><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></label>
+        <label>Tingkat kesulitan<select name="difficulty" required><option>Mudah</option><option>Sedang</option><option>Sulit</option></select></label>
+      </div>
+      <label>Pembahasan (opsional)<textarea name="explanation" maxlength="1200" rows="2" placeholder="Penjelasan jawaban yang benar"></textarea></label>
+      <button class="btn" type="submit">💾 Simpan Soal</button>
+    </form>
+    <h3 class="custom-list-title">📚 Soal buatan guru</h3>
+    ${list.length?`<div class="custom-question-list">${list.map(q=>`<article class="custom-question-card"><div class="custom-question-card-top"><b>${esc(q.title||q.material)}</b><span>${esc(q.difficulty||"Mudah")}</span></div><small>📚 ${esc(q.material)} · Kunci ${esc(q.correctAnswer)}</small><p>${esc(q.question)}</p><div class="custom-question-actions"><button type="button" onclick="editCustomQuestion('${String(q.id).replace(/[^a-zA-Z0-9_-]/g,"")}')">✏️ Edit</button><button type="button" onclick="deleteCustomQuestion('${String(q.id).replace(/[^a-zA-Z0-9_-]/g,"")}')">🗑️ Hapus</button></div></article>`).join("")}</div>`:`<div class="custom-empty">Belum ada soal buatan guru. Isi formulir di atas untuk menambahkan soal pertama.</div>`}
+    <button class="menu-close-bottom" onclick="openMenu()">‹ Kembali ke Menu Guru</button>
+  </div>`);
+}
+function saveCustomQuestion(event){
+  event.preventDefault();const form=event.currentTarget;const d=new FormData(form);
+  const item={id:"q-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,7),material:String(d.get("material")||"").trim(),title:String(d.get("title")||"").trim(),question:String(d.get("question")||"").trim(),options:["A","B","C","D"].map(k=>String(d.get("option"+k)||"").trim()),correctAnswer:String(d.get("correctAnswer")||"A"),difficulty:String(d.get("difficulty")||"Mudah"),explanation:String(d.get("explanation")||"").trim(),createdAt:new Date().toISOString()};
+  if(!item.material||!item.title||!item.question||item.options.some(x=>!x)){alert("Lengkapi materi, judul, pertanyaan, dan keempat pilihan jawaban.");return}
+  if(optionsDuplicate(item.options)){alert("Ada pilihan jawaban yang sama. Setiap pilihan A–D harus berbeda.");return}
+  const list=customQuestionStore();item.material=canonMaterial(item.material,list);const norm=item.question.replace(/\s+/g," ").trim().toLowerCase();
+  if(BUILTIN_Q.some(q=>String(q[0]).replace(/\s+/g," ").trim().toLowerCase()===norm)||list.some(q=>String(q.question).replace(/\s+/g," ").trim().toLowerCase()===norm)){alert("Pertanyaan yang sama sudah ada. Buat pertanyaan yang berbeda agar bank soal tidak berulang.");return}
+  list.push(item);
+  try{localStorage.setItem("ludoEdukasiCustomQuestions",JSON.stringify(list));syncCustomLive();manageCustomQuestions();alert("Soal tersimpan dan langsung masuk ke bank permainan.");}catch(e){alert("Gagal menyimpan soal. Periksa ruang penyimpanan browser.");}
+}
+function editCustomQuestion(id){
+  const q=customQuestionStore().find(x=>x.id===id);if(!q)return;
+  modal(`<div class="custom-bank-wrap"><div class="custom-bank-head"><div><h2>✏️ Edit Soal</h2><p>Perubahan langsung berlaku untuk soal berikutnya.</p></div></div>
+  <form class="custom-question-form" onsubmit="updateCustomQuestion(event,'${id}')">
+  <label>Nama materi<input name="material" required maxlength="80" value="${esc(q.material)}"></label>
+  <label>Judul / topik<input name="title" required maxlength="100" value="${esc(q.title||"")}"></label>
+  <label>Pertanyaan<textarea name="question" required maxlength="1200" rows="3">${esc(q.question)}</textarea></label>
+  <div class="custom-options-grid">${["A","B","C","D"].map((k,i)=>`<label>Pilihan ${k}<input name="option${k}" required maxlength="300" value="${esc(q.options[i])}"></label>`).join("")}</div>
+  <div class="custom-options-grid"><label>Kunci jawaban<select name="correctAnswer">${["A","B","C","D"].map(k=>`<option ${q.correctAnswer===k?"selected":""}>${k}</option>`).join("")}</select></label><label>Tingkat kesulitan<select name="difficulty">${["Mudah","Sedang","Sulit"].map(k=>`<option ${q.difficulty===k?"selected":""}>${k}</option>`).join("")}</select></label></div>
+  <label>Pembahasan<textarea name="explanation" maxlength="1200" rows="2">${esc(q.explanation||"")}</textarea></label>
+  <button class="btn" type="submit">💾 Simpan Perubahan</button><button class="menu-close-bottom" type="button" onclick="manageCustomQuestions()">Batal</button></form></div>`);
+}
+function updateCustomQuestion(event,id){
+  event.preventDefault();const d=new FormData(event.currentTarget);const list=customQuestionStore();const i=list.findIndex(q=>q.id===id);if(i<0)return;
+  const next={...list[i],material:String(d.get("material")||"").trim(),title:String(d.get("title")||"").trim(),question:String(d.get("question")||"").trim(),options:["A","B","C","D"].map(k=>String(d.get("option"+k)||"").trim()),correctAnswer:String(d.get("correctAnswer")||"A"),difficulty:String(d.get("difficulty")||"Mudah"),explanation:String(d.get("explanation")||"").trim(),updatedAt:new Date().toISOString()};
+  if(!next.material||!next.title||!next.question||next.options.some(x=>!x)){alert("Semua kolom wajib harus diisi.");return}
+  if(optionsDuplicate(next.options)){alert("Ada pilihan jawaban yang sama. Setiap pilihan A–D harus berbeda.");return}
+  next.material=canonMaterial(next.material,list.filter((_,j)=>j!==i));
+  const norm=next.question.replace(/\s+/g," ").trim().toLowerCase();
+  if(BUILTIN_Q.some(q=>String(q[0]).replace(/\s+/g," ").trim().toLowerCase()===norm)||list.some((q,j)=>j!==i&&String(q.question).replace(/\s+/g," ").trim().toLowerCase()===norm)){alert("Pertanyaan yang sama sudah ada di bank soal.");return}
+  list[i]=next;try{localStorage.setItem("ludoEdukasiCustomQuestions",JSON.stringify(list));syncCustomLive();manageCustomQuestions();alert("Perubahan tersimpan dan langsung berlaku di permainan.");}catch(e){alert("Gagal menyimpan perubahan.");}
+}
+function deleteCustomQuestion(id){
+  const q=customQuestionStore().find(x=>x.id===id);if(!q)return;if(!confirm(`Hapus soal “${q.title||q.question}”?`))return;
+  const list=customQuestionStore().filter(x=>x.id!==id);try{localStorage.setItem("ludoEdukasiCustomQuestions",JSON.stringify(list));syncCustomLive();manageCustomQuestions();alert("Soal dihapus dari bank permainan.");}catch(e){alert("Gagal menghapus soal.");}
+}
+
 function openMenu(){
   const dash=document.body.classList.contains("dashboard-open");
   const dashLabel=dash?"Sembunyikan Aktivitas Permainan":"Tampilkan Aktivitas Permainan";
@@ -930,6 +1033,15 @@ function openMenu(){
       <button class="menu-item-modern" onclick="showMateri()">
         <span class="menu-item-icon orange">📚</span>
         <span><b>Materi Berpikir Komputasional</b><small>Pelajari 4 pilar utama sebelum atau sesudah bermain.</small></span>
+        <i>›</i>
+      </button>
+    </section>
+
+    <section class="menu-section menu-section-teal">
+      <div class="menu-section-title"><span>📝</span> BANK SOAL</div>
+      <button class="menu-item-modern" onclick="manageCustomQuestions()">
+        <span class="menu-item-icon green">✍️</span>
+        <span><b>Materi &amp; Soal Saya</b><small>Tambah, edit, dan kelola soal buatan guru untuk permainan Ludo.</small></span>
         <i>›</i>
       </button>
     </section>

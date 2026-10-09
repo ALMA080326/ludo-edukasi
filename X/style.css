@@ -1753,3 +1753,33 @@ body:before,body:after{opacity:.32;filter:blur(18px)}
 /* Never allow the hidden activity area to reappear through later legacy rules. */
 .full-dashboard .info-grid{display:none!important}
 .full-dashboard>.section-head{display:none!important}
+
+/* Materi & Soal Saya — integrated into the existing teacher menu. */
+.custom-bank-wrap{display:flex;flex-direction:column;gap:12px;color:#173f72;max-height:78vh;overflow:auto;padding:3px 2px 8px}
+.custom-bank-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.custom-bank-head h2{margin:0;font-size:clamp(20px,4vw,27px);font-weight:950;color:#164777}
+.custom-bank-head p{margin:5px 0 0;color:#71879c;font-size:12px;font-weight:700}
+.custom-bank-notice{background:#eaf6ff;border:1px solid #cde9fa;border-radius:14px;padding:11px 12px;font-size:12px;line-height:1.5;font-weight:750;color:#245a83}
+.custom-bank-stats{display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#f4f9ff;border-radius:14px;padding:10px 12px;font-size:12px;color:#71879c}
+.custom-bank-stats b{font-size:20px;color:#1769a6;margin-left:5px}
+.custom-question-form{display:flex;flex-direction:column;gap:11px;padding:14px;border:1px solid #d7eaf7;border-radius:18px;background:linear-gradient(145deg,#f8fcff,#eef8ff)}
+.custom-question-form h3,.custom-list-title{margin:0;color:#164777;font-size:16px;font-weight:950}
+.custom-question-form label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:850;color:#315a7b}
+.custom-question-form input,.custom-question-form textarea,.custom-question-form select{width:100%;box-sizing:border-box;border:1px solid #cbddea;border-radius:11px;padding:10px 11px;font:inherit;font-size:14px;color:#183d5c;background:#fff;min-width:0}
+.custom-question-form textarea{resize:vertical;min-height:64px}
+.custom-question-form input:focus,.custom-question-form textarea:focus,.custom-question-form select:focus{outline:2px solid #77c4f1;outline-offset:1px}
+.custom-options-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.custom-question-list{display:grid;gap:9px}
+.custom-question-card{border:1px solid #d9e9f5;border-radius:15px;padding:12px;background:#fff;box-shadow:0 4px 12px rgba(30,95,145,.05)}
+.custom-question-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.custom-question-card-top b{font-size:14px;line-height:1.35}
+.custom-question-card-top span{font-size:10px;font-weight:900;background:#eaf5ff;color:#28618a;padding:5px 7px;border-radius:99px;white-space:nowrap}
+.custom-question-card small{display:block;color:#64829b;font-weight:800;margin-top:5px}
+.custom-question-card p{font-size:13px;line-height:1.5;color:#315a7b;overflow-wrap:anywhere}
+.custom-question-actions{display:flex;gap:8px}
+.custom-question-actions button{border:1px solid #cfe4f4;border-radius:10px;background:#f3faff;color:#24577e;font-weight:850;padding:8px 11px}
+.custom-question-actions button:last-child{background:#fff3f1;color:#a54136;border-color:#f2d4d0}
+.custom-empty{padding:18px;border:1px dashed #bad5e8;border-radius:14px;text-align:center;color:#71879c;font-size:13px;line-height:1.5}
+@media(max-width:520px){.custom-options-grid{grid-template-columns:1fr}.custom-question-form{padding:11px}.custom-bank-wrap{max-height:80vh}}
+
+.answer-explain{margin:10px 0 4px;padding:10px 12px;border-radius:14px;background:#eef8ff;border:1px solid #cfe7f7;color:#24465f;font-size:14px;line-height:1.5;text-align:left;display:flex;flex-direction:column;gap:4px}
