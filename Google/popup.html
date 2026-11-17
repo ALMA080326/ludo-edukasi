@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<title>G1 Ultra $0 · Sat ⚡ Set | Injector</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    width: 370px; margin: 0; padding: 20px 18px 14px;
+    font: 13px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: #c9d1d9; background: #0a0e14;
+    background-image: radial-gradient(circle at top right, #00ff6612 0%, transparent 50%), radial-gradient(circle at bottom left, #052b14 0%, #0a0e14 100%);
+  }
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  h1 { font-size: 15px; margin: 0; font-weight: 700; letter-spacing: -.3px; color: #f0f6fc; }
+
+  /* Animated Hacker/Cyber Green Glow Badge */
+  .badge {
+    font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
+    background: #00ff6615; color: #00ff66; text-transform: uppercase;
+    border: 1px solid #00ff6640; box-shadow: 0 0 10px #00ff6620;
+    animation: pulseGlow 2.5s infinite ease-in-out;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 6px #00ff6620; border-color: #00ff6640; }
+    50% { box-shadow: 0 0 14px #00ff6650; border-color: #00ff6690; }
+  }
+
+  .sub { font-size: 11px; color: #8b949e; margin-bottom: 16px; line-height: 1.4; }
+  .box {
+    border: 1px solid #21262d; border-radius: 12px; padding: 12px; margin-bottom: 12px;
+    background: #11161d; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+  .lbl { font-size: 11px; font-weight: 600; color: #8b949e; margin: 0 2px 10px; letter-spacing: .3px; }
+
+  /* chip grid (replaces radio rows) */
+  .grid { display: grid; gap: 6px; }
+  .grid.sku { grid-template-columns: 1fr 1fr; }
+  .grid.period { grid-template-columns: repeat(4, 1fr); }
+  .grid + .lbl { margin-top: 12px; }
+
+  .chip {
+    appearance: none; cursor: pointer; font-family: inherit;
+    font-size: 12px; font-weight: 700; text-align: center;
+    padding: 9px 4px; border-radius: 8px;
+    color: #c9d1d9; background: #161b22;
+    border: 1px solid #30363d;
+    transition: background .15s, border-color .15s, color .15s, box-shadow .15s;
+  }
+  .chip:hover { background: #1c232c; border-color: #00ff6650; color: #e6edf3; }
+  .chip.is-on {
+    background: #00ff6612; border-color: #00ff6666; color: #00ff66;
+    box-shadow: 0 0 10px #00ff6625, inset 0 0 0 1px #00ff6620;
+  }
+  .chip:focus-visible { outline: 2px solid #00ff66; outline-offset: 2px; }
+
+  #state { font-size: 11.5px; padding: 10px 12px; border-radius: 8px; background: #161b22; border: 1px solid #30363d; font-weight: 500; color: #8b949e; }
+  #state.ok { background: #033a16; border-color: #1f6feb40; color: #3fb950; }
+  #state.warn { background: #382300; border-color: #9e6a0350; color: #f0883e; }
+  #state.err { background: #3d1116; border-color: #f8514950; color: #f85149; }
+
+  ol { margin: 14px 0 0; padding-left: 20px; font-size: 11.5px; color: #8b949e; }
+  ol li { margin: 6px 0; padding-left: 2px; }
+  ol li::marker { color: #00ff6680; font-weight: 600; }
+  ol b { font-weight: 600; color: #e6edf3; }
+
+  .foot {
+    margin-top: 14px; padding-top: 10px; border-top: 1px solid #21262d;
+    font-size: 11px; color: #6e7681; display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  }
+  .foot-links { display: flex; gap: 10px; }
+  .foot a { color: #00ff66; text-decoration: none; font-weight: 500; border-radius: 3px; transition: opacity .15s; }
+  .foot a:hover { opacity: 0.8; text-decoration: underline; }
+  .foot a:focus-visible { outline: 2px solid #00ff66; outline-offset: 3px; }
+  #us-addr { font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; padding: 4px 9px; border-radius: 6px;
+    color: #c9d1d9; background: #161b22; border: 1px solid #30363d; transition: .15s; }
+  #us-addr:hover { border-color: #00ff6650; color: #00ff66; }
+
+  @media (prefers-reduced-motion: reduce) { .chip { transition: none; } .badge { animation: none; } }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>G1 Ultra $0 · Sat ⚡ Set</h1>
+    <span class="badge">🔥 Sat ⚡ Set 🔥</span>
+  </div>
+  <div class="sub">Login ke akun target (region US) di browser sebelum memilih paket.</div>
+
+  <div class="box">
+    <div class="lbl">Pilih Kapasitas</div>
+    <div id="sku-row" class="grid sku">
+      <button type="button" class="chip" data-sku="20tb">Ultra 20TB</button>
+      <button type="button" class="chip" data-sku="30tb">Ultra 30TB</button>
+    </div>
+
+    <div class="lbl">Pilih Periode</div>
+    <div id="period-row" class="grid period">
+      <button type="button" class="chip" data-months="12">12 bln</button>
+      <button type="button" class="chip" data-months="6">6 bln</button>
+      <button type="button" class="chip" data-months="3">3 bln</button>
+      <button type="button" class="chip" data-months="1">1 bln</button>
+    </div>
+  </div>
+
+  <div id="state" class="warn" role="status" aria-live="polite">Pilih paket dulu, lalu buka pembayaran sendiri</div>
+
+  <ol>
+    <li>Buka <b>one.google.com/plans</b> dan pastikan akun target sudah benar.</li>
+    <li>Pilih kapasitas + periode di atas → refresh halaman → pastikan panel terpasang di kanan bawah.</li>
+    <li>Klik <b>Get discount</b> pada kartu AI Pro untuk checkout Google Play.</li>
+    <li>Periksa banner atas modal: <b>Hijau = gratis, silakan klaim</b>, Merah = jangan lanjut.</li>
+    <li>Tambah metode bayar (ZIP bebas pajak US 97201) → pastikan total $0.00 → Subscribe.</li>
+    <li>Untuk stack paket berikutnya: kembali ke sini, ganti paket, refresh, ulangi checkout.</li>
+    <li>Setelah selesai, buka <b>play.google.com</b> untuk membatalkan perpanjangan otomatis.</li>
+  </ol>
+
+  <div class="foot">
+    <span>Saluran Sat ⚡ Set · <a href="https://t.me/sipalingsatset" target="_blank" rel="noopener noreferrer">Telegram</a></span>
+    <div class="foot-links">
+      <button id="us-addr" type="button">🇺🇸 OR 97201</button>
+    </div>
+  </div>
+
+  <script src="presets.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
